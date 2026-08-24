@@ -4,7 +4,7 @@ import { Equal } from 'typeorm'
 import { Setting } from '../../storage/entities/Settings'
 import { type MigrationContext, hasMigration, markMigration } from './context'
 
-export const MIGRATION_FROM_151 = 'akari-migration-from-1.5.1_champion-data'
+export const MIGRATION_FROM_151 = 'akari-migration-from-1.5.1_champion-data-window'
 export const LEGACY_OPGG_PREFERENCES_KEY = 'opgg-renderer/savedPreferences'
 export const CHAMPION_DATA_PREFERENCES_KEY = 'champion-data-main/preferences'
 export const LEGACY_AUX_SHOW_SKIN_SELECTOR_KEY = 'window-manager-main/aux-window/showSkinSelector'
