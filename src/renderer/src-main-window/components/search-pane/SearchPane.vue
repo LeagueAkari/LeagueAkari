@@ -1,53 +1,60 @@
 <template>
   <NModal v-model:show="show" transform-origin="center" @after-enter="handleAfterEnter">
     <div
-      class="search-pane flex h-160 max-h-[90vh] w-200 max-w-[90vw] flex-col overflow-hidden rounded-lg border border-solid border-white/10 bg-neutral-100 dark:bg-neutral-900"
+      class="h-160 max-h-[90vh] w-200 max-w-[90vw]"
       role="dialog"
       aria-modal="true"
       :aria-label="t('titlebar.search.open')"
     >
-      <NTabs
-        class="search-pane__tabs"
-        :value="page"
-        type="line"
-        size="small"
-        :animated="false"
-        :tabs-padding="16"
-        :tab-style="searchTabStyle"
-        :pane-style="searchPaneStyle"
-        :theme-overrides="searchTabsThemeOverrides"
-        @update:value="handlePageUpdate"
+      <div
+        class="search-pane flex h-full flex-col overflow-hidden rounded-lg border border-solid border-white/10 bg-neutral-100 dark:bg-neutral-900"
       >
-        <NTabPane v-if="leagueClient.isConnected" name="summoner" display-directive="show">
-          <template #tab>
-            <span class="inline-flex items-center gap-1.5">
-              <NIcon size="16" aria-hidden="true">
-                <PeopleSearch24RegularIcon />
-              </NIcon>
-              <span>{{ t('titlebar.search.summoner') }}</span>
-            </span>
-          </template>
+        <NTabs
+          class="search-pane__tabs"
+          :value="page"
+          type="line"
+          size="small"
+          :animated="false"
+          :tabs-padding="16"
+          :tab-style="searchTabStyle"
+          :pane-style="searchPaneStyle"
+          :theme-overrides="searchTabsThemeOverrides"
+          @update:value="handlePageUpdate"
+        >
+          <NTabPane v-if="leagueClient.isConnected" name="summoner" display-directive="show">
+            <template #tab>
+              <span class="inline-flex items-center gap-1.5">
+                <NIcon size="16" aria-hidden="true">
+                  <PeopleSearch24RegularIcon />
+                </NIcon>
+                <span>{{ t('titlebar.search.summoner') }}</span>
+              </span>
+            </template>
 
-          <SummonerSearch ref="summoner-search" @navigate-to-summoner="handleNavigateToSummoner" />
-        </NTabPane>
+            <SummonerSearch
+              ref="summoner-search"
+              @navigate-to-summoner="handleNavigateToSummoner"
+            />
+          </NTabPane>
 
-        <NTabPane name="settings" display-directive="show">
-          <template #tab>
-            <span class="inline-flex items-center gap-1.5">
-              <NIcon size="16" aria-hidden="true">
-                <SearchSettings20RegularIcon />
-              </NIcon>
-              <span>{{ t('titlebar.search.settings') }}</span>
-            </span>
-          </template>
+          <NTabPane name="settings" display-directive="show">
+            <template #tab>
+              <span class="inline-flex items-center gap-1.5">
+                <NIcon size="16" aria-hidden="true">
+                  <SearchSettings20RegularIcon />
+                </NIcon>
+                <span>{{ t('titlebar.search.settings') }}</span>
+              </span>
+            </template>
 
-          <SettingsSearch
-            ref="settings-search"
-            @navigate="emit('navigateToSetting', $event)"
-            @close="show = false"
-          />
-        </NTabPane>
-      </NTabs>
+            <SettingsSearch
+              ref="settings-search"
+              @navigate="emit('navigateToSetting', $event)"
+              @close="show = false"
+            />
+          </NTabPane>
+        </NTabs>
+      </div>
     </div>
   </NModal>
 </template>
