@@ -615,6 +615,18 @@ export abstract class BaseAkariWindow<
 
   showOrRestore(inactive = false) {
     if (this._window) {
+      if (this._window.isMinimized()) {
+        this._window.restore()
+
+        if (!inactive) {
+          this._window.focus()
+        }
+
+        this._syncShowStateFromWindow()
+
+        return
+      }
+
       if (!this._window.isVisible()) {
         if (inactive) {
           this._window.showInactive()
@@ -626,11 +638,6 @@ export abstract class BaseAkariWindow<
 
         return
       }
-
-      if (this._window.isMinimized()) {
-        this._window.restore()
-      }
-
       if (!inactive) {
         this._window.focus()
       }
@@ -640,7 +647,23 @@ export abstract class BaseAkariWindow<
   }
 
   show(inactive = false) {
-    if (this._window && !this._window.isVisible()) {
+    if (!this._window) {
+      return
+    }
+
+    if (this._window.isMinimized()) {
+      this._window.restore()
+
+      if (!inactive) {
+        this._window.focus()
+      }
+
+      this._syncShowStateFromWindow()
+
+      return
+    }
+
+    if (!this._window.isVisible()) {
       if (inactive) {
         this._window.showInactive()
       } else {
@@ -652,7 +675,7 @@ export abstract class BaseAkariWindow<
   }
 
   hide() {
-    if (this._window && this._window.isVisible()) {
+    if (this._window && (this._window.isVisible() || this._window.isMinimized())) {
       this._window.hide()
       this._syncShowStateFromWindow()
     }
