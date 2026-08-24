@@ -35,8 +35,7 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
       repositionWindowIfInvisible: true,
       settingSchema: {
         enabled: { default: settings.enabled, schema: z.boolean() },
-        autoShow: { default: settings.autoShow, schema: z.boolean() },
-        showSkinSelector: { default: settings.showSkinSelector, schema: z.boolean() }
+        autoShow: { default: settings.autoShow, schema: z.boolean() }
       },
       browserWindowOptions: {
         title: AkariAuxWindow.TITLE,
@@ -180,6 +179,6 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
   }
 
   protected override getSettingPropKeys() {
-    return ['enabled', 'autoShow', 'showSkinSelector'] as const
+    return ['enabled', 'autoShow'] as const
   }
 }

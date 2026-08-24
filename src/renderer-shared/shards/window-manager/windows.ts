@@ -70,10 +70,6 @@ export class AkariAuxWindow extends BaseAkariWindowRenderer<
     return this._context.setting.set(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'enabled', value)
   }
 
-  setShowSkinSelector(value: boolean) {
-    return this._context.setting.set(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'showSkinSelector', value)
-  }
-
   repositionToAlignLeagueClientUx() {
     return this._context.ipc.call(
       MAIN_SHARD_NAMESPACE_AUX_WINDOW,

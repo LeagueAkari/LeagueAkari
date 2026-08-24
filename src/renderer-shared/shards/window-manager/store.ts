@@ -55,8 +55,7 @@ export const useAuxWindowStore = defineStore('shard:window-manager-renderer/aux-
     enabled: true,
     autoShow: true,
     opacity: 0.9,
-    pinned: true,
-    showSkinSelector: false
+    pinned: true
   })
 
   const basicWindowState = useBasicWindowStates()
