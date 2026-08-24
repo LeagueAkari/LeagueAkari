@@ -10,6 +10,7 @@ import type {
   ChampionDataFallbackReason,
   ChampionDataLoadResult,
   ChampionDataMode,
+  ChampionDataOverview,
   ChampionDataPosition,
   ChampionDataQuery,
   ChampionDataSourceId
@@ -125,6 +126,7 @@ export type OpggContext = {
 
   versions: Ref<string[]>
   champions: Ref<OpggChampionsResponse | null>
+  overview: Ref<ChampionDataOverview | null>
   champion: Ref<OpggChampionBuildResponse | null>
 
   kiwiAugments: Ref<OpggAramMayhemChampionAugmentsResponse | null>
@@ -249,6 +251,7 @@ export function provideOpgg() {
   const championId = ref<number | null>(null)
   const versions = shallowRef<string[]>([])
   const champions = shallowRef<OpggChampionsResponse | null>(null)
+  const overview = shallowRef<ChampionDataOverview | null>(null)
   const champion = shallowRef<OpggChampionBuildResponse | null>(null)
 
   const kiwiAugments = shallowRef<OpggAramMayhemChampionAugmentsResponse | null>(null)
@@ -271,6 +274,7 @@ export function provideOpgg() {
     if (result.status === 'unavailable') {
       isDataUnavailable.value = true
       champions.value = null
+      overview.value = null
       champion.value = null
       kiwiAugments.value = null
       throw new ChampionDataUnavailableError(
@@ -366,6 +370,7 @@ export function provideOpgg() {
         fallbackReason.value = 'mode-unsupported'
         isDataUnavailable.value = true
         champions.value = null
+        overview.value = null
         champion.value = null
         kiwiAugments.value = null
         return false
@@ -412,6 +417,7 @@ export function provideOpgg() {
       }
 
       let updatedChampionsData: OpggChampionsResponse | null = null
+      let updatedOverviewData: ChampionDataOverview | null = null
 
       if (
         opts.force ||
@@ -429,7 +435,8 @@ export function provideOpgg() {
           { tags: ['opgg-group'] }
         )
 
-        updatedChampionsData = toOpggChampionOverviewViewModel(unwrapResult(result, generation))
+        updatedOverviewData = unwrapResult(result, generation)
+        updatedChampionsData = toOpggChampionOverviewViewModel(updatedOverviewData)
       }
 
       let updatedChampionData: OpggChampionBuildResponse | null = null
@@ -462,6 +469,7 @@ export function provideOpgg() {
 
       if (updatedChampionsData) {
         champions.value = updatedChampionsData
+        overview.value = updatedOverviewData
       }
 
       if (updatedChampionData) {
@@ -787,6 +795,7 @@ export function provideOpgg() {
 
     versions,
     champions,
+    overview,
     champion,
 
     kiwiAugments,

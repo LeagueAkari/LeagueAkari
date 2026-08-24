@@ -305,10 +305,10 @@ export interface OpggArenaSynergy {
   champion_id: number
   op_rank: number
   play: number
-  win: number
-  total_place: number
-  first_place: number
-  pick_rate: number
+  win?: number
+  total_place?: number
+  first_place?: number
+  pick_rate?: number
 }
 
 export interface OpggArenaAugment {

@@ -71,6 +71,17 @@ opgg:
       challenger: 王者
     settings:
       button: 设置
+  mayhemOverview:
+    dataDate: 数据日期 {{date}}
+    sections:
+      champions: 英雄排行
+      augments: 强化符文
+      synergies: 英雄组合
+    columns:
+      augment: 强化符文
+      rarity: 品质
+      bestChampions: 适配英雄
+      combination: 英雄组合
   championTable:
     searchPlaceholder: 查找英雄
     columns:

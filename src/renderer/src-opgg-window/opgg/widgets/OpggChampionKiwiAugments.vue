@@ -53,7 +53,7 @@
 
             <div class="flex min-w-0 items-center gap-1">
               <AugmentDisplay :size="24" :augment-id="a.id" class="mr-1" />
-              <span class="name truncate text-xs">{{ lcs.gameData.augmentName(a.id) }}</span>
+              <span class="name truncate text-xs">{{ resources.augments.name(a.id) }}</span>
             </div>
 
             <div
@@ -80,7 +80,7 @@
 
 <script setup lang="tsx">
 import AugmentDisplay from '@renderer-shared/components/widgets/AugmentDisplay.vue'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { OpggAramMayhemChampionAugmentItem } from '@shared/types/opgg'
 import { ArrowSort16Filled } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
@@ -91,7 +91,7 @@ import { useOpgg } from '../context'
 
 const { champion, kiwiAugments } = useOpgg()
 const { t } = useTranslation()
-const lcs = useLeagueClientStore()
+const resources = useAkariResourceProvider()
 
 const augmentTab = ref<AugmentTab | undefined>(undefined)
 const augmentSort = ref<AugmentSort>('default')
@@ -178,7 +178,7 @@ const augments = computed(() => {
   const mappedByRarity = kiwiAugments.value.data.map((item) => {
     return {
       ...item,
-      rarity: lcs.gameData.augments[item.id]?.rarity ?? null
+      rarity: resources.augments.display(item.id)?.rarity ?? null
     }
   })
 

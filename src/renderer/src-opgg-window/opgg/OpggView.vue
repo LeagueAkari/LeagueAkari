@@ -9,7 +9,11 @@
     />
     <template v-else>
       <KeepAlive>
-        <OpggChampionTable class="min-h-0 flex-1" v-if="currentTab === 'champions'" />
+        <MayhemOverview
+          v-if="currentTab === 'champions' && mode === 'aram_mayhem'"
+          class="min-h-0 flex-1"
+        />
+        <OpggChampionTable v-else-if="currentTab === 'champions'" class="min-h-0 flex-1" />
         <OpggChampion class="min-h-0 flex-1" v-else-if="currentTab === 'champion'" />
       </KeepAlive>
     </template>
@@ -22,6 +26,7 @@
 import { useTranslation } from 'i18next-vue'
 import { NEmpty } from 'naive-ui'
 
+import MayhemOverview from './MayhemOverview.vue'
 import OpggChampion from './OpggChampion.vue'
 import OpggChampionTable from './OpggChampionTable.vue'
 import OpggTabAndFilters from './OpggTabAndFilters.vue'
@@ -29,5 +34,5 @@ import { useOpgg } from './context'
 import SessionChampions from './widgets/SessionChampions.vue'
 
 const { t } = useTranslation()
-const { currentTab, isDataUnavailable } = useOpgg()
+const { currentTab, mode, isDataUnavailable } = useOpgg()
 </script>

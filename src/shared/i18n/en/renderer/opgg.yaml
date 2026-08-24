@@ -71,6 +71,17 @@ opgg:
       challenger: Challenger
     settings:
       button: Settings
+  mayhemOverview:
+    dataDate: Data date {{date}}
+    sections:
+      champions: Champions
+      augments: Augments
+      synergies: Combinations
+    columns:
+      augment: Augment
+      rarity: Rarity
+      bestChampions: Best Champions
+      combination: Combination
   championTable:
     searchPlaceholder: Search for name
     columns:

@@ -22,7 +22,7 @@
           <div class="min-w-6 text-[10px] text-[#666666] dark:text-[#b2b2b2]">#{{ i + 1 }}</div>
           <div class="flex items-center gap-1">
             <AugmentDisplay :size="24" :augment-id="a.id" class="mr-1" />
-            <span class="name text-xs">{{ lcs.gameData.augmentName(a.id) }}</span>
+            <span class="name text-xs">{{ resources.augments.name(a.id) }}</span>
           </div>
           <div class="desc ml-auto flex items-center">
             <div class="pick flex min-w-19 flex-col items-center">
@@ -64,7 +64,7 @@
           <div class="min-w-6 text-[10px] text-[#666666] dark:text-[#b2b2b2]">#{{ i + 1 }}</div>
           <div class="flex items-center gap-1">
             <AugmentDisplay :size="24" :augment-id="a.id" class="mr-1" />
-            <span class="name text-xs">{{ lcs.gameData.augmentName(a.id) }}</span>
+            <span class="name text-xs">{{ resources.augments.name(a.id) }}</span>
           </div>
           <div class="desc ml-auto flex items-center">
             <div class="pick flex min-w-19 flex-col items-center">
@@ -107,7 +107,7 @@
           <div class="min-w-6 text-[10px] text-[#666666] dark:text-[#b2b2b2]">#{{ i + 1 }}</div>
           <div class="flex items-center gap-1">
             <AugmentDisplay :size="24" :augment-id="a.id" class="mr-1" />
-            <span class="name text-xs">{{ lcs.gameData.augmentName(a.id) }}</span>
+            <span class="name text-xs">{{ resources.augments.name(a.id) }}</span>
           </div>
           <div class="desc ml-auto flex items-center">
             <div class="pick flex min-w-19 flex-col items-center">
@@ -142,7 +142,7 @@
 
 <script setup lang="ts">
 import AugmentDisplay from '@renderer-shared/components/widgets/AugmentDisplay.vue'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { OpggArenaAugmentGroup } from '@shared/types/opgg'
 import { useTranslation } from 'i18next-vue'
 import { NCheckbox, NTabPane, NTabs } from 'naive-ui'
@@ -152,7 +152,7 @@ import { useOpgg } from '../context'
 
 const { champion } = useOpgg()
 const { t } = useTranslation()
-const lcs = useLeagueClientStore()
+const resources = useAkariResourceProvider()
 
 const augmentTab = ref<string | undefined>('silver')
 // OP.GG 使用 rarity 来表示三种不同的 augment 等级

@@ -15,24 +15,33 @@
     >
       <div class="mr-1 min-w-4 text-[10px] text-[#666666] dark:text-[#b2b2b2]">#{{ i + 1 }}</div>
       <div
-        class="flex cursor-pointer items-center gap-1 text-xs transition-[filter] duration-200 hover:brightness-[1.2]"
+        class="flex cursor-pointer items-center gap-1 text-xs transition-[filter] duration-200 hover:brightness-120"
         @click="setTab('champion', s.champion_id)"
       >
-        <LcuImage class="image h-6 w-6" :src="championIconUri(s.champion_id)" />
-        <span>{{ lcs.gameData.championName(s.champion_id) }}</span>
+        <LcuImage
+          class="image size-6"
+          :src="resources.champions.icon(s.champion_id)?.iconPath ?? ''"
+        />
+        <span>{{ resources.champions.name(s.champion_id) }}</span>
       </div>
       <div class="desc ml-auto flex items-center">
-        <div class="value-text flex min-w-19 flex-col items-center">
+        <div
+          v-if="s.play > 0 && typeof s.total_place === 'number'"
+          class="value-text flex min-w-19 flex-col items-center"
+        >
           <span class="value text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]">{{
-            (s.total_place / (s.play || 1)).toFixed(2)
+            (s.total_place / s.play).toFixed(2)
           }}</span>
           <span class="text text-xs text-[#666666] dark:text-[#bebebe]"
             >{{ t('opgg.champion.avgPlace') }}
           </span>
         </div>
-        <div class="value-text flex min-w-19 flex-col items-center">
+        <div
+          v-if="s.play > 0 && typeof s.first_place === 'number'"
+          class="value-text flex min-w-19 flex-col items-center"
+        >
           <span class="value text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]"
-            >{{ ((s.first_place / (s.play || 1)) * 100).toFixed(2) }}%</span
+            >{{ ((s.first_place / s.play) * 100).toFixed(2) }}%</span
           >
           <span class="text text-xs text-[#666666] dark:text-[#bebebe]">{{
             t('opgg.champion.1st')
@@ -42,16 +51,17 @@
           <span
             class="value text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]"
             :title="t('opgg.champion.pickRate')"
-            >{{ (s.pick_rate * 100).toFixed(2) }}%</span
+            >{{
+              typeof s.pick_rate === 'number' ? `${(s.pick_rate * 100).toFixed(2)}%` : '-'
+            }}</span
           >
           <span
             class="text text-xs text-[#666666] dark:text-[#bebebe]"
             :title="t('opgg.champion.plays')"
-          >
-            {{
-              t('opgg.champion.times', {
-                times: s.play.toLocaleString()
-              })
+            >{{
+              s.play > 0
+                ? t('opgg.champion.times', { times: s.play.toLocaleString() })
+                : t('opgg.champion.pickRate')
             }}</span
           >
         </div>
@@ -59,7 +69,9 @@
           <span
             class="value text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]"
             :title="t('opgg.champion.winRate')"
-            >{{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%</span
+            >{{
+              typeof s.win === 'number' ? `${((s.win / (s.play || 1)) * 100).toFixed(2)}%` : '-'
+            }}</span
           >
           <span
             class="text text-xs text-[#666666] dark:text-[#bebebe]"
@@ -74,8 +86,7 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { championIconUri } from '@renderer-shared/shards/league-client/game-data-assets'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { useTranslation } from 'i18next-vue'
 import { NCheckbox } from 'naive-ui'
 import { ref, watchEffect } from 'vue'
@@ -84,7 +95,7 @@ import { useOpgg } from '../context'
 
 const { champion, setTab } = useOpgg()
 const { t } = useTranslation()
-const lcs = useLeagueClientStore()
+const resources = useAkariResourceProvider()
 
 const isSynergiesExpanded = ref(false)
 

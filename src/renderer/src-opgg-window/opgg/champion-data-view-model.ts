@@ -35,13 +35,17 @@ function tierNumber(value: string | number | null) {
   return Number.isFinite(parsed) ? parsed : undefined
 }
 
-function inferredWins(performance: ChampionRecommendationPerformance) {
+function inferredWinsIfAvailable(performance: ChampionRecommendationPerformance) {
   if (performance.wins !== null) return performance.wins
   if (performance.games !== null && performance.winRate !== null) {
     return performance.games * performance.winRate
   }
   if (performance.winRate !== null) return performance.winRate
-  return 0
+  return undefined
+}
+
+function inferredWins(performance: ChampionRecommendationPerformance) {
+  return inferredWinsIfAvailable(performance) ?? 0
 }
 
 function averageStats(performance: ChampionPerformance): OpggChampionAverageStats {
@@ -249,25 +253,24 @@ export function toOpggChampionDetailsViewModel(
       counters: matchupCounters,
       synergies: details.sections.synergies?.flatMap((item) => {
         const championId = item.championIds.find((id) => id !== details.championId)
-        return championId === undefined
-          ? []
-          : [
-              {
-                champion_id: championId,
-                op_rank: item.performance.rank ?? 0,
-                play: item.performance.games ?? 0,
-                win: inferredWins(item.performance),
-                total_place:
-                  item.performance.averagePlacement === null || item.performance.games === null
-                    ? 0
-                    : item.performance.averagePlacement * item.performance.games,
-                first_place:
-                  item.performance.firstPlaceRate === null || item.performance.games === null
-                    ? 0
-                    : item.performance.firstPlaceRate * item.performance.games,
-                pick_rate: item.performance.pickRate ?? 0
-              }
-            ]
+        if (championId === undefined) return []
+
+        const inferredWin = inferredWinsIfAvailable(item.performance)
+        return [
+          {
+            champion_id: championId,
+            op_rank: item.performance.rank ?? 0,
+            play: item.performance.games ?? 0,
+            ...(inferredWin === undefined ? {} : { win: inferredWin }),
+            ...(item.performance.averagePlacement === null || item.performance.games === null
+              ? {}
+              : { total_place: item.performance.averagePlacement * item.performance.games }),
+            ...(item.performance.firstPlaceRate === null || item.performance.games === null
+              ? {}
+              : { first_place: item.performance.firstPlaceRate * item.performance.games }),
+            ...(item.performance.pickRate === null ? {} : { pick_rate: item.performance.pickRate })
+          }
+        ]
       }),
       augment_group:
         details.metadata.mode === 'arena'

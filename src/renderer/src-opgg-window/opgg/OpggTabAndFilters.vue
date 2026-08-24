@@ -52,7 +52,7 @@
         <NTab :title="t('opgg.filters.champion')" name="champion" :disabled="!championId">
           <div v-if="championId" class="flex items-center gap-2">
             <ChampionIcon round class="size-5" :champion-id="championId" />
-            <span>{{ lcs.gameData.championName(championId) }}</span>
+            <span>{{ resources.champions.name(championId) }}</span>
           </div>
           <div v-else>{{ t('opgg.filters.empty') }}</div>
         </NTab>
@@ -139,8 +139,8 @@ import {
   useTierOptions
 } from '@opgg-window/opgg/utils/options'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { useChampionDataStore } from '@renderer-shared/shards/champion-data/store'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import {
   type ChampionDataFilter,
   type ChampionDataMode,
@@ -155,7 +155,7 @@ import { useOpgg } from './context'
 import SettingsPane from './widgets/Settings.vue'
 
 const { t } = useTranslation()
-const lcs = useLeagueClientStore()
+const resources = useAkariResourceProvider()
 const championDataStore = useChampionDataStore()
 
 const {

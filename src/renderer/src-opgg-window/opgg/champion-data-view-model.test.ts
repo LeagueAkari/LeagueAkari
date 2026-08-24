@@ -153,6 +153,41 @@ describe('champion data legacy view model', () => {
     })
   })
 
+  it('does not invent zero placement or game data for Mayhem synergies', () => {
+    const withoutCounts = {
+      ...recommendation,
+      games: null,
+      wins: null,
+      winRate: 0.58,
+      averagePlacement: null,
+      firstPlaceRate: null
+    }
+    const details: ChampionDataDetails = {
+      metadata: {
+        source: 'qq101',
+        mode: 'aram_mayhem',
+        patch: null,
+        dataDate: '20260820',
+        updatedAt: null
+      },
+      championId: 101,
+      summary: {
+        championId: 101,
+        position: 'none',
+        performance,
+        counterChampionIds: []
+      },
+      sections: {
+        synergies: [{ championIds: [101, 99], performance: withoutCounts }]
+      }
+    }
+
+    const synergy = toOpggChampionDetailsViewModel(details).data.synergies?.[0]
+    expect(synergy).toMatchObject({ champion_id: 99, play: 0, win: 0.58, pick_rate: 0.2 })
+    expect(synergy).not.toHaveProperty('total_place')
+    expect(synergy).not.toHaveProperty('first_place')
+  })
+
   it('does not turn unavailable overview rates into zeroes', () => {
     const overview: ChampionDataOverview = {
       metadata: {
