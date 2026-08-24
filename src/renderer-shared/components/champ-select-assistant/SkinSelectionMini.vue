@@ -54,7 +54,7 @@ const renderLabel: SelectRenderLabel = (option) => {
         {...({
           src: option.isChild ? (option.chromaPreviewUrl as string) : (option.previewUrl as string),
           cache: false,
-          class: 'h-5 w-9 rounded-[2px] object-contain'
+          class: 'h-5 w-9 rounded-xs object-contain'
         } as any)}
       />
       <div

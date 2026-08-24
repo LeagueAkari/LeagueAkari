@@ -21,7 +21,7 @@
               :champion-id="lcs.champSelect.currentChampion || -1"
             />
           </template>
-          <div class="rounded-sm bg-neutral-100 px-2 py-1 dark:bg-neutral-900">
+          <div class="rounded-xs bg-neutral-100 px-2 py-1 dark:bg-neutral-900">
             <div
               class="flex text-[11px] text-neutral-900/60 dark:text-neutral-100/60"
               v-for="b of championAdjustment(lcs.champSelect.currentChampion || -1)
@@ -92,7 +92,7 @@
         >
           <template #trigger>
             <ChampionIcon
-              class="size-8 cursor-pointer rounded-sm border border-black/10 dark:border-white/10"
+              class="size-8 cursor-pointer rounded-xs border border-black/10 dark:border-white/10"
               :class="[
                 getChampionImageClass(championAdjustment(c.championId)?.overallEffect || 'neutral'),
                 {
@@ -105,7 +105,7 @@
               @click.right="handleBenchSwapOrPick(c.championId, false)"
             />
           </template>
-          <div class="rounded-sm bg-neutral-100 px-2 py-1 dark:bg-neutral-900">
+          <div class="rounded-xs bg-neutral-100 px-2 py-1 dark:bg-neutral-900">
             <div
               class="flex text-[11px] text-neutral-900/60 dark:text-neutral-100/60"
               v-for="b of championAdjustment(c.championId)?.sortedAdjustments"
@@ -123,7 +123,7 @@
         </NTooltip>
         <div
           v-for="_i of Math.max(10 - combinedChampions.length, 0)"
-          class="size-8 rounded-sm border border-black/10 dark:border-white/10"
+          class="size-8 rounded-xs border border-black/10 dark:border-white/10"
         />
       </div>
     </div>

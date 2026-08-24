@@ -82,6 +82,13 @@ opgg:
       rarity: Rarity
       bestChampions: Best Champions
       combination: Combination
+  workspace:
+    data: Champion Data
+    champSelect: Champion Select
+  champSelectAssistant:
+    status: Champion select assistant
+    active: Active
+    waitingForChampion: Waiting for champion
   championTable:
     searchPlaceholder: Search for name
     columns:
