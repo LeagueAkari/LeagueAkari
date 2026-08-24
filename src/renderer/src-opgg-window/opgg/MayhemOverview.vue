@@ -119,6 +119,10 @@ const championName = (championId: number) =>
 const championIconSource = (championId: number) =>
   resources.champions.icon(championId)?.iconPath ?? ''
 
+const championIdsWithDetails = computed(
+  () => new Set(overview.value?.sections.champions.map((item) => item.championId) ?? [])
+)
+
 const rarityTranslationKey = {
   kBronze: 'bronze',
   kSilver: 'silver',
@@ -129,16 +133,22 @@ const rarityTranslationKey = {
 
 const renderChampionIcons = (championIds: number[], showNames: boolean) => (
   <div class="flex min-w-0 items-center gap-1.5">
-    {championIds.map((championId) => (
-      <div
-        class="flex min-w-0 cursor-pointer items-center gap-1 rounded px-1 py-0.5 hover:bg-black/6 dark:hover:bg-white/8"
-        title={championName(championId)}
-        onClick={() => setTab('champion', championId)}
-      >
-        <LcuImage class="size-6 shrink-0" src={championIconSource(championId)} />
-        {showNames ? <span class="truncate text-xs">{championName(championId)}</span> : null}
-      </div>
-    ))}
+    {championIds.map((championId) => {
+      const hasDetails = championIdsWithDetails.value.has(championId)
+      return (
+        <div
+          class={[
+            'flex min-w-0 items-center gap-1 rounded px-1 py-0.5',
+            hasDetails ? 'cursor-pointer hover:bg-black/6 dark:hover:bg-white/8' : 'cursor-default'
+          ]}
+          title={championName(championId)}
+          onClick={hasDetails ? () => setTab('champion', championId) : undefined}
+        >
+          <LcuImage class="size-6 shrink-0" src={championIconSource(championId)} />
+          {showNames ? <span class="truncate text-xs">{championName(championId)}</span> : null}
+        </div>
+      )
+    })}
   </div>
 )
 

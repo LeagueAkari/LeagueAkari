@@ -581,6 +581,21 @@ export function provideOpgg() {
   }
 
   const setTab = (tab: 'champions' | 'champion', championId0?: number) => {
+    if (tab === 'champion') {
+      const targetChampionId = championId0 ?? championId.value
+      const capability = getChampionDataCapability(
+        preferredSource.value,
+        toChampionDataMode(mode.value)
+      )
+      const hasChampionDetails =
+        targetChampionId !== null &&
+        targetChampionId !== undefined &&
+        capability?.features.includes('champion-summary') &&
+        overview.value?.sections.champions.some((item) => item.championId === targetChampionId)
+
+      if (!hasChampionDetails) return
+    }
+
     currentTab.value = tab
 
     if (championId0) {
