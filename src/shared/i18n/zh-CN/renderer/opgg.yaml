@@ -74,6 +74,7 @@ opgg:
       button: 设置
   mayhemOverview:
     dataDate: 数据日期 {{date}}
+    noDataToday: 当日暂无数据
     sections:
       champions: 英雄排行
       augments: 强化符文

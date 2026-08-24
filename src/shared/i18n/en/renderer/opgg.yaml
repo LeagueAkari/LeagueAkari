@@ -74,6 +74,7 @@ opgg:
       button: Settings
   mayhemOverview:
     dataDate: Data date {{date}}
+    noDataToday: No data available for this date
     sections:
       champions: Champions
       augments: Augments

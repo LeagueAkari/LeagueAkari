@@ -21,7 +21,11 @@
       </div>
     </div>
 
-    <OpggChampionTable v-if="activeSection === 'champions'" class="min-h-0 flex-1" />
+    <OpggChampionTable
+      v-if="activeSection === 'champions'"
+      class="min-h-0 flex-1"
+      :empty-description="t('opgg.mayhemOverview.noDataToday')"
+    />
 
     <NDataTable
       v-else-if="activeSection === 'augments'"

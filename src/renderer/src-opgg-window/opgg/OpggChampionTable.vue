@@ -21,6 +21,9 @@
       :loading="isLoading"
       size="small"
     >
+      <template v-if="emptyDescription" #empty>
+        <NEmpty :description="emptyDescription" />
+      </template>
       <template #loading>
         <div class="flex flex-col items-center gap-2">
           <NSpin size="small" />
@@ -50,6 +53,7 @@ import {
   DataTableCreateRowProps,
   NButton,
   NDataTable,
+  NEmpty,
   NInput,
   NSpin
 } from 'naive-ui'
@@ -61,6 +65,8 @@ import { useOpgg } from './context'
 import { getTierTextColorClass } from './utils/theme'
 
 const { t } = useTranslation()
+
+defineProps<{ emptyDescription?: string }>()
 
 const {
   inputValue: filterInput,
