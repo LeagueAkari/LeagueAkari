@@ -27,4 +27,8 @@ export class FeatureGatingMain {
 
     return isFeatureGateEnabled(key, defaultValue, evaluation)
   }
+
+  hasConfiguredGate(key: string) {
+    return Boolean(this._akariApi.state.featureGates?.gates[key])
+  }
 }

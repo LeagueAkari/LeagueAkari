@@ -3,11 +3,11 @@ tray:
   settings: Settings
   quit: Quit
   auxWindow: Aux Window
-  opggWindow: OP.GG Window
+  opggWindow: Champion Data Window
   dev:
     toggleMainWindowDevtools: Toggle DevTools - Main Window
     toggleAuxWindowDevtools: Toggle DevTools - Aux Window
-    toggleOpggWindowDevtools: Toggle DevTools - OP.GG Window
+    toggleOpggWindowDevtools: Toggle DevTools - Champion Data Window
     toggleOngoingGameWindowDevtools: Toggle DevTools - Ongoing Game Window
     toggleCdTimerWindowDevtools: Toggle DevTools - Cooldown Timer Window
   adjustAllWindowPositions: Adjust All Window Positions

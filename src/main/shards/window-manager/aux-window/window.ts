@@ -35,8 +35,7 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
       repositionWindowIfInvisible: true,
       settingSchema: {
         enabled: { default: settings.enabled, schema: z.boolean() },
-        autoShow: { default: settings.autoShow, schema: z.boolean() },
-        showSkinSelector: { default: settings.showSkinSelector, schema: z.boolean() }
+        autoShow: { default: settings.autoShow, schema: z.boolean() }
       },
       browserWindowOptions: {
         title: AkariAuxWindow.TITLE,
@@ -66,6 +65,16 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
           if (this._leagueClient.data.champSelect.session?.isSpectating) {
             return 'ignore'
           }
+
+          if (
+            this._windowManager.opggWindow.settings.enabled &&
+            (this._windowManager.opggWindow.settings.autoShow ||
+              this._windowManager.opggWindow.state.show)
+          ) {
+            return 'hide'
+          }
+
+          return 'show'
         case 'Lobby':
         case 'Matchmaking':
         case 'ReadyCheck':
@@ -170,6 +179,6 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
   }
 
   protected override getSettingPropKeys() {
-    return ['enabled', 'autoShow', 'showSkinSelector'] as const
+    return ['enabled', 'autoShow'] as const
   }
 }

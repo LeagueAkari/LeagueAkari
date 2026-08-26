@@ -55,8 +55,7 @@ export const useAuxWindowStore = defineStore('shard:window-manager-renderer/aux-
     enabled: true,
     autoShow: true,
     opacity: 0.9,
-    pinned: true,
-    showSkinSelector: false
+    pinned: true
   })
 
   const basicWindowState = useBasicWindowStates()
@@ -73,7 +72,8 @@ export const useOpggWindowStore = defineStore('shard:window-manager-renderer/opg
     autoShow: true,
     opacity: 0.9,
     pinned: true,
-    showShortcut: null as string | null
+    showShortcut: null as string | null,
+    showSkinSelector: false
   })
 
   const basicWindowState = useBasicWindowStates()

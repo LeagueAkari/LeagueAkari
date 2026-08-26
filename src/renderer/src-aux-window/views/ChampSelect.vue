@@ -9,10 +9,12 @@
 </template>
 
 <script setup lang="ts">
-import AutomationPlan from '@aux-window/components/AutomationPlan.vue'
-import BenchChampionsMini from '@aux-window/components/BenchChampionsMini.vue'
-import ChampSelectActions from '@aux-window/components/ChampSelectActions.vue'
-import ChampSelectOperations from '@aux-window/components/ChampSelectOperations.vue'
-import SkinSelectionMini from '@aux-window/components/SkinSelectionMini.vue'
+import {
+  AutomationPlan,
+  BenchChampionsMini,
+  ChampSelectActions,
+  ChampSelectOperations,
+  SkinSelectionMini
+} from '@renderer-shared/components/champ-select-assistant'
 import { NScrollbar } from 'naive-ui'
 </script>

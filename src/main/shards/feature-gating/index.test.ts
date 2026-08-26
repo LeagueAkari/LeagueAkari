@@ -42,4 +42,20 @@ describe('FeatureGatingMain', () => {
     expect(values).toEqual([true, false, true])
     dispose()
   })
+
+  it('distinguishes an absent gate from a configured gate', () => {
+    const state = new AkariApiState()
+    const featureGating = new FeatureGatingMain(
+      {
+        global: { platform: 'win32', version: '1.5.0' }
+      } as unknown as SharedGlobalShard,
+      { state } as unknown as AkariApiMain,
+      { state: { auth: null } } as unknown as LeagueClientMain
+    )
+
+    state.setFeatureGates(snapshot({ 'champion-data.source.opgg': {} }))
+
+    expect(featureGating.hasConfiguredGate('champion-data.source.opgg')).toBe(true)
+    expect(featureGating.hasConfiguredGate('champion-data.source.qq101')).toBe(false)
+  })
 })

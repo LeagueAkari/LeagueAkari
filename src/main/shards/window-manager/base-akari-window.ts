@@ -615,39 +615,80 @@ export abstract class BaseAkariWindow<
 
   showOrRestore(inactive = false) {
     if (this._window) {
-      if (!this.state.show) {
+      if (this._window.isMinimized()) {
+        this._window.restore()
+
+        if (!inactive) {
+          this._window.focus()
+        }
+
+        this._syncShowStateFromWindow()
+
+        return
+      }
+
+      if (!this._window.isVisible()) {
         if (inactive) {
           this._window.showInactive()
         } else {
           this._window.show()
         }
 
+        this._syncShowStateFromWindow()
+
         return
       }
-
-      if (this._window.isMinimized()) {
-        this._window.restore()
-      }
-
       if (!inactive) {
         this._window.focus()
       }
+
+      this._syncShowStateFromWindow()
     }
   }
 
   show(inactive = false) {
-    if (this._window && !this.state.show) {
+    if (!this._window) {
+      return
+    }
+
+    if (this._window.isMinimized()) {
+      this._window.restore()
+
+      if (!inactive) {
+        this._window.focus()
+      }
+
+      this._syncShowStateFromWindow()
+
+      return
+    }
+
+    if (!this._window.isVisible()) {
       if (inactive) {
         this._window.showInactive()
       } else {
         this._window.show()
       }
+
+      this._syncShowStateFromWindow()
     }
   }
 
   hide() {
-    if (this._window && this.state.show) {
+    if (this._window && (this._window.isVisible() || this._window.isMinimized())) {
       this._window.hide()
+      this._syncShowStateFromWindow()
+    }
+  }
+
+  private _syncShowStateFromWindow() {
+    if (!this._window) {
+      return
+    }
+
+    const show = this._window.isVisible()
+    if (this.state.show !== show) {
+      runInAction(() => (this.state.show = show))
     }
   }
 

@@ -39,7 +39,7 @@ export interface OpggChampionItem {
   id: number
   is_rotation: boolean
   is_rip: boolean
-  average_stats: OpggChampionAverageStats
+  average_stats: OpggChampionAverageStats | null
   positions?: OpggChampionPosition[] | null
   roles?: OpggChampionRole[]
 }
@@ -47,7 +47,7 @@ export interface OpggChampionItem {
 export interface OpggChampionAverageStats {
   play: number
   win_rate?: number
-  pick_rate: number
+  pick_rate?: number
   ban_rate: number | null
   kda?: number
   tier?: number
@@ -226,7 +226,7 @@ export interface OpggChampionBuildSummary {
   id: number
   is_rotation: boolean
   is_rip: boolean
-  average_stats: OpggChampionAverageStats
+  average_stats: OpggChampionAverageStats | null
   positions: OpggChampionPosition[] | null
   roles: OpggChampionRole[]
 }
@@ -251,17 +251,11 @@ export interface OpggChampionBuildMeta {
   cached_at: Date
 }
 
-export type ModeType = 'aram' | 'arena' | 'nexus_blitz' | 'urf' | 'ranked' | (string & {})
+export type ModeType =
+  'aram' | 'aram_mayhem' | 'arena' | 'nexus_blitz' | 'urf' | 'ranked' | (string & {})
 
 export type PositionType =
-  | 'mid'
-  | 'jungle'
-  | 'adc'
-  | 'top'
-  | 'support'
-  | 'all'
-  | 'none'
-  | (string & {})
+  'mid' | 'jungle' | 'adc' | 'top' | 'support' | 'all' | 'none' | (string & {})
 
 export type TierType =
   | 'all'
@@ -311,10 +305,10 @@ export interface OpggArenaSynergy {
   champion_id: number
   op_rank: number
   play: number
-  win: number
-  total_place: number
-  first_place: number
-  pick_rate: number
+  win?: number
+  total_place?: number
+  first_place?: number
+  pick_rate?: number
 }
 
 export interface OpggArenaAugment {
@@ -332,7 +326,7 @@ export interface OpggAramMayhemChampionAugmentsResponse {
 
 export interface OpggAramMayhemChampionAugmentItem {
   id: number
-  tier: number
+  tier: number | null
   performance: number
   popular: number
 }

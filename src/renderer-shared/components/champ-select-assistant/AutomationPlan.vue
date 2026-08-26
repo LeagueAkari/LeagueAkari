@@ -10,7 +10,7 @@
             t('auxWindow.automationPlan.autoPick.willPick')
           }}</span>
           <div class="flex items-center gap-1">
-            <ChampionIcon class="h-4 w-4" :champion-id="as2.delayedPick.championId" />
+            <ChampionIcon class="size-4" :champion-id="as2.delayedPick.championId" />
             <div class="text-xs font-bold text-black dark:text-white">
               {{ championName(as2.delayedPick.championId) }}
             </div>
@@ -33,7 +33,7 @@
             t('auxWindow.automationPlan.autoBan.willBan')
           }}</span>
           <div class="flex items-center gap-1">
-            <ChampionIcon class="h-4 w-4" :champion-id="as2.delayedBan.championId" />
+            <ChampionIcon class="size-4" :champion-id="as2.delayedBan.championId" />
             <div class="text-xs font-bold text-black dark:text-white">
               {{ championName(as2.delayedBan.championId) }}
             </div>
@@ -56,7 +56,7 @@
             t('auxWindow.automationPlan.autoBenchSwap.willSwap')
           }}</span>
           <div class="flex items-center gap-1">
-            <ChampionIcon class="h-4 w-4" :champion-id="as2.delayedBenchSwap.championId" />
+            <ChampionIcon class="size-4" :champion-id="as2.delayedBenchSwap.championId" />
             <div class="text-xs font-bold text-black dark:text-white">
               {{ championName(as2.delayedBenchSwap.championId) }}
             </div>
@@ -85,7 +85,7 @@
           }}</span>
           <div class="flex items-center gap-1">
             <ChampionIcon
-              class="h-4 w-4"
+              class="size-4"
               :champion-id="as2.delayedChampionSwap.requesterChampionId"
             />
             <div class="text-xs font-bold text-black dark:text-white">

@@ -1,12 +1,14 @@
 opgg:
   titlebar:
+    title: Champion Data
     close: Close
     minimize: Minimize
     pin: Pin
     unpin: Unpin
     repositionToAlignLeagueClientUx: Align with League Client UX
   filters:
-    toOpgg: Go to OP.GG
+    source: Data Source
+    openSource: Open {{source}}
     refresh: Refresh
     champions: Tier
     champion: Champion
@@ -16,9 +18,16 @@ opgg:
     rankTier: Rank Tier
     position: Position
     version: Version
+    sourceActive: 'Current source: {{source}}'
+    sourceFallback: 'Preferred source unavailable; switched to {{source}}'
+    sources:
+      opgg: OP.GG
+      qq101: 101 (CN)
     modes:
       ranked: Ranked
+      classic: Classic
       aram: ARAM
+      aram_mayhem: 'ARAM: Mayhem'
       arena: Arena
       nexus_blitz: Nexus Blitz
       urf: URF
@@ -63,6 +72,25 @@ opgg:
       challenger: Challenger
     settings:
       button: Settings
+  mayhemOverview:
+    dataDate: Data date {{date}}
+    noDataToday: No data available for this date
+    sections:
+      champions: Champions
+      augments: Augments
+      synergies: Combinations
+    columns:
+      augment: Augment
+      rarity: Rarity
+      bestChampions: Best Champions
+      combination: Combination
+  workspace:
+    data: Champion Data
+    champSelect: Champion Select
+  champSelectAssistant:
+    status: Champion select assistant
+    active: Active
+    waitingForChampion: Waiting for champion
   championTable:
     searchPlaceholder: Search for name
     columns:
@@ -77,11 +105,15 @@ opgg:
     replace: Provide
     create: Create
     noVersionFound: No version found
+    dataUnavailable: The selected source does not support this mode or is unavailable
     settings:
-      title: OP.GG Settings
+      title: Champion Data Settings
       enabled:
         label: Enable
-        description: Enabled OP.GG window. If disabled, it can be re-opened in main settings
+        description: Enable the champion data window. If disabled, it can be re-opened in main settings
+      defaultSource:
+        label: Default Data Source
+        description: The preferred source when opening the window; unavailable sources are disabled
       flashPosition:
         label: Flash Position Preference
         description: The position for Flash when setting summoner spells
@@ -92,19 +124,19 @@ opgg:
           auto: Decide based on the current Flash position
       autoApplyRunes:
         label: Auto Apply Runes
-        description: Automatically apply the highest pick rate summoner spells and runes if the champion data matches the current mode. Only effective when the OP.GG window is enabled and visible
+        description: Automatically apply the highest pick rate runes if the champion data matches the current mode. Only effective when the champion data window is enabled and visible
       autoApplySpells:
         label: Auto Apply Summoner Spells
-        description: Automatically apply the highest pick rate summoner spells and runes if the champion data matches the current mode. Only effective when the OP.GG window is enabled and visible
+        description: Automatically apply the highest pick rate summoner spells if the champion data matches the current mode. Only effective when the champion data window is enabled and visible
       autoApplyItems:
         label: Auto Apply Item Builds
-        description: Automatically apply item builds if the champion data matches the current mode. Only effective when the OP.GG window is enabled and visible
+        description: Automatically apply item builds if the champion data matches the current mode. Only effective when the champion data window is enabled and visible
     success: 'Request sent: {{reason}}'
     summonerSpells: Summoner Spells
     runes: Rune Builds
     setSpellsFailedMessage: 'Failed to set summoner spells: {{reason}}'
     setRunesFailedMessage: 'Failed to set rune builds: {{reason}}'
-    spellsSet: '[$t(common:appName)] Summoner spells set: [OP.GG] {{spell1}} | {{spell2}}'
+    spellsSet: '[$t(common:appName)] Summoner spells set: {{spell1}} | {{spell2}}'
     runesSet: '[$t(common:appName)] {{action}} rune build: {{name}}'
     sessionChampions:
       title: Session Champions

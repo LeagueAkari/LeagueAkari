@@ -7,6 +7,7 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import type {
   AkariResourceProviderValue,
   AugmentDisplayResource,
+  AugmentRarity,
   ItemInlineResource,
   MapNameContext
 } from './types'
@@ -110,7 +111,9 @@ export function createAkariResourceProvider(): AkariResourceProviderValue {
           )
         }
 
-        return leagueClient.gameData.champions[id]?.name || id.toString()
+        return (
+          leagueClient.gameData.champions[id]?.name || extra.heroListMap[id]?.name || id.toString()
+        )
       },
       icon(id: number) {
         if (id === -3) {
@@ -119,6 +122,16 @@ export function createAkariResourceProvider(): AkariResourceProviderValue {
             iconPath: braveryIcon,
             source: 'url',
             variant: 'bravery'
+          }
+        }
+
+        const gtimgHero = extra.heroListMap[id]
+        if (!leagueClient.isConnected && gtimgHero?.alias) {
+          return {
+            id,
+            iconPath: `https://game.gtimg.cn/images/lol/act/img/champion/${gtimgHero.alias}.png`,
+            source: 'url',
+            variant: 'default'
           }
         }
 
@@ -244,21 +257,37 @@ export function createAkariResourceProvider(): AkariResourceProviderValue {
 
     augments: {
       name(id: number) {
-        return leagueClient.gameData.augments[id]?.nameTRA || id.toString()
+        const gtimgAugment = extra.kiwiAugmentsMap[id]
+        return (
+          leagueClient.gameData.augments[id]?.nameTRA ||
+          gtimgAugment?.name_cn ||
+          gtimgAugment?.name_en ||
+          id.toString()
+        )
       },
       display(id: number): AugmentDisplayResource | null {
         const augment = leagueClient.gameData.augments[id]
+        const gtimgAugment = extra.kiwiAugmentsMap[id]
 
-        if (!augment?.nameTRA || !augment.augmentSmallIconPath || !augment.rarity) {
-          return null
+        if (augment?.nameTRA && augment.augmentSmallIconPath && augment.rarity) {
+          return {
+            id,
+            name: augment.nameTRA,
+            iconPath: augment.augmentSmallIconPath,
+            rarity: augment.rarity,
+            tooltipHtml: augmentTooltipHtml(id)
+          }
         }
+
+        if (!gtimgAugment?.name_cn || !gtimgAugment.small_Icon || !gtimgAugment.level) return null
 
         return {
           id,
-          name: augment.nameTRA,
-          iconPath: augment.augmentSmallIconPath,
-          rarity: augment.rarity,
-          tooltipHtml: augmentTooltipHtml(id)
+          name: gtimgAugment.name_cn || gtimgAugment.name_en,
+          iconPath: gtimgAugment.small_Icon,
+          rarity: gtimgAugment.level as AugmentRarity,
+          tooltipHtml:
+            app.settings.locale === 'zh-CN' ? gtimgAugment.tooltip || undefined : undefined
         }
       }
     }

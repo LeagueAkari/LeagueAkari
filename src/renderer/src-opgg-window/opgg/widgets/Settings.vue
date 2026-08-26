@@ -27,6 +27,19 @@
         />
       </SettingsRow>
       <SettingsRow
+        :label="t('opgg.view.settings.defaultSource.label')"
+        :label-description="t('opgg.view.settings.defaultSource.description')"
+      >
+        <NSelect
+          size="small"
+          class="w-28!"
+          :value="preferredSource"
+          :options="sourceOptions"
+          :consistent-menu-width="false"
+          @update:value="changeSource"
+        />
+      </SettingsRow>
+      <SettingsRow
         :label="t('opgg.view.settings.flashPosition.label')"
         :label-description="t('opgg.view.settings.flashPosition.description')"
         align="start"
@@ -68,11 +81,13 @@ import { useOpggStore } from '@opgg-window/shards/opgg/store'
 import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
 import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { useChampionDataStore } from '@renderer-shared/shards/champion-data/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useOpggWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { Close } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'
-import { NIcon, NRadio, NRadioGroup, NSwitch } from 'naive-ui'
+import { NIcon, NRadio, NRadioGroup, NSelect, NSwitch } from 'naive-ui'
+import { computed } from 'vue'
 
 import { useOpgg } from '../context'
 
@@ -80,10 +95,19 @@ const { t } = useTranslation()
 
 const ows = useOpggWindowStore()
 const os = useOpggStore()
+const championDataStore = useChampionDataStore()
 
 const wm = useInstance(WindowManagerRenderer)
 
-const { flashPosition, setFlashPosition } = useOpgg()
+const { flashPosition, preferredSource, changeSource, setFlashPosition } = useOpgg()
+
+const sourceOptions = computed(() =>
+  (['opgg', 'qq101'] as const).map((source) => ({
+    label: t(`opgg.filters.sources.${source}`),
+    value: source,
+    disabled: !championDataStore.availability.sources[source].enabled
+  }))
+)
 
 const emits = defineEmits<{
   close: []

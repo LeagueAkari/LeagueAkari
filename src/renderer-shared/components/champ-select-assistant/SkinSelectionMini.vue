@@ -1,7 +1,7 @@
 <template>
   <NCard
     size="small"
-    v-if="aws.settings.showSkinSelector && lcs.champSelect.currentChampion && skinOptions.length"
+    v-if="ows.settings.showSkinSelector && lcs.champSelect.currentChampion && skinOptions.length"
   >
     <NSelect
       size="tiny"
@@ -28,7 +28,7 @@ import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
-import { useAuxWindowStore } from '@renderer-shared/shards/window-manager/store'
+import { useOpggWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { CarouselSkins } from '@shared/types/league-client/champ-select'
 import { ChampDetails } from '@shared/types/league-client/game-data'
 import { useTranslation } from 'i18next-vue'
@@ -38,7 +38,7 @@ import { computed, ref, shallowRef, watch } from 'vue'
 const { t } = useTranslation()
 const componentName = useComponentName()
 
-const aws = useAuxWindowStore()
+const ows = useOpggWindowStore()
 const lcs = useLeagueClientStore()
 
 const lc = useInstance(LeagueClientRenderer)
@@ -54,7 +54,7 @@ const renderLabel: SelectRenderLabel = (option) => {
         {...({
           src: option.isChild ? (option.chromaPreviewUrl as string) : (option.previewUrl as string),
           cache: false,
-          class: 'h-5 w-9 rounded-[2px] object-contain'
+          class: 'h-5 w-9 rounded-xs object-contain'
         } as any)}
       />
       <div

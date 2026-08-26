@@ -71,12 +71,14 @@
       </NTooltip>
     </HorizontalExpand>
 
-    <!-- op.gg -->
+    <!-- champion data -->
     <HorizontalExpand :show="ows.settings.enabled" class="h-full">
       <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
         <template #trigger>
           <div class="common-button-outer" @click="handleShowOpggWindow">
-            <OpggIcon class="common-button-inner common-button-inner-img" />
+            <div class="common-button-inner">
+              <NIcon><ChartLineData /></NIcon>
+            </div>
           </div>
         </template>
         {{ t('titlebar.actions.opggWindow') }}
@@ -104,7 +106,6 @@
 </template>
 
 <script setup lang="ts">
-import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
 import HorizontalExpand from '@renderer-shared/components/HorizontalExpand.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAkariApiStore } from '@renderer-shared/shards/akari-api/store'
@@ -125,7 +126,7 @@ import {
   getThemeColorTheme,
   isAppThemeSetting
 } from '@shared/types/app-theme'
-import { Checkmark, Notification } from '@vicons/carbon'
+import { ChartLineData, Checkmark, Notification } from '@vicons/carbon'
 import { Window24Filled } from '@vicons/fluent'
 import { ColorPaletteOutline, LogoGithub } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'

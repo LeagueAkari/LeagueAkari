@@ -25,7 +25,7 @@
           <!-- T 级 / 名字 / 位置 -->
           <div class="mr-auto">
             <div class="text-lg font-bold">
-              {{ lcs.gameData.championName(summary.id) }}
+              {{ resources.champions.name(summary.id) }}
             </div>
             <div class="flex items-center gap-2">
               <div
@@ -122,7 +122,7 @@
 
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NScrollbar, NSpin } from 'naive-ui'
 import { computed } from 'vue'
@@ -148,7 +148,7 @@ const { champion, position, kiwiAugments, cancel, isLoading } = useOpgg()
 
 const { t } = useTranslation()
 
-const lcs = useLeagueClientStore()
+const resources = useAkariResourceProvider()
 
 const summary = computed(() => {
   if (!champion.value) {

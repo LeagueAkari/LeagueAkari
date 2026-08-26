@@ -20,6 +20,7 @@ export function useLoadout() {
   const componentName = useComponentName()
 
   const { t } = useTranslation()
+  const recommendationLabel = `[${t('appName', { ns: 'common' })}]`
 
   // 更新召唤师技能，会考虑到闪现位置的偏好
   const setSummonerSpells = async (ids: number[], flashPosition: 'auto' | 'd' | 'f') => {
@@ -79,10 +80,10 @@ export function useLoadout() {
   // 获取符文页名称，如果位置为 none，则只显示英雄名称
   const getRunePageName = (championId: number, position: string) => {
     if (position === 'none') {
-      return `[OP.GG] ${lcs.gameData.championName(championId)}`
+      return `${recommendationLabel} ${lcs.gameData.championName(championId)}`
     }
 
-    return `[OP.GG] ${lcs.gameData.championName(championId)} - ${t(
+    return `${recommendationLabel} ${lcs.gameData.championName(championId)} - ${t(
       `opgg.filters.positions.${position}`
     )}`
   }
@@ -189,7 +190,7 @@ export function useLoadout() {
     const { championId, mode, position } = options
 
     const championName = lcs.gameData.championName(championId)
-    let title = `[OP.GG] ${championName}`
+    let title = `${recommendationLabel} ${championName}`
 
     if (mode) {
       const modeName = t(`opgg.filters.modes.${mode}`)
@@ -209,7 +210,7 @@ export function useLoadout() {
     const { championId, position } = options
 
     const championName = lcs.gameData.championName(championId)
-    let name = `[OP.GG] ${championName}`
+    let name = `${recommendationLabel} ${championName}`
 
     const hasPosition = position && position !== 'none'
     if (hasPosition) {

@@ -415,13 +415,6 @@ const targetDefinitions = [
     descriptionKey: 'settings.multiWindow.auxWindow.opacity.description'
   },
   {
-    id: 'multi-window.aux.skin-selector',
-    route: { tab: 'multi-window' },
-    parentId: 'multi-window.aux',
-    labelKey: 'settings.multiWindow.auxWindow.showSkinSelector.label',
-    descriptionKey: 'settings.multiWindow.auxWindow.showSkinSelector.description'
-  },
-  {
     id: 'multi-window.aux.reset-position',
     route: { tab: 'multi-window' },
     parentId: 'multi-window.aux',
@@ -461,6 +454,13 @@ const targetDefinitions = [
     parentId: 'multi-window.opgg',
     labelKey: 'settings.multiWindow.opggWindow.opacity.label',
     descriptionKey: 'settings.multiWindow.opggWindow.opacity.description'
+  },
+  {
+    id: 'multi-window.opgg.skin-selector',
+    route: { tab: 'multi-window' },
+    parentId: 'multi-window.opgg',
+    labelKey: 'settings.multiWindow.opggWindow.showSkinSelector.label',
+    descriptionKey: 'settings.multiWindow.opggWindow.showSkinSelector.description'
   },
   {
     id: 'multi-window.opgg.reset-position',
