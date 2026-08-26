@@ -1,7 +1,10 @@
+import type { AxiosRetry } from 'axios-retry'
 import { describe, expect, it, vi } from 'vitest'
 
 import { createExternalHttpAxiosClient } from './axios-client'
 import type { ExternalHttpSession } from './context'
+
+const axiosRetry = require('axios-retry').default as AxiosRetry
 
 function jsonResponse(data: unknown) {
   return new Response(JSON.stringify(data), {
@@ -63,5 +66,27 @@ describe('createExternalHttpAxiosClient', () => {
 
     await expect(pending).rejects.toMatchObject({ code: 'ERR_CANCELED' })
     expect(requestSignal?.aborted).toBe(true)
+  })
+
+  it('remains compatible with the champion-data retry policy', async () => {
+    const fetch = vi
+      .fn<ExternalHttpSession['fetch']>()
+      .mockRejectedValueOnce(new TypeError('network failure'))
+      .mockResolvedValueOnce(jsonResponse({ ok: true }))
+    const client = createExternalHttpAxiosClient(
+      { fetch } as unknown as ExternalHttpSession,
+      async () => undefined,
+      { baseURL: 'https://example.com', timeout: 8_000 }
+    )
+    axiosRetry(client, {
+      retries: 1,
+      shouldResetTimeout: true,
+      retryDelay: () => 0,
+      retryCondition: axiosRetry.isNetworkOrIdempotentRequestError
+    })
+
+    await expect(client.get('/retry')).resolves.toMatchObject({ data: { ok: true } })
+    expect(fetch).toHaveBeenCalledTimes(2)
+    expect(client.defaults.timeout).toBe(8_000)
   })
 })

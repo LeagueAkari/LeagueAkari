@@ -2,11 +2,11 @@ import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import type { ChampionDataPreferences } from '@shared/data-adapter/champion-data'
 import { OpggHttpApiAxiosHelper } from '@shared/http-api-axios-helper/opgg'
 import { Qq101HttpApiAxiosHelper } from '@shared/http-api-axios-helper/qq101'
-import axios, { type AxiosInstance } from 'axios'
+import type { AxiosInstance } from 'axios'
 import type { AxiosRetry } from 'axios-retry'
 import { z } from 'zod'
 
-import { AppCommonMain } from '../app-common'
+import { ExternalHttpMain } from '../external-http'
 import { FeatureGatingMain } from '../feature-gating'
 import { AkariIpcMain } from '../ipc'
 import { type AkariLogger, LoggerFactoryMain } from '../logger-factory'
@@ -51,7 +51,7 @@ export class ChampionDataMain implements IAkariShardInitDispose {
   private readonly _ipcHandlers: ChampionDataIpcHandlers
 
   constructor(
-    private readonly _appCommon: AppCommonMain,
+    private readonly _externalHttp: ExternalHttpMain,
     private readonly _featureGating: FeatureGatingMain,
     private readonly _ipc: AkariIpcMain,
     loggerFactory: LoggerFactoryMain,
@@ -103,7 +103,6 @@ export class ChampionDataMain implements IAkariShardInitDispose {
       'lastFallbackReason'
     ])
     this._watchAvailability()
-    this._watchHttpProxy()
     this._ipcHandlers.register()
   }
 
@@ -127,7 +126,7 @@ export class ChampionDataMain implements IAkariShardInitDispose {
   }
 
   private _createHttpClient(headers?: Record<string, string>) {
-    const client = axios.create({ timeout: 8_000, headers })
+    const client = this._externalHttp.createAxiosClient({ timeout: 8_000, headers })
     axiosRetry(client, {
       retries: 1,
       shouldResetTimeout: true,
@@ -162,24 +161,6 @@ export class ChampionDataMain implements IAkariShardInitDispose {
           preferredSource,
           sources: { opgg: { enabled: opgg }, qq101: { enabled: qq101 } }
         })
-      },
-      { fireImmediately: true }
-    )
-  }
-
-  private _watchHttpProxy() {
-    this._mobxUtils.reaction(
-      () => this._appCommon.settings.httpProxy,
-      (httpProxy) => {
-        for (const client of [this._opggHttpClient, this._qq101HttpClient]) {
-          if (httpProxy.strategy === 'force') {
-            client.defaults.proxy = { host: httpProxy.host, port: httpProxy.port }
-          } else if (httpProxy.strategy === 'disable') {
-            client.defaults.proxy = false
-          } else {
-            client.defaults.proxy = undefined
-          }
-        }
       },
       { fireImmediately: true }
     )
