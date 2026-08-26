@@ -708,10 +708,10 @@ const handleUninstallApp = () => {
 
 const httpProxyStrategies = computed(() => {
   return [
-    // {
-    //   label: t('settings.app.misc.httpProxy.strategy.options.auto'),
-    //   value: 'auto'
-    // },
+    {
+      label: t('settings.app.misc.httpProxy.strategy.options.auto'),
+      value: 'auto'
+    },
     {
       label: t('settings.app.misc.httpProxy.strategy.options.disable'),
       value: 'disable'

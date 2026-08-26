@@ -150,7 +150,7 @@ settings:
       httpProxy:
         strategy:
           label: HTTP Proxy
-          description: Set the HTTP proxy. All network requests except LCU HTTP will be routed through this proxy
+          description: Configure the proxy for external HTTP requests. Follow System currently applies to OP.GG and 101; local LCU requests are unaffected
           options:
             force: Use Proxy
             auto: Auto

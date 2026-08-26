@@ -150,7 +150,7 @@ settings:
       httpProxy:
         strategy:
           label: HTTP 代理
-          description: 设置 HTTP 代理，除 LCU HTTP 之外的所有网络请求都将通过该代理
+          description: 设置应用外部 HTTP 请求的代理。跟随系统目前用于 OP.GG 和 101；LCU 本地请求不受影响
           options:
             force: 使用代理
             auto: 跟随系统
