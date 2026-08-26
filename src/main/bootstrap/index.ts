@@ -12,6 +12,7 @@ import { AutoSelectMain } from '@main/shards/auto-select'
 import { ChampionDataMain } from '@main/shards/champion-data'
 import { ClientInstallationMain } from '@main/shards/client-installation'
 import { ConfigMigrateMain } from '@main/shards/config-migrate'
+import { ExternalHttpMain } from '@main/shards/external-http'
 import { ExtraAssetsMain } from '@main/shards/extra-assets'
 import { FeatureGatingMain } from '@main/shards/feature-gating'
 import { GameClientMain } from '@main/shards/game-client'
@@ -314,6 +315,7 @@ export function bootstrap() {
 
     // connection & data provider shards
     manager.use(ConfigMigrateMain)
+    manager.use(ExternalHttpMain)
     manager.use(SettingFactoryMain)
     manager.use(StorageMain)
 
