@@ -24,7 +24,21 @@
             <NButton size="tiny" quaternary @click="closePreview()">{{ t('close') }}</NButton>
           </div>
         </div>
-        <div v-if="hasPreviewLines" class="flex flex-col gap-1 font-mono select-text">
+        <NScrollbar v-if="hasPreviewLines && constrained" class="max-h-30">
+          <div class="flex flex-col gap-1 pr-3 font-mono select-text">
+            <div
+              v-for="(line, idx) of previewedLines?.lines || []"
+              :key="idx"
+              class="flex items-baseline gap-2"
+            >
+              <span class="min-w-[2ch] shrink-0 text-right tabular-nums opacity-40">
+                {{ idx + 1 }}
+              </span>
+              <span class="min-w-0 flex-1 wrap-break-word">{{ line }}</span>
+            </div>
+          </div>
+        </NScrollbar>
+        <div v-else-if="hasPreviewLines" class="flex flex-col gap-1 font-mono select-text">
           <div
             v-for="(line, idx) of previewedLines?.lines || []"
             :key="idx"
@@ -47,16 +61,22 @@
 <script setup lang="ts">
 import { Copy24Regular as CopyIcon } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCollapseTransition, NIcon, useMessage } from 'naive-ui'
+import { NButton, NCollapseTransition, NIcon, NScrollbar, useMessage } from 'naive-ui'
 import { computed } from 'vue'
 
 import { writeClipboardText } from '@renderer-shared/utils/clipboard'
 
 import type { PresetScopeContext } from '../data/shared'
 
-const props = defineProps<{
-  preset: PresetScopeContext
-}>()
+const props = withDefaults(
+  defineProps<{
+    preset: PresetScopeContext
+    constrained?: boolean
+  }>(),
+  {
+    constrained: false
+  }
+)
 
 const { previewedLines, closePreview } = props.preset
 const { t } = useTranslation('renderer', { keyPrefix: 'toolkit.inGameSend.presets.preview' })

@@ -484,7 +484,7 @@ toolkit:
         label: Custom Template
         risk:
           title: Please read before using
-          description: Custom templates can access and change information in the application. An untrusted or faulty template may expose information, damage data, or crash the application. Use only templates you trust. If you are unsure what a template does, do not use it. AI-generated templates are not necessarily safe.
+          description: Custom templates can read and modify application information. Templates that are untrusted, unreviewed, or defective may cause information disclosure, data corruption, or application crashes. Use only templates from trusted sources whose contents you have verified; do not use a template if its behavior is unclear. AI-generated templates must also be reviewed before use.
         empty:
           description: No custom templates yet. Add one, then write and save its JavaScript code.
           action: Add Custom Template
@@ -506,17 +506,8 @@ toolkit:
         expand: Expand Editor
         expandedTitle: 'Edit Template: {{title}}'
         editorLoadFailed: 'Failed to load the Monaco editor: {{reason}}'
-        runFailed: Template execution failed. See the last error below.
-        lastErrorTitle: Last error · {{stage}} · {{target}} · {{time}}
-        errorStage:
-          load: Load code
-          contract: Check function
-          execute: Run function
-          result: Check result
-        errorTarget:
-          friendly: Allies
-          enemy: Enemies
-          all: All
+        runFailed: Template execution failed. Check the error indicator.
+        lastErrorTitle: The previous template execution failed
         disabled:
           saveFirst: Save current edits first
   claim:

@@ -79,11 +79,11 @@
         <div class="grid h-7 flex-none grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
           <div v-if="isEditingTitle" class="flex min-w-0 items-center gap-1.5">
             <span
-              class="size-1.5 flex-none rounded-full transition-opacity"
-              :class="isDirty ? 'bg-orange-500 opacity-100 dark:bg-orange-400' : 'opacity-0'"
-              :title="isDirty ? t('unsaved') : undefined"
+              v-if="isDirty"
+              class="size-1.5 flex-none rounded-full bg-orange-500 dark:bg-orange-400"
+              :title="t('unsaved')"
             >
-              <span v-if="isDirty" class="sr-only">{{ t('unsaved') }}</span>
+              <span class="sr-only">{{ t('unsaved') }}</span>
             </span>
             <NInput
               ref="titleInputRef"
@@ -104,11 +104,11 @@
             @click="startTitleEdit"
           >
             <span
-              class="size-1.5 flex-none rounded-full transition-opacity"
-              :class="isDirty ? 'bg-orange-500 opacity-100 dark:bg-orange-400' : 'opacity-0'"
-              :title="isDirty ? t('unsaved') : undefined"
+              v-if="isDirty"
+              class="size-1.5 flex-none rounded-full bg-orange-500 dark:bg-orange-400"
+              :title="t('unsaved')"
             >
-              <span v-if="isDirty" class="sr-only">{{ t('unsaved') }}</span>
+              <span class="sr-only">{{ t('unsaved') }}</span>
             </span>
             <span
               class="min-w-0 overflow-hidden text-[15px] leading-7 text-ellipsis whitespace-nowrap"
@@ -144,7 +144,7 @@
                 <NButton
                   size="tiny"
                   quaternary
-                  :disabled="!currentModel"
+                  :disabled="!isEditorReady"
                   :aria-label="t('expand')"
                   @click="isExpanded = true"
                 >
@@ -173,33 +173,37 @@
           />
         </SettingsRow>
 
-        <div
-          class="min-h-0 flex-1 overflow-hidden rounded-[5px] border border-black/10 dark:border-white/10"
-        >
-          <div v-if="isLoadingMonaco" class="flex h-full items-center justify-center">
-            <NSpin size="small" />
-          </div>
-          <NAlert v-else-if="monacoLoadError" type="error" class="m-3">
-            {{ t('editorLoadFailed', { reason: monacoLoadError }) }}
-          </NAlert>
-          <MonacoEditor
-            v-else-if="currentModel && !isExpanded"
-            :model="currentModel"
-            :theme="monacoTheme"
-            variant="plain-text"
-          />
-        </div>
+        <PresetMonacoEditor
+          ref="editorRef"
+          v-model:expanded="isExpanded"
+          class="flex-1"
+          :model-key="selectedItem.id"
+          :initial-value="draftContent"
+          :model-uri="`inmemory://league-akari/in-game-send-fixed-text/${selectedItem.id}.txt`"
+          variant="plain-text"
+          :max-length="contentMaxLength"
+          :expanded-title="t('expandedTitle', { title: getDisplayTitle(draftTitle) })"
+          :dirty="isDirty"
+          :saving="isSaving"
+          :revert-label="t('revert')"
+          :save-label="t('save')"
+          :format-load-error="formatEditorLoadError"
+          @change="handleContentChange"
+          @ready="isEditorReady = $event"
+          @revert="handleRevert"
+          @save="handleSaveClick"
+        />
 
         <div class="flex flex-none flex-wrap items-center justify-between gap-2.5">
           <span
             class="text-xs [font-variant-numeric:tabular-nums]"
             :class="
-              draftContent.length >= contentMaxLength
+              draftContentLength >= contentMaxLength
                 ? 'text-orange-700/85 dark:text-orange-400/90'
                 : 'text-black/45 dark:text-white/45'
             "
           >
-            {{ draftContent.length }} / {{ contentMaxLength }}
+            {{ draftContentLength }} / {{ contentMaxLength }}
           </span>
 
           <div class="flex items-center gap-1.5">
@@ -246,45 +250,6 @@
         </div>
       </section>
     </div>
-
-    <NModal
-      v-if="currentModel"
-      v-model:show="isExpanded"
-      preset="card"
-      :title="t('expandedTitle', { title: getDisplayTitle(draftTitle) })"
-      :bordered="false"
-      style="width: calc(100vw - 48px); max-width: none"
-    >
-      <div class="flex h-[calc(100vh-132px)] min-h-0 flex-col gap-3">
-        <div class="flex flex-wrap items-center justify-end gap-2">
-          <span class="text-xs text-black/45 tabular-nums dark:text-white/45">
-            {{ draftContent.length }} / {{ contentMaxLength }}
-          </span>
-          <NButton size="small" secondary :disabled="!isDirty" @click="handleRevert">
-            {{ t('revert') }}
-          </NButton>
-          <NButton
-            size="small"
-            type="primary"
-            :loading="isSaving"
-            :disabled="!isDirty"
-            @click="handleSaveClick"
-          >
-            {{ t('save') }}
-          </NButton>
-        </div>
-        <div
-          class="min-h-0 flex-1 overflow-hidden rounded-[5px] border border-black/10 dark:border-white/10"
-        >
-          <MonacoEditor
-            :model="currentModel"
-            :theme="monacoTheme"
-            variant="plain-text"
-            :use-shadow-dom="false"
-          />
-        </div>
-      </div>
-    </NModal>
   </div>
 </template>
 
@@ -293,13 +258,11 @@ import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useInstance } from '@renderer-shared/shards'
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import {
   IN_GAME_SEND_FIXED_TEXT_PRESET_CONTENT_MAX_LENGTH,
   IN_GAME_SEND_FIXED_TEXT_PRESET_MAX_ITEMS,
-  IN_GAME_SEND_FIXED_TEXT_PRESET_TITLE_MAX_LENGTH,
-  type InGameSendFixedTextPresetItem
+  IN_GAME_SEND_FIXED_TEXT_PRESET_TITLE_MAX_LENGTH
 } from '@shared/shards/in-game-send'
 import { RestrictToVerticalAxis } from '@dnd-kit/abstract/modifiers'
 import { DragDropProvider, type DragEndEvent } from '@dnd-kit/vue'
@@ -314,27 +277,15 @@ import {
   ArrowUndo24Regular as UndoIcon
 } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import type { IDisposable, editor } from 'monaco-editor/editor/editor.api.js'
-import {
-  NAlert,
-  NButton,
-  NEmpty,
-  NIcon,
-  NInput,
-  NModal,
-  NSpin,
-  NTooltip,
-  useMessage
-} from 'naive-ui'
-import { computed, nextTick, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
+import { NButton, NEmpty, NIcon, NInput, NTooltip, useMessage } from 'naive-ui'
+import { computed, nextTick, ref, watch } from 'vue'
 
 import { useNativeInputStatus } from '../composables/useNativeInputStatus'
 import { useFixedTextPreset } from '../data/fixed-text'
-import { loadMonaco, MonacoEditor, type MonacoApi } from '../monaco'
+import { PresetMonacoEditor } from '../monaco'
 import SortablePresetListItem from '../widgets/SortablePresetListItem.vue'
 
 const fixedTextPreset = useFixedTextPreset()
-const appCommonStore = useAppCommonStore()
 const componentName = useComponentName()
 const logger = useInstance(LoggerRenderer)
 const message = useMessage()
@@ -350,27 +301,21 @@ const titleInputRef = ref<InstanceType<typeof NInput> | null>(null)
 const selectedId = ref<string | null>(null)
 const draftTitle = ref('')
 const draftContent = ref('')
+const draftContentLength = ref(0)
 const isDirty = ref(false)
 const isSaving = ref(false)
 const isCreating = ref(false)
 const isEditingTitle = ref(false)
 const isExpanded = ref(false)
+const isEditorReady = ref(false)
 const pendingTitleEditItemId = ref<string | null>(null)
-const models = new Map<string, editor.ITextModel>()
-const modelSubscriptions = new Map<string, IDisposable>()
-const currentModel = shallowRef<editor.ITextModel | null>(null)
-const monacoApi = shallowRef<MonacoApi | null>(null)
-const monacoLoadError = ref<string | null>(null)
-const isLoadingMonaco = ref(false)
+const editorRef = ref<InstanceType<typeof PresetMonacoEditor> | null>(null)
 
 const items = computed(() => fixedTextPreset.items.value)
 const selectedItem = computed(
   () => items.value.find((item) => item.id === selectedId.value) ?? null
 )
 const canCreate = computed(() => items.value.length < maxItems)
-const monacoTheme = computed<'vs' | 'vs-dark'>(() =>
-  appCommonStore.colorTheme === 'dark' ? 'vs-dark' : 'vs'
-)
 
 const sendButtonText = computed(() => {
   if (fixedTextPreset.gamePhase.value === 'in-game') {
@@ -414,14 +359,6 @@ const sendDisabledReason = computed(() => {
 watch(
   items,
   (currentItems) => {
-    const currentIds = new Set(currentItems.map((item) => item.id))
-
-    for (const id of models.keys()) {
-      if (!currentIds.has(id)) {
-        disposeModel(id)
-      }
-    }
-
     if (currentItems.length === 0) {
       selectedId.value = null
       return
@@ -438,11 +375,12 @@ watch(
   () => selectedItem.value?.id,
   async (id) => {
     const item = selectedItem.value
-    currentModel.value = null
     isExpanded.value = false
+    isEditorReady.value = false
     isDirty.value = false
     draftTitle.value = item?.title ?? ''
     draftContent.value = item?.content ?? ''
+    draftContentLength.value = draftContent.value.length
 
     if (id && pendingTitleEditItemId.value === id) {
       pendingTitleEditItemId.value = null
@@ -456,76 +394,9 @@ watch(
     if (!id || !item) {
       return
     }
-
-    const model = await ensureModel(item)
-    if (selectedId.value === id) {
-      currentModel.value = model
-    }
   },
   { immediate: true }
 )
-
-async function ensureMonaco() {
-  if (monacoApi.value) {
-    return monacoApi.value
-  }
-
-  isLoadingMonaco.value = true
-  monacoLoadError.value = null
-  try {
-    monacoApi.value = await loadMonaco()
-    return monacoApi.value
-  } catch (error) {
-    monacoLoadError.value = error instanceof Error ? error.message : String(error)
-    logger.warn(componentName, 'Failed to load Monaco editor', error)
-    return null
-  } finally {
-    isLoadingMonaco.value = false
-  }
-}
-
-async function ensureModel(item: InGameSendFixedTextPresetItem) {
-  const existingModel = models.get(item.id)
-  if (existingModel) {
-    return existingModel
-  }
-
-  const monaco = await ensureMonaco()
-  if (!monaco) {
-    return null
-  }
-
-  const model = monaco.editor.createModel(
-    item.content,
-    'plaintext',
-    monaco.Uri.parse(`inmemory://league-akari/in-game-send-fixed-text/${item.id}.txt`)
-  )
-  const subscription = model.onDidChangeContent(() => {
-    if (selectedId.value !== item.id) {
-      return
-    }
-
-    const value = model.getValue()
-    if (value.length > contentMaxLength) {
-      model.setValue(value.slice(0, contentMaxLength))
-      return
-    }
-
-    draftContent.value = value
-    isDirty.value = true
-  })
-
-  models.set(item.id, model)
-  modelSubscriptions.set(item.id, subscription)
-  return model
-}
-
-function disposeModel(id: string) {
-  modelSubscriptions.get(id)?.dispose()
-  modelSubscriptions.delete(id)
-  models.get(id)?.dispose()
-  models.delete(id)
-}
 
 const getTrimmedTitle = (title: string) => {
   return title.trim()
@@ -533,6 +404,15 @@ const getTrimmedTitle = (title: string) => {
 
 const getDisplayTitle = (title: string) => {
   return getTrimmedTitle(title) || t('unnamed')
+}
+
+const formatEditorLoadError = (reason: string) => {
+  return t('editorLoadFailed', { reason })
+}
+
+const handleContentChange = (length: number) => {
+  draftContentLength.value = length
+  isDirty.value = true
 }
 
 const handleTitleUpdate = (value: string) => {
@@ -551,11 +431,14 @@ const saveCurrent = async () => {
 
   isSaving.value = true
   try {
+    const content = editorRef.value?.getValue() ?? draftContent.value
     await fixedTextPreset.updateItem(selectedItem.value.id, {
       title: draftTitle.value.slice(0, titleMaxLength),
-      content: draftContent.value.slice(0, contentMaxLength)
+      content: content.slice(0, contentMaxLength)
     })
 
+    draftContent.value = content
+    draftContentLength.value = content.length
     isDirty.value = false
     message.success(t('saved'))
 
@@ -603,7 +486,8 @@ const revertCurrentDraft = () => {
   if (isDirty.value) {
     draftTitle.value = selectedItem.value.title
     draftContent.value = selectedItem.value.content
-    currentModel.value?.setValue(selectedItem.value.content)
+    draftContentLength.value = selectedItem.value.content.length
+    editorRef.value?.replaceValue(selectedItem.value.content)
   }
   isDirty.value = false
   isEditingTitle.value = false
@@ -634,6 +518,7 @@ const handleCreate = async () => {
     selectedId.value = item.id
     draftTitle.value = ''
     draftContent.value = ''
+    draftContentLength.value = 0
     pendingTitleEditItemId.value = item.id
     isEditingTitle.value = true
     await nextTick()
@@ -721,10 +606,4 @@ const handleSend = async () => {
     message.success(title ? t('sendSucceededWithTitle', { title }) : t('sendSucceeded'))
   }
 }
-
-onBeforeUnmount(() => {
-  for (const id of models.keys()) {
-    disposeModel(id)
-  }
-})
 </script>

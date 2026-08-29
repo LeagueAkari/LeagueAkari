@@ -68,10 +68,17 @@
               :active="item.id === selectedId"
               :dirty="item.id === selectedId && isDirty"
               :dirty-label="t('unsaved')"
-              :error-summary="lastErrors[item.id] ? getErrorSummary(lastErrors[item.id]) : null"
               @select="handleSelect(item.id)"
               @delete="handleDelete(item.id)"
-            />
+            >
+              <template v-if="lastErrors[item.id]" #status>
+                <CustomTemplateErrorPopover :error="lastErrors[item.id]" placement="right-start">
+                  <NIcon size="16" class="shrink-0 text-red-500 dark:text-red-400">
+                    <ErrorIcon />
+                  </NIcon>
+                </CustomTemplateErrorPopover>
+              </template>
+            </SortablePresetListItem>
           </div>
         </DragDropProvider>
       </aside>
@@ -83,11 +90,11 @@
         <div class="grid h-7 flex-none grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
           <div v-if="isEditingTitle" class="flex min-w-0 items-center gap-1.5">
             <span
-              class="size-1.5 flex-none rounded-full transition-opacity"
-              :class="isDirty ? 'bg-orange-500 opacity-100 dark:bg-orange-400' : 'opacity-0'"
-              :title="isDirty ? t('unsaved') : undefined"
+              v-if="isDirty"
+              class="size-1.5 flex-none rounded-full bg-orange-500 dark:bg-orange-400"
+              :title="t('unsaved')"
             >
-              <span v-if="isDirty" class="sr-only">{{ t('unsaved') }}</span>
+              <span class="sr-only">{{ t('unsaved') }}</span>
             </span>
             <NInput
               ref="titleInputRef"
@@ -108,11 +115,11 @@
             @click="startTitleEdit"
           >
             <span
-              class="size-1.5 flex-none rounded-full transition-opacity"
-              :class="isDirty ? 'bg-orange-500 opacity-100 dark:bg-orange-400' : 'opacity-0'"
-              :title="isDirty ? t('unsaved') : undefined"
+              v-if="isDirty"
+              class="size-1.5 flex-none rounded-full bg-orange-500 dark:bg-orange-400"
+              :title="t('unsaved')"
             >
-              <span v-if="isDirty" class="sr-only">{{ t('unsaved') }}</span>
+              <span class="sr-only">{{ t('unsaved') }}</span>
             </span>
             <span
               class="min-w-0 overflow-hidden text-[15px] leading-7 text-ellipsis whitespace-nowrap"
@@ -148,7 +155,7 @@
                 <NButton
                   size="tiny"
                   quaternary
-                  :disabled="!currentModel"
+                  :disabled="!isEditorReady"
                   :aria-label="t('expand')"
                   @click="isExpanded = true"
                 >
@@ -159,6 +166,14 @@
               </template>
               {{ t('expand') }}
             </NTooltip>
+
+            <CustomTemplateErrorPopover v-if="currentError" :error="currentError">
+              <NButton size="tiny" quaternary :aria-label="t('lastErrorTitle')">
+                <template #icon>
+                  <NIcon class="text-red-500 dark:text-red-400"><ErrorIcon /></NIcon>
+                </template>
+              </NButton>
+            </CustomTemplateErrorPopover>
           </div>
         </div>
 
@@ -169,65 +184,65 @@
           :execution-disabled-reason="executionDisabledReason"
         />
 
-        <div
-          class="min-h-0 flex-1 overflow-hidden rounded-[5px] border border-black/10 dark:border-white/10"
-        >
-          <div v-if="isLoadingMonaco" class="flex h-full items-center justify-center">
-            <NSpin size="small" />
-          </div>
-          <NAlert v-else-if="monacoLoadError" type="error" class="m-3">
-            {{ t('editorLoadFailed', { reason: monacoLoadError }) }}
-          </NAlert>
-          <MonacoEditor
-            v-else-if="currentModel && !isExpanded"
-            :model="currentModel"
-            :theme="monacoTheme"
+        <div class="flex min-h-0 flex-1 flex-col gap-1.5">
+          <PresetMonacoEditor
+            ref="editorRef"
+            v-model:expanded="isExpanded"
+            class="min-h-0 flex-1"
+            :model-key="selectedItem.id"
+            :initial-value="selectedDraft.code"
+            :model-uri="`inmemory://league-akari/in-game-send-template/${selectedItem.id}.js`"
             variant="javascript"
+            :max-length="codeMaxLength"
+            :expanded-title="t('expandedTitle', { title: getDisplayTitle(selectedDraft.title) })"
+            :dirty="isDirty"
+            :saving="isSaving"
+            :revert-label="t('revert')"
+            :save-label="t('save')"
+            :format-load-error="formatEditorLoadError"
+            @change="handleCodeChange"
+            @ready="isEditorReady = $event"
+            @revert="handleRevert"
+            @save="handleSave"
           />
-        </div>
 
-        <div class="flex flex-none flex-wrap items-center justify-between gap-2.5">
-          <span
-            class="shrink-0 text-xs [font-variant-numeric:tabular-nums]"
-            :class="
-              selectedDraft.code.length >= codeMaxLength
-                ? 'text-orange-700/85 dark:text-orange-400/90'
-                : 'text-black/45 dark:text-white/45'
-            "
-          >
-            {{ selectedDraft.code.length }} / {{ codeMaxLength }}
-          </span>
-
-          <div class="flex flex-none items-center gap-1.5">
-            <NButton size="small" :disabled="!isDirty" @click="handleRevert">
-              <template #icon>
-                <NIcon><UndoIcon /></NIcon>
-              </template>
-              {{ t('revert') }}
-            </NButton>
-            <NButton
-              size="small"
-              type="primary"
-              secondary
-              :loading="isSaving"
-              :disabled="!isDirty"
-              @click="handleSave"
+          <div class="flex flex-none flex-wrap items-center justify-between gap-2.5">
+            <span
+              class="shrink-0 text-xs [font-variant-numeric:tabular-nums]"
+              :class="
+                draftCodeLength >= codeMaxLength
+                  ? 'text-orange-700/85 dark:text-orange-400/90'
+                  : 'text-black/45 dark:text-white/45'
+              "
             >
-              <template #icon>
-                <NIcon><SaveIcon /></NIcon>
-              </template>
-              {{ t('save') }}
-            </NButton>
+              {{ draftCodeLength }} / {{ codeMaxLength }}
+            </span>
+
+            <div class="flex flex-none items-center gap-1.5">
+              <NButton size="small" :disabled="!isDirty" @click="handleRevert">
+                <template #icon>
+                  <NIcon><UndoIcon /></NIcon>
+                </template>
+                {{ t('revert') }}
+              </NButton>
+              <NButton
+                size="small"
+                type="primary"
+                secondary
+                :loading="isSaving"
+                :disabled="!isDirty"
+                @click="handleSave"
+              >
+                <template #icon>
+                  <NIcon><SaveIcon /></NIcon>
+                </template>
+                {{ t('save') }}
+              </NButton>
+            </div>
           </div>
+
+          <PreviewPanel class="max-h-48 min-h-0 flex-none" :preset="presetScope" constrained />
         </div>
-
-        <NAlert v-if="currentError" class="flex-none" type="error" :title="currentErrorTitle">
-          <pre
-            class="max-h-48 overflow-auto text-xs wrap-break-word whitespace-pre-wrap select-text"
-            >{{ currentError.error }}</pre>
-        </NAlert>
-
-        <PreviewPanel class="flex-none" :preset="presetScope" />
       </section>
     </div>
 
@@ -242,60 +257,18 @@
         {{ t('risk.description') }}
       </div>
     </NModal>
-
-    <NModal
-      v-if="currentModel && selectedDraft"
-      v-model:show="isExpanded"
-      preset="card"
-      :title="t('expandedTitle', { title: getDisplayTitle(selectedDraft.title) })"
-      :bordered="false"
-      style="width: calc(100vw - 48px); max-width: none"
-    >
-      <div class="flex h-[calc(100vh-132px)] min-h-0 flex-col gap-3">
-        <div class="flex flex-wrap items-center justify-end gap-2">
-          <span class="text-xs text-black/45 tabular-nums dark:text-white/45">
-            {{ selectedDraft.code.length }} / {{ codeMaxLength }}
-          </span>
-          <NButton size="small" secondary :disabled="!isDirty" @click="handleRevert">
-            {{ t('revert') }}
-          </NButton>
-          <NButton
-            size="small"
-            type="primary"
-            :loading="isSaving"
-            :disabled="!isDirty"
-            @click="handleSave"
-          >
-            {{ t('save') }}
-          </NButton>
-        </div>
-        <div
-          class="min-h-0 flex-1 overflow-hidden rounded-[5px] border border-black/10 dark:border-white/10"
-        >
-          <MonacoEditor
-            :model="currentModel"
-            :theme="monacoTheme"
-            variant="javascript"
-            :use-shadow-dom="false"
-          />
-        </div>
-      </div>
-    </NModal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useInstance } from '@renderer-shared/shards'
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import {
   IN_GAME_SEND_CUSTOM_TEMPLATE_CODE_MAX_LENGTH,
   IN_GAME_SEND_CUSTOM_TEMPLATE_MAX_ITEMS,
   IN_GAME_SEND_CUSTOM_TEMPLATE_TITLE_MAX_LENGTH,
   createDefaultInGameSendPresetTargetShortcuts,
-  type InGameSendCustomTemplateItem,
-  type InGameSendCustomTemplateLastError,
   type InGameSendPresetTarget
 } from '@shared/shards/in-game-send'
 import { RestrictToVerticalAxis } from '@dnd-kit/abstract/modifiers'
@@ -306,37 +279,19 @@ import {
   ArrowExpand24Regular as ExpandIcon,
   Code24Regular as CodeIcon,
   Edit24Regular as EditIcon,
+  ErrorCircle24Filled as ErrorIcon,
   Save24Regular as SaveIcon,
   ArrowUndo24Regular as UndoIcon
 } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import type { IDisposable, editor } from 'monaco-editor/editor/editor.api.js'
-import {
-  NAlert,
-  NButton,
-  NEmpty,
-  NIcon,
-  NInput,
-  NModal,
-  NSpin,
-  NTooltip,
-  useMessage
-} from 'naive-ui'
-import {
-  computed,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  reactive,
-  ref,
-  shallowRef,
-  watch
-} from 'vue'
+import { NButton, NEmpty, NIcon, NInput, NModal, NTooltip, useMessage } from 'naive-ui'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
 
 import type { PresetScopeContext } from '../data/shared'
 import { useCustomTemplatePreset } from '../data/custom-template'
-import { loadJavaScriptMonaco, MonacoEditor, type MonacoApi } from '../monaco'
+import { PresetMonacoEditor } from '../monaco'
 import type { PreviewedLines } from '../types'
+import CustomTemplateErrorPopover from '../widgets/CustomTemplateErrorPopover.vue'
 import PresetSendControls from '../widgets/PresetSendControls.vue'
 import PreviewPanel from '../widgets/PreviewPanel.vue'
 import SortablePresetListItem from '../widgets/SortablePresetListItem.vue'
@@ -347,7 +302,6 @@ interface TemplateDraft {
 }
 
 const customTemplatePreset = useCustomTemplatePreset()
-const appCommonStore = useAppCommonStore()
 const logger = useInstance(LoggerRenderer)
 const componentName = useComponentName()
 const message = useMessage()
@@ -363,13 +317,9 @@ const dragModifiers = [RestrictToVerticalAxis]
 const titleInputRef = ref<InstanceType<typeof NInput> | null>(null)
 const selectedId = ref<string | null>(null)
 const drafts = reactive<Record<string, TemplateDraft>>({})
-const models = new Map<string, editor.ITextModel>()
-const modelSubscriptions = new Map<string, IDisposable>()
-const currentModel = shallowRef<editor.ITextModel | null>(null)
-const monacoApi = shallowRef<MonacoApi | null>(null)
-const monacoLoadError = ref<string | null>(null)
-const isLoadingMonaco = ref(false)
+const editorRef = ref<InstanceType<typeof PresetMonacoEditor> | null>(null)
 const isExpanded = ref(false)
+const isEditorReady = ref(false)
 const isCreating = ref(false)
 const isSaving = ref(false)
 const isEditingTitle = ref(false)
@@ -377,6 +327,7 @@ const showRiskNotice = ref(false)
 const previewedLines = ref<PreviewedLines | null>(null)
 const pendingTitleEditItemId = ref<string | null>(null)
 const isDirty = ref(false)
+const draftCodeLength = ref(0)
 
 const items = computed(() => customTemplatePreset.items.value)
 const lastErrors = computed(() => customTemplatePreset.lastErrors.value)
@@ -388,21 +339,7 @@ const currentError = computed(() =>
   selectedId.value ? (lastErrors.value[selectedId.value] ?? null) : null
 )
 const canCreate = computed(() => items.value.length < maxItems)
-const monacoTheme = computed<'vs' | 'vs-dark'>(() =>
-  appCommonStore.colorTheme === 'dark' ? 'vs-dark' : 'vs'
-)
 const executionDisabledReason = computed(() => (isDirty.value ? t('disabled.saveFirst') : null))
-const currentErrorTitle = computed(() => {
-  if (!currentError.value) {
-    return ''
-  }
-
-  return t('lastErrorTitle', {
-    stage: t(`errorStage.${currentError.value.stage}`),
-    target: t(`errorTarget.${currentError.value.target}`),
-    time: new Date(currentError.value.occurredAt).toLocaleString()
-  })
-})
 
 const shortcutTargetIds = reactive<Record<InGameSendPresetTarget, string>>({
   friendly: '',
@@ -438,7 +375,6 @@ watch(
 
     for (const id of Object.keys(drafts)) {
       if (!currentIds.has(id)) {
-        disposeModel(id)
         delete drafts[id]
       }
     }
@@ -457,9 +393,10 @@ watch(
   async (id) => {
     previewedLines.value = null
     isExpanded.value = false
+    isEditorReady.value = false
     isEditingTitle.value = false
     isDirty.value = false
-    currentModel.value = null
+    draftCodeLength.value = selectedDraft.value?.code.length ?? 0
 
     if (!id || !selectedItem.value) {
       return
@@ -473,11 +410,6 @@ watch(
       await nextTick()
       titleInputRef.value?.focus()
     }
-
-    const model = await ensureModel(selectedItem.value)
-    if (selectedId.value === id) {
-      currentModel.value = model
-    }
   },
   { immediate: true }
 )
@@ -490,8 +422,8 @@ function getDisplayTitle(title: string) {
   return getTrimmedTitle(title) || t('unnamed')
 }
 
-function getErrorSummary(error: InGameSendCustomTemplateLastError) {
-  return error.error.split('\n')[0]
+function formatEditorLoadError(reason: string) {
+  return t('editorLoadFailed', { reason })
 }
 
 function handleSelect(id: string) {
@@ -507,74 +439,16 @@ function updateShortcutTargetIds(id: string) {
   shortcutTargetIds.all = customTemplatePreset.getShortcutTargetId(id, 'all')
 }
 
-async function ensureMonaco() {
-  if (monacoApi.value) {
-    return monacoApi.value
-  }
-
-  isLoadingMonaco.value = true
-  monacoLoadError.value = null
-  try {
-    monacoApi.value = await loadJavaScriptMonaco()
-    return monacoApi.value
-  } catch (error) {
-    monacoLoadError.value = error instanceof Error ? error.message : String(error)
-    logger.warn(componentName, 'Failed to load Monaco editor', error)
-    return null
-  } finally {
-    isLoadingMonaco.value = false
-  }
-}
-
-async function ensureModel(item: InGameSendCustomTemplateItem) {
-  const existingModel = models.get(item.id)
-  if (existingModel) {
-    return existingModel
-  }
-
-  const monaco = await ensureMonaco()
-  if (!monaco) {
-    return null
-  }
-
-  const model = monaco.editor.createModel(
-    drafts[item.id]?.code ?? item.code,
-    'javascript',
-    monaco.Uri.parse(`inmemory://league-akari/in-game-send-template/${item.id}.js`)
-  )
-  const subscription = model.onDidChangeContent(() => {
-    const draft = drafts[item.id]
-    if (!draft) {
-      return
-    }
-
-    const value = model.getValue()
-    if (value.length > codeMaxLength) {
-      model.setValue(value.slice(0, codeMaxLength))
-      return
-    }
-
-    draft.code = value
-    isDirty.value = true
-  })
-
-  models.set(item.id, model)
-  modelSubscriptions.set(item.id, subscription)
-  return model
-}
-
-function disposeModel(id: string) {
-  modelSubscriptions.get(id)?.dispose()
-  modelSubscriptions.delete(id)
-  models.get(id)?.dispose()
-  models.delete(id)
-}
-
 function handleTitleUpdate(value: string) {
   if (selectedDraft.value) {
     selectedDraft.value.title = value.slice(0, titleMaxLength)
     isDirty.value = true
   }
+}
+
+function handleCodeChange(length: number) {
+  draftCodeLength.value = length
+  isDirty.value = true
 }
 
 async function startTitleEdit() {
@@ -602,6 +476,13 @@ async function handleCreate() {
     return
   }
 
+  if (!customTemplatePreset.riskNoticeShown.value) {
+    showRiskNotice.value = true
+    void customTemplatePreset.markRiskNoticeShown().catch((error) => {
+      logger.warn(componentName, 'Failed to persist custom template risk notice state', error)
+    })
+  }
+
   isCreating.value = true
   try {
     const item = await customTemplatePreset.createItem()
@@ -624,10 +505,13 @@ async function handleSave() {
 
   isSaving.value = true
   try {
+    const code = editorRef.value?.getValue() ?? selectedDraft.value.code
     await customTemplatePreset.updateItem(selectedItem.value.id, {
       title: selectedDraft.value.title,
-      code: selectedDraft.value.code
+      code
     })
+    selectedDraft.value.code = code
+    draftCodeLength.value = code.length
     isDirty.value = false
     isEditingTitle.value = false
     message.success(t('saved'))
@@ -647,7 +531,8 @@ function handleRevert() {
   if (isDirty.value) {
     selectedDraft.value.title = selectedItem.value.title
     selectedDraft.value.code = selectedItem.value.code
-    currentModel.value?.setValue(selectedItem.value.code)
+    draftCodeLength.value = selectedItem.value.code.length
+    editorRef.value?.replaceValue(selectedItem.value.code)
   }
   isDirty.value = false
   isEditingTitle.value = false
@@ -738,21 +623,4 @@ async function handleSend(target: InGameSendPresetTarget) {
     return false
   }
 }
-
-onMounted(() => {
-  if (customTemplatePreset.riskNoticeShown.value) {
-    return
-  }
-
-  showRiskNotice.value = true
-  void customTemplatePreset.markRiskNoticeShown().catch((error) => {
-    logger.warn(componentName, 'Failed to persist custom template risk notice state', error)
-  })
-})
-
-onBeforeUnmount(() => {
-  for (const id of models.keys()) {
-    disposeModel(id)
-  }
-})
 </script>

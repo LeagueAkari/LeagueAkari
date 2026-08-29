@@ -29,12 +29,7 @@
       class="item-main flex min-h-5.5 min-w-0 flex-1 cursor-pointer items-center justify-start gap-1.5 border-0 bg-transparent p-0 text-left text-inherit focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600/50"
       @click="emit('select')"
     >
-      <NTooltip v-if="errorSummary" placement="right">
-        <template #trigger>
-          <NIcon class="shrink-0 text-red-500"><ErrorIcon /></NIcon>
-        </template>
-        {{ errorSummary }}
-      </NTooltip>
+      <slot name="status" />
       <span
         v-if="dirty"
         class="size-1.5 flex-none rounded-full bg-orange-500 dark:bg-orange-400"
@@ -90,10 +85,9 @@
 import { useSortable } from '@dnd-kit/vue/sortable'
 import {
   Delete24Regular as DeleteIcon,
-  ErrorCircle24Filled as ErrorIcon,
   ReOrderDotsVertical20Regular as DragHandleIcon
 } from '@vicons/fluent'
-import { NButton, NIcon, NPopconfirm, NTooltip } from 'naive-ui'
+import { NButton, NIcon, NPopconfirm } from 'naive-ui'
 import { computed, ref, useTemplateRef } from 'vue'
 
 const props = defineProps<{
@@ -109,7 +103,6 @@ const props = defineProps<{
   active: boolean
   dirty: boolean
   dirtyLabel: string
-  errorSummary?: string | null
 }>()
 
 const emit = defineEmits<{

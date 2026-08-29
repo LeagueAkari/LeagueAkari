@@ -484,7 +484,7 @@ toolkit:
         label: 自定义模板
         risk:
           title: 使用前请注意
-          description: 自定义模板可以访问并修改应用中的信息。来源不明或有问题的模板可能泄露信息、破坏数据，甚至导致应用崩溃。只使用你信任的模板；如果不确定它会做什么，请不要使用。AI 生成的模板也不一定安全。
+          description: 自定义模板具有读取和修改应用信息的能力。来源不明、未经审查或存在缺陷的模板，可能导致信息泄露、数据损坏或应用崩溃。请仅使用来源可信且内容已经确认的模板；若无法确认其具体行为，请勿使用。AI 生成的模板同样应在使用前经过审查。
         empty:
           description: 还没有自定义模板。新增后编写并保存 JavaScript 代码。
           action: 新增自定义模板
@@ -506,17 +506,8 @@ toolkit:
         expand: 放大编辑
         expandedTitle: 编辑模板：{{title}}
         editorLoadFailed: Monaco 编辑器加载失败：{{reason}}
-        runFailed: 模板运行失败，请查看上一次错误
-        lastErrorTitle: 上一次错误 · {{stage}} · {{target}} · {{time}}
-        errorStage:
-          load: 加载代码
-          contract: 检查函数
-          execute: 执行函数
-          result: 检查返回值
-        errorTarget:
-          friendly: 我方
-          enemy: 敌方
-          all: 全体
+        runFailed: 模板运行失败，请查看错误提示
+        lastErrorTitle: 上一次执行模板出现错误
         disabled:
           saveFirst: 请先保存当前修改
   claim:
