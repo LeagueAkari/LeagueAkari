@@ -1,7 +1,13 @@
 import type { AkariFeatureGateSnapshot } from '@shared/shards/akari-api'
 import { describe, expect, it } from 'vitest'
 
-import { type FeatureGateContext, FeatureGateEvaluator, isFeatureGateEnabled } from '.'
+import {
+  type FeatureGateContext,
+  type FeatureGateDevOverrides,
+  FeatureGateEvaluator,
+  isFeatureGateConfigured,
+  isFeatureGateEnabled
+} from '.'
 
 const config: AkariFeatureGateSnapshot = {
   updatedAt: '2026-07-25T04:00:00.000Z',
@@ -24,8 +30,9 @@ const context = (overrides: Partial<FeatureGateContext> = {}): FeatureGateContex
 
 const evaluate = (
   snapshot: AkariFeatureGateSnapshot | null,
-  overrides: Partial<FeatureGateContext> = {}
-) => new FeatureGateEvaluator().evaluate(snapshot, context(overrides))
+  contextOverrides: Partial<FeatureGateContext> = {},
+  devOverrides?: FeatureGateDevOverrides
+) => new FeatureGateEvaluator().evaluate(snapshot, context(contextOverrides), devOverrides)
 
 describe('feature gate evaluation', () => {
   it('enables a gate when every configured condition matches', () => {
@@ -44,6 +51,65 @@ describe('feature gate evaluation', () => {
 
     expect(isFeatureGateEnabled('unknown.feature', true, evaluation)).toBe(false)
     expect(isFeatureGateEnabled('self-update.automatic', false, evaluation)).toBe(false)
+  })
+
+  it('replaces same-name remote configurations with development overrides', () => {
+    const evaluation = evaluate(
+      config,
+      {},
+      {
+        'match-history.bulk-collection': {
+          mode: 'rule',
+          config: { platforms: ['darwin'] }
+        },
+        'champion-data.source.opgg': { mode: 'force-on' },
+        'champion-data.source.qq101': { mode: 'force-off' }
+      }
+    )
+
+    expect(isFeatureGateEnabled('match-history.bulk-collection', true, evaluation)).toBe(false)
+    expect(isFeatureGateEnabled('champion-data.source.opgg', false, evaluation)).toBe(true)
+    expect(isFeatureGateEnabled('champion-data.source.qq101', true, evaluation)).toBe(false)
+    expect(isFeatureGateConfigured('champion-data.source.opgg', evaluation)).toBe(true)
+  })
+
+  it('evaluates a same-name rule replacement without inheriting remote fields', () => {
+    const evaluation = evaluate(
+      config,
+      { platform: 'darwin', sgpServerId: 'EUW' },
+      {
+        'match-history.bulk-collection': {
+          mode: 'rule',
+          config: { platforms: ['darwin'] }
+        }
+      }
+    )
+
+    expect(isFeatureGateEnabled('match-history.bulk-collection', false, evaluation)).toBe(true)
+  })
+
+  it('keeps caller defaults for unoverridden gates when the remote snapshot is unavailable', () => {
+    const evaluation = evaluate(
+      null,
+      {},
+      {
+        'champion-data.source.opgg': { mode: 'force-off' },
+        'champion-data.source.rule': {
+          mode: 'rule',
+          config: { platforms: ['win32'] }
+        },
+        'champion-data.source.unmatched': {
+          mode: 'rule',
+          config: { platforms: ['darwin'] }
+        }
+      }
+    )
+
+    expect(isFeatureGateEnabled('champion-data.source.opgg', true, evaluation)).toBe(false)
+    expect(isFeatureGateEnabled('champion-data.source.rule', false, evaluation)).toBe(true)
+    expect(isFeatureGateEnabled('champion-data.source.unmatched', true, evaluation)).toBe(false)
+    expect(isFeatureGateEnabled('unknown.feature', true, evaluation)).toBe(true)
+    expect(isFeatureGateEnabled('another.feature', false, evaluation)).toBe(false)
   })
 
   it('requires platform and SGP server matches', () => {
@@ -97,9 +163,15 @@ describe('feature gate evaluation', () => {
   it('reuses the converted key set until the snapshot or context changes', () => {
     const evaluator = new FeatureGateEvaluator()
     const currentContext = context()
-    const first = evaluator.evaluate(config, currentContext)
+    const devOverrides = {
+      'champion-data.source.opgg': { mode: 'force-on' as const }
+    }
+    const first = evaluator.evaluate(config, currentContext, devOverrides)
 
-    expect(evaluator.evaluate(config, { ...currentContext })).toBe(first)
-    expect(evaluator.evaluate(config, { ...currentContext, platform: 'darwin' })).not.toBe(first)
+    expect(evaluator.evaluate(config, { ...currentContext }, devOverrides)).toBe(first)
+    expect(
+      evaluator.evaluate(config, { ...currentContext, platform: 'darwin' }, devOverrides)
+    ).not.toBe(first)
+    expect(evaluator.evaluate(config, currentContext, { ...devOverrides })).not.toBe(first)
   })
 })

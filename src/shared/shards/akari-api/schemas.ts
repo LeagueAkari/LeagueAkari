@@ -20,7 +20,9 @@ const UniqueNonEmptyStringArraySchema = z
   .min(1)
   .refine((values) => new Set(values).size === values.length)
 
-const AkariFeatureGateRuntimeRuleSchema = z
+export const AkariFeatureGateKeySchema = z.string().regex(/^[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)+$/)
+
+export const AkariFeatureGateRuntimeRuleSchema = z
   .object({
     platforms: z
       .array(z.enum(['win32', 'darwin']))
@@ -62,10 +64,7 @@ const AkariFeatureGateRuntimeRuleSchema = z
 export const AkariFeatureGateSnapshotSchema: z.ZodType<AkariFeatureGateSnapshot> = z
   .object({
     ...ConfigMetadataShape,
-    gates: z.record(
-      z.string().regex(/^[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)+$/),
-      AkariFeatureGateRuntimeRuleSchema
-    )
+    gates: z.record(AkariFeatureGateKeySchema, AkariFeatureGateRuntimeRuleSchema)
   })
   .strict()
 

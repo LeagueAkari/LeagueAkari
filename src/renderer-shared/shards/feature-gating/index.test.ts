@@ -8,7 +8,10 @@ import { AkariApiRenderer } from '../akari-api'
 import { useAkariApiStore } from '../akari-api/store'
 import { AppCommonRenderer } from '../app-common'
 import { useAppCommonStore } from '../app-common/store'
+import type { AkariIpcRenderer } from '../ipc'
+import type { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { useSgpStore } from '../sgp/store'
+import { useFeatureGatingStore } from './store'
 
 vi.mock('i18next-vue', () => ({
   useTranslation: () => ({
@@ -29,8 +32,14 @@ describe('FeatureGatingRenderer', () => {
   it('can be observed from a Vue watch', () => {
     const akariApi = useAkariApiStore()
     const appCommon = useAppCommonStore()
+    const featureGatingStore = useFeatureGatingStore()
     const sgp = useSgpStore()
-    const featureGating = new FeatureGatingRenderer({} as AkariApiRenderer, {} as AppCommonRenderer)
+    const featureGating = new FeatureGatingRenderer(
+      {} as AkariApiRenderer,
+      {} as AppCommonRenderer,
+      {} as AkariIpcRenderer,
+      {} as PiniaMobxUtilsRenderer
+    )
     const values: boolean[] = []
 
     appCommon.platform = 'win32'
@@ -54,8 +63,39 @@ describe('FeatureGatingRenderer', () => {
       }
     })
     appCommon.platform = 'darwin'
+    featureGatingStore.devOverrides = {
+      'ongoing-game.deobfuscation': { mode: 'force-on' }
+    }
+    featureGatingStore.devOverrides = {}
 
-    expect(values).toEqual([true, false, true, false])
+    expect(values).toEqual([true, false, true, false, true, false])
     stop()
+  })
+
+  it('reports the remote status independently from development overrides', () => {
+    const akariApi = useAkariApiStore()
+    const appCommon = useAppCommonStore()
+    const featureGatingStore = useFeatureGatingStore()
+    const featureGating = new FeatureGatingRenderer(
+      {} as AkariApiRenderer,
+      {} as AppCommonRenderer,
+      {} as AkariIpcRenderer,
+      {} as PiniaMobxUtilsRenderer
+    )
+
+    appCommon.platform = 'win32'
+    featureGatingStore.devOverrides = { 'test.remote-gate': { mode: 'force-on' } }
+
+    expect(featureGating.getServerStatus('test.remote-gate')).toBe('snapshot-unavailable')
+
+    akariApi.featureGates = snapshot({
+      'test.remote-gate': { platforms: ['darwin'] }
+    })
+
+    expect(featureGating.getServerStatus('test.remote-gate')).toBe('rule-not-matched')
+    expect(featureGating.getServerStatus('test.unknown-gate')).toBe('not-configured')
+
+    appCommon.platform = 'darwin'
+    expect(featureGating.getServerStatus('test.remote-gate')).toBe('enabled')
   })
 })

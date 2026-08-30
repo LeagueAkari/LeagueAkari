@@ -15,10 +15,11 @@ import {
   ArrowSync24Filled,
   DataUsage24Filled,
   DocumentText24Filled,
+  Flag24Regular,
   Filter20Regular,
   Keyboard24Regular
 } from '@vicons/fluent'
-import { computed } from 'vue'
+import { computed, defineAsyncComponent } from 'vue'
 
 import TabbedPage, { TabConfig } from '@main-window/components/TabbedPage.vue'
 
@@ -27,6 +28,10 @@ import KeyboardShortcutsTest from './KeyboardShortcutsTest.vue'
 import MarkdownTest from './MarkdownTest.vue'
 import MatchHistoryFiltersTest from './MatchHistoryFiltersTest.vue'
 import SelfUpdateTest from './SelfUpdateTest.vue'
+
+const featureGateOverridesTest = import.meta.env.DEV
+  ? defineAsyncComponent(() => import('./feature-gate-overrides/FeatureGateOverridesTest.vue'))
+  : null
 
 const tabs = computed<TabConfig[]>(() => [
   {
@@ -58,6 +63,16 @@ const tabs = computed<TabConfig[]>(() => [
     name: '快捷键系统',
     icon: Keyboard24Regular,
     component: KeyboardShortcutsTest
-  }
+  },
+  ...(featureGateOverridesTest
+    ? [
+        {
+          key: 'feature-gates',
+          name: 'FG 覆盖',
+          icon: Flag24Regular,
+          component: featureGateOverridesTest
+        }
+      ]
+    : [])
 ])
 </script>
