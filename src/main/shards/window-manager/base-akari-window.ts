@@ -310,7 +310,9 @@ export abstract class BaseAkariWindow<
         sandbox: false,
         spellcheck: false,
         partition: this._partition,
-        backgroundThrottling: false,
+        // Disabling this can leave hidden Windows windows with stale rendering and input state.
+        // Keep Electron's default throttling behavior unless a window has a proven need to opt out.
+        backgroundThrottling: true,
         additionalArguments: [`--akari-window-type=${this._namespaceSuffix}`],
         ...webPreferences
       },
@@ -627,7 +629,14 @@ export abstract class BaseAkariWindow<
         return
       }
 
-      if (!this._window.isVisible()) {
+      const nativeVisible = this._window.isVisible()
+      if (!this.state.show || !nativeVisible) {
+        if (this.state.show !== nativeVisible) {
+          this._logger.warn(
+            `Window visibility state mismatch (${this._namespace}): state.show=${this.state.show}, nativeVisible=${nativeVisible}; reissuing show`
+          )
+        }
+
         if (inactive) {
           this._window.showInactive()
         } else {
@@ -663,7 +672,14 @@ export abstract class BaseAkariWindow<
       return
     }
 
-    if (!this._window.isVisible()) {
+    const nativeVisible = this._window.isVisible()
+    if (!this.state.show || !nativeVisible) {
+      if (this.state.show !== nativeVisible) {
+        this._logger.warn(
+          `Window visibility state mismatch (${this._namespace}): state.show=${this.state.show}, nativeVisible=${nativeVisible}; reissuing show`
+        )
+      }
+
       if (inactive) {
         this._window.showInactive()
       } else {
@@ -675,10 +691,15 @@ export abstract class BaseAkariWindow<
   }
 
   hide() {
-    if (this._window && (this._window.isVisible() || this._window.isMinimized())) {
-      this._window.hide()
-      this._syncShowStateFromWindow()
+    if (!this._window) {
+      return
     }
+
+    if (this._window.isVisible() || this._window.isMinimized()) {
+      this._window.hide()
+    }
+
+    this._syncShowStateFromWindow()
   }
 
   private _syncShowStateFromWindow() {

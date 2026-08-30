@@ -142,6 +142,14 @@ describe('AkariOngoingGameWindow', () => {
     expect(close).toHaveBeenCalledWith(true)
   })
 
+  it('keeps background throttling enabled for the non-focusable overlay window', () => {
+    const ongoingGameWindow = new AkariOngoingGameWindow(createContext() as any)
+
+    expect(
+      (ongoingGameWindow as any)._config.browserWindowOptions.webPreferences.backgroundThrottling
+    ).toBe(true)
+  })
+
   it('delays tracked bounds writes at the storage layer', async () => {
     const context = createContext()
     const ongoingGameWindow = new AkariOngoingGameWindow(context as any)
