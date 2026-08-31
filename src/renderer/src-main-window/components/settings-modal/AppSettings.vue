@@ -663,10 +663,10 @@ const mainWindowBackgroundModeOptions = computed(() => {
       value: 'none'
     },
     {
-      label: t('settings.app.mainWindowUi.background.options.mica'),
-      value: 'mica',
-      tooltip: t('settings.app.mainWindowUi.background.tooltips.mica'),
-      disabled: !wms.supportsMica
+      label: t('settings.app.mainWindowUi.background.options.system'),
+      value: 'system',
+      tooltip: t('settings.app.mainWindowUi.background.tooltips.system'),
+      disabled: !wms.supportsSystemBackgroundMaterial
     }
   ]
 })

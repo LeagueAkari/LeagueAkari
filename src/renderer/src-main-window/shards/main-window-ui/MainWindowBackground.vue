@@ -1,8 +1,11 @@
 <template>
-  <div class="main-window-background" :class="{ 'is-mica': isMicaActive }">
+  <div
+    class="main-window-background"
+    :class="{ 'is-system-background-material': isSystemBackgroundMaterialActive }"
+  >
     <Transition name="main-window-background-fade">
       <div
-        v-if="backgroundMediaUrl && backgroundMediaType && !isMicaActive"
+        v-if="backgroundMediaUrl && backgroundMediaType && !isSystemBackgroundMaterialActive"
         :key="backgroundMediaUrl"
         class="main-window-background__visual"
       >
@@ -33,8 +36,12 @@ import { useInstance } from '@renderer-shared/shards'
 import { MainWindowUiRenderer } from '.'
 
 const mainWindowUi = useInstance(MainWindowUiRenderer)
-const { backgroundMediaUrl, backgroundMediaType, isMicaActive, overlayStrength } =
-  mainWindowUi.useBackgroundPresentation()
+const {
+  backgroundMediaUrl,
+  backgroundMediaType,
+  isSystemBackgroundMaterialActive,
+  overlayStrength
+} = mainWindowUi.useBackgroundPresentation()
 
 const handleBackgroundMediaError = () => {
   if (backgroundMediaUrl.value) {
@@ -53,7 +60,7 @@ const handleBackgroundMediaError = () => {
   pointer-events: none;
 }
 
-.main-window-background.is-mica {
+.main-window-background.is-system-background-material {
   background-color: transparent;
 }
 
@@ -94,13 +101,13 @@ body {
   background-color: var(--la-background-color-primary);
 }
 
-html.mica-enabled,
-body.mica-enabled,
-html.mica-enabled #app {
+html.system-background-material-enabled,
+body.system-background-material-enabled,
+html.system-background-material-enabled #app {
   background-color: transparent !important;
 }
 
-.mica-enabled .app-titlebar {
+.system-background-material-enabled .app-titlebar {
   backdrop-filter: none;
 }
 </style>

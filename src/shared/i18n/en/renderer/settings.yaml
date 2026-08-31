@@ -102,11 +102,10 @@ settings:
           profileSkin: Champion Background
           customImage: Custom Wallpaper
           none: Default
-          mica: Mica
+          system: System Material
         tooltips:
           profileSkin: Use the current player's profile background skin as the main window background
-          mica: Available only on newer Windows versions. If unsupported on the current platform, it falls back to the default background
-          micaUnsupported: Mica is not supported on the current platform and will fall back to the default background
+          system: Uses Mica on Windows and native window blur on macOS. Falls back to the default solid background when unavailable or if activation fails
       customBackground:
         label: Custom Wallpaper
         description: Use a fixed local image or video as the background. The wallpaper is center-cropped
@@ -119,8 +118,8 @@ settings:
         description: Set the background material of the application interface, requires specific system version support
         options:
           none: None
-          mica: Mica
-          micaUnsupported: Mica (Unsupported)
+          system: System Material
+          systemUnsupported: System Material (Unsupported)
     lcConnection:
       title: LCU Connection
       autoConnect:

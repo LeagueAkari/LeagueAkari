@@ -4,11 +4,12 @@ import { Equal } from 'typeorm'
 import { Setting } from '../../storage/entities/Settings'
 import { type MigrationContext, hasMigration, markMigration } from './context'
 
-export const MIGRATION_FROM_151 = 'akari-migration-from-1.5.1_champion-data-window'
+export const MIGRATION_FROM_151 = 'akari-migration-from-1.5.1_patch2'
 export const LEGACY_OPGG_PREFERENCES_KEY = 'opgg-renderer/savedPreferences'
 export const CHAMPION_DATA_PREFERENCES_KEY = 'champion-data-main/preferences'
 export const LEGACY_AUX_SHOW_SKIN_SELECTOR_KEY = 'window-manager-main/aux-window/showSkinSelector'
 export const OPGG_SHOW_SKIN_SELECTOR_KEY = 'window-manager-main/opgg-window/showSkinSelector'
+export const BACKGROUND_MATERIAL_SETTING_KEY = 'window-manager-main/backgroundMaterial'
 
 const DEFAULT_PREFERENCES: ChampionDataPreferences = {
   mode: 'ranked',
@@ -78,11 +79,28 @@ async function migrateSkinSelectorSetting({ manager }: MigrationContext) {
   await manager.save(Setting.create(OPGG_SHOW_SKIN_SELECTOR_KEY, legacy.value))
 }
 
+export function migrateBackgroundMaterialValue(value: unknown) {
+  return value === 'mica' ? 'system' : value
+}
+
+async function migrateBackgroundMaterialSetting({ manager }: MigrationContext) {
+  const saved = await manager.findOneBy(Setting, {
+    key: Equal(BACKGROUND_MATERIAL_SETTING_KEY)
+  })
+  if (!saved) return
+
+  const migratedValue = migrateBackgroundMaterialValue(saved.value)
+  if (migratedValue === saved.value) return
+
+  await manager.save(Setting.create(BACKGROUND_MATERIAL_SETTING_KEY, migratedValue))
+}
+
 export async function migrateFrom151(context: MigrationContext) {
   if (await hasMigration(context.manager, MIGRATION_FROM_151)) return
   context.logger.info('Start migrating settings', MIGRATION_FROM_151)
   await migrateChampionDataPreferences(context)
   await migrateSkinSelectorSetting(context)
+  await migrateBackgroundMaterialSetting(context)
   await markMigration(context.manager, MIGRATION_FROM_151)
   context.logger.info(`Migration completed, to ${MIGRATION_FROM_151}`)
 }

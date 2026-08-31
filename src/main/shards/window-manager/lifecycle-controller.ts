@@ -1,4 +1,5 @@
 import type { AkariAuxWindow } from './aux-window/window'
+import { isSystemBackgroundMaterialSupported } from './background-material-resolver'
 import type { AkariCdTimerWindow } from './cd-timer-window/windows'
 import type { WindowManagerMainContext } from './context'
 import type { AkariMainWindow } from './main-window/window'
@@ -22,15 +23,22 @@ export class WindowManagerLifecycleController {
   async init() {
     await this._context.settingService.applyToState()
 
-    if (this._context.shared.global.isWindows11_22H2_OrHigher) {
-      this._context.windowManager.state.setSupportsMica(true)
-    }
+    const supportsMica = this._context.shared.global.isWindows11_22H2_OrHigher
+    this._context.windowManager.state.setSupportsMica(supportsMica)
+    this._context.windowManager.state.setSupportsSystemBackgroundMaterial(
+      isSystemBackgroundMaterialSupported(this._context.shared.global.platform, supportsMica)
+    )
 
     this._context.mobxUtils.propSync(
       this._context.namespace,
       'state',
       this._context.windowManager.state,
-      ['supportsMica', 'downloadTasks']
+      [
+        'supportsMica',
+        'supportsSystemBackgroundMaterial',
+        'systemBackgroundMaterialActive',
+        'downloadTasks'
+      ]
     )
     this._context.mobxUtils.propSync(
       this._context.namespace,

@@ -13,7 +13,6 @@ import { SelfUpdateMain } from '../self-update'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { AkariAuxWindow } from './aux-window/window'
-import { settingToNativeBackgroundMaterial } from './background-material-resolver'
 import { AkariCdTimerWindow } from './cd-timer-window/windows'
 import { WINDOW_MANAGER_MAIN_NAMESPACE, type WindowManagerMainContext } from './context'
 import { WindowManagerLifecycleController } from './lifecycle-controller'
@@ -59,7 +58,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       {
         backgroundMaterial: {
           default: this.settings.backgroundMaterial,
-          schema: z.enum(['mica', 'none'])
+          schema: z.enum(['system', 'none'])
         },
         contentProtection: { default: this.settings.contentProtection, schema: z.boolean() }
       },
@@ -108,20 +107,5 @@ export class WindowManagerMain implements IAkariShardInitDispose {
 
   async onFinish() {
     this._lifecycleController.finish()
-  }
-
-  /**
-   * 设置项的背景材质转换为原生系统级别背景材质
-   */
-  _settingToNativeBackgroundMaterial(material: string) {
-    // fixed in v35.0.0, https://github.com/electron/electron/pull/45525
-    // if (material === 'mica' && process.env['NODE_ENV'] !== 'development') {
-    //   this._logger.warn(
-    //     'Mica is disabled in production mode. (https://github.com/electron/electron/issues/41824)'
-    //   )
-    //   return 'none'
-    // }
-
-    return settingToNativeBackgroundMaterial(material, this.state.supportsMica)
   }
 }

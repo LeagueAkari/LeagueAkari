@@ -1,7 +1,7 @@
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
-import { computed, onScopeDispose, ref, watch, watchEffect } from 'vue'
+import { computed, nextTick, onScopeDispose, ref, watch, watchEffect } from 'vue'
 
 import { router } from '@main-window/routes'
 
@@ -13,7 +13,7 @@ import {
 } from './context'
 import { type MainWindowBackgroundImageMode, useMainWindowUiStore } from './store'
 
-export type MainWindowBackgroundMode = MainWindowBackgroundImageMode | 'mica'
+export type MainWindowBackgroundMode = MainWindowBackgroundImageMode | 'system'
 
 export type MainWindowBackgroundMediaType = 'image' | 'video'
 
@@ -38,6 +38,7 @@ export class MainWindowBackgroundController {
   private readonly _urlCache = new Map<number, string>()
   private readonly _loadedBackgroundMediaUrl = ref<string | null>(null)
   private readonly _loadedBackgroundMediaType = ref<MainWindowBackgroundMediaType | null>(null)
+  private readonly _suppressSystemBackgroundMaterialPresentation = ref(false)
   private _backgroundRequestId = 0
 
   constructor(private readonly _context: MainWindowUiRendererContext) {}
@@ -46,7 +47,8 @@ export class MainWindowBackgroundController {
     const leagueClientStore = useLeagueClientStore()
     const mainWindowUiStore = useMainWindowUiStore()
     const playerTabsStore = usePlayerTabsStore()
-    const { isMicaRequested, isMicaActive } = this._useMicaState()
+    const { isSystemBackgroundMaterialRequested, isSystemBackgroundMaterialActive } =
+      this._useSystemBackgroundMaterialState()
 
     const selfBackgroundCandidate = computed<MainWindowProfileBackgroundMediaCandidate | null>(
       () => {
@@ -106,7 +108,7 @@ export class MainWindowBackgroundController {
     )
 
     const backgroundMediaCandidates = computed<MainWindowBackgroundMediaCandidate[]>(() => {
-      if (isMicaRequested.value) {
+      if (isSystemBackgroundMaterialRequested.value) {
         return []
       }
 
@@ -147,20 +149,20 @@ export class MainWindowBackgroundController {
     )
 
     watchEffect(() => {
-      this._toggleMicaDocumentClass(isMicaActive.value)
+      this._toggleSystemBackgroundMaterialDocumentClass(isSystemBackgroundMaterialActive.value)
     })
 
     onScopeDispose(() => {
       this._backgroundRequestId++
       this._loadedBackgroundMediaUrl.value = null
       this._loadedBackgroundMediaType.value = null
-      this._toggleMicaDocumentClass(false)
+      this._toggleSystemBackgroundMaterialDocumentClass(false)
     })
   }
 
   usePresentation() {
     const mainWindowUiStore = useMainWindowUiStore()
-    const { isMicaActive } = this._useMicaState()
+    const { isSystemBackgroundMaterialActive } = this._useSystemBackgroundMaterialState()
     const overlayStrength = computed(() => {
       if (!this._loadedBackgroundMediaUrl.value) {
         return 0
@@ -176,7 +178,7 @@ export class MainWindowBackgroundController {
     return {
       backgroundMediaUrl: this._loadedBackgroundMediaUrl,
       backgroundMediaType: this._loadedBackgroundMediaType,
-      isMicaActive,
+      isSystemBackgroundMaterialActive,
       overlayStrength
     }
   }
@@ -186,8 +188,8 @@ export class MainWindowBackgroundController {
     const windowManagerStore = useWindowManagerStore()
 
     return computed<MainWindowBackgroundMode>(() => {
-      if (windowManagerStore.settings.backgroundMaterial === 'mica') {
-        return 'mica'
+      if (windowManagerStore.settings.backgroundMaterial === 'system') {
+        return 'system'
       }
 
       return mainWindowUiStore.frontendSettings.backgroundImageMode
@@ -197,14 +199,21 @@ export class MainWindowBackgroundController {
   async setMode(mode: MainWindowBackgroundMode) {
     const mainWindowUiStore = useMainWindowUiStore()
 
-    if (mode === 'mica') {
+    if (mode === 'system') {
       mainWindowUiStore.frontendSettings.backgroundImageMode = 'none'
-      await this._context.windowManager.setBackgroundMaterial('mica')
+      await this._context.windowManager.setBackgroundMaterial('system')
       return
     }
 
+    this._suppressSystemBackgroundMaterialPresentation.value = true
     mainWindowUiStore.frontendSettings.backgroundImageMode = mode
-    await this._context.windowManager.setBackgroundMaterial('none')
+    await nextTick()
+
+    try {
+      await this._context.windowManager.setBackgroundMaterial('none')
+    } finally {
+      this._suppressSystemBackgroundMaterialPresentation.value = false
+    }
   }
 
   useCustomBackgroundSettings() {
@@ -243,22 +252,28 @@ export class MainWindowBackgroundController {
     )
   }
 
-  private _useMicaState() {
+  private _useSystemBackgroundMaterialState() {
     const windowManagerStore = useWindowManagerStore()
-    const isMicaRequested = computed(
-      () => windowManagerStore.settings.backgroundMaterial === 'mica'
+    const isSystemBackgroundMaterialRequested = computed(
+      () => windowManagerStore.settings.backgroundMaterial === 'system'
     )
-    const isMicaActive = computed(() => windowManagerStore.supportsMica && isMicaRequested.value)
+    const isSystemBackgroundMaterialActive = computed(
+      () =>
+        windowManagerStore.supportsSystemBackgroundMaterial &&
+        windowManagerStore.systemBackgroundMaterialActive &&
+        !this._suppressSystemBackgroundMaterialPresentation.value &&
+        isSystemBackgroundMaterialRequested.value
+    )
 
     return {
-      isMicaRequested,
-      isMicaActive
+      isSystemBackgroundMaterialRequested,
+      isSystemBackgroundMaterialActive
     }
   }
 
-  private _toggleMicaDocumentClass(enabled: boolean) {
-    document.documentElement.classList.toggle('mica-enabled', enabled)
-    document.body.classList.toggle('mica-enabled', enabled)
+  private _toggleSystemBackgroundMaterialDocumentClass(enabled: boolean) {
+    document.documentElement.classList.toggle('system-background-material-enabled', enabled)
+    document.body.classList.toggle('system-background-material-enabled', enabled)
   }
 
   reportBackgroundMediaLoadFailure(url: string) {

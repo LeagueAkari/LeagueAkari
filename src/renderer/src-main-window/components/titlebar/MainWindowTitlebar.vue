@@ -2,10 +2,7 @@
   <div
     ref="titlebar"
     class="app-titlebar"
-    :class="[
-      { 'should-show-bottom-border': shouldShowBottomBorder },
-      as.isMacOS ? 'pl-[calc(8px+var(--la-mac-titlebar-safe-left))]' : 'pl-2'
-    ]"
+    :class="[{ 'should-show-bottom-border': shouldShowBottomBorder }, 'pl-2']"
   >
     <div class="shard-area">
       <Transition name="fade">

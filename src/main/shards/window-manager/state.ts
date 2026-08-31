@@ -1,15 +1,15 @@
-import { DownloadTask } from '@shared/shards/window-manager'
+import type { BackgroundMaterialSetting, DownloadTask } from '@shared/shards/window-manager'
 import { makeAutoObservable, observableRef } from 'mobx'
 
 export class WindowManagerSettings {
-  backgroundMaterial: 'mica' | 'none' = 'none'
+  backgroundMaterial: BackgroundMaterialSetting = 'none'
 
   /** not used */
   overlayType: 'window-band' | 'topmost' = 'window-band'
 
   contentProtection: boolean = false
 
-  setBackgroundMaterial(material: 'mica' | 'none') {
+  setBackgroundMaterial(material: BackgroundMaterialSetting) {
     this.backgroundMaterial = material
   }
 
@@ -32,6 +32,10 @@ const MAX_FINISHED_TASKS = 20
 export class WindowManagerState {
   supportsMica: boolean = false
 
+  supportsSystemBackgroundMaterial: boolean = false
+
+  systemBackgroundMaterialActive: boolean = false
+
   isManagerFinishedInit: boolean = false
 
   /** 下载任务列表 */
@@ -39,6 +43,14 @@ export class WindowManagerState {
 
   setSupportsMica(supports: boolean) {
     this.supportsMica = supports
+  }
+
+  setSupportsSystemBackgroundMaterial(supports: boolean) {
+    this.supportsSystemBackgroundMaterial = supports
+  }
+
+  setSystemBackgroundMaterialActive(active: boolean) {
+    this.systemBackgroundMaterialActive = active
   }
 
   setManagerFinishedInit(ready: boolean) {

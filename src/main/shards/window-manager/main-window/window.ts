@@ -1,8 +1,13 @@
 import icon from '@resources/LA_ICON.ico?asset&asarUnpack'
+import type { BackgroundMaterialSetting } from '@shared/shards/window-manager'
 import { Event } from 'electron'
 import { compareShallow } from 'mobx'
 import { z } from 'zod'
 
+import {
+  type NativeBackgroundMaterial,
+  resolveNativeBackgroundMaterial
+} from '../background-material-resolver'
 import { BaseAkariWindow } from '../base-akari-window'
 import type { WindowManagerMainContext } from '../context'
 import { MainWindowSettings, MainWindowState } from './state'
@@ -48,7 +53,10 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
         trafficLightPosition: {
           x: 4,
           y: 12
-        }
+        },
+        // Constructor-time vibrancy also initializes Chromium's backing as transparent.
+        // Calling setVibrancy() only after creation leaves the default opaque backing in place.
+        ...(process.platform === 'darwin' ? { vibrancy: 'under-window' as const } : {})
       }
     })
   }
@@ -67,9 +75,7 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
       () => [this._windowManager.settings.backgroundMaterial, this.state.ready] as const,
       ([material, ready]) => {
         if (ready) {
-          this._window?.setBackgroundMaterial(
-            this._windowManager._settingToNativeBackgroundMaterial(material)
-          )
+          this._applyBackgroundMaterial(material)
         }
       },
       { fireImmediately: true, equals: compareShallow }
@@ -99,6 +105,65 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
         }
       }
     )
+  }
+
+  private _applyBackgroundMaterial(material: BackgroundMaterialSetting) {
+    if (!this._window) {
+      this._windowManager.state.setSystemBackgroundMaterialActive(false)
+      return
+    }
+
+    if (material === 'system' && !this._windowManager.state.supportsSystemBackgroundMaterial) {
+      this._windowManager.state.setSystemBackgroundMaterialActive(false)
+      return
+    }
+
+    const nativeMaterial = resolveNativeBackgroundMaterial(
+      material,
+      this._context.shared.global.platform,
+      this._windowManager.state.supportsMica
+    )
+
+    try {
+      this._setNativeBackgroundMaterial(nativeMaterial)
+      this._windowManager.state.setSystemBackgroundMaterialActive(nativeMaterial !== 'none')
+    } catch (error) {
+      this._windowManager.state.setSystemBackgroundMaterialActive(false)
+
+      if (material === 'system') {
+        this._windowManager.state.setSupportsSystemBackgroundMaterial(false)
+      }
+
+      this._logger.warn(
+        'Failed to apply system background material, falling back to a solid background',
+        {
+          platform: this._context.shared.global.platform,
+          nativeMaterial
+        },
+        error
+      )
+
+      try {
+        this._setNativeBackgroundMaterial('none')
+      } catch (clearError) {
+        this._logger.warn('Failed to clear native background material after fallback', clearError)
+      }
+    }
+  }
+
+  private _setNativeBackgroundMaterial(material: NativeBackgroundMaterial) {
+    if (!this._window) {
+      return
+    }
+
+    if (this._context.shared.global.platform === 'darwin') {
+      this._window.setVibrancy(material === 'vibrancy' ? 'under-window' : null)
+      return
+    }
+
+    if (this._context.shared.global.platform === 'win32') {
+      this._window.setBackgroundMaterial(material === 'mica' ? 'mica' : 'none')
+    }
   }
 
   private _registerMainWindowIpcHandlers() {

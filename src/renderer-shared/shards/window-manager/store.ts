@@ -1,4 +1,8 @@
-import { DownloadTask, MainWindowCloseAction } from '@shared/shards/window-manager'
+import type {
+  BackgroundMaterialSetting,
+  DownloadTask,
+  MainWindowCloseAction
+} from '@shared/shards/window-manager'
 import { defineStore } from 'pinia'
 import { ref, shallowReactive, shallowRef } from 'vue'
 
@@ -20,17 +24,21 @@ export function useBasicWindowStates() {
 
 export const useWindowManagerStore = defineStore('shard:window-manager-renderer', () => {
   const settings = shallowReactive({
-    backgroundMaterial: 'none' as 'none' | 'mica',
+    backgroundMaterial: 'none' as BackgroundMaterialSetting,
     contentProtection: false
   })
 
   const supportsMica = ref(false)
+  const supportsSystemBackgroundMaterial = ref(false)
+  const systemBackgroundMaterialActive = ref(false)
 
   const downloadTasks = shallowRef<DownloadTask[]>([])
 
   return {
     settings,
     supportsMica,
+    supportsSystemBackgroundMaterial,
+    systemBackgroundMaterialActive,
     downloadTasks
   }
 })

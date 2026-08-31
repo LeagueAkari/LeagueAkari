@@ -1,5 +1,7 @@
 export type MainWindowCloseAction = 'minimize-to-tray' | 'quit' | 'ask'
 
+export type BackgroundMaterialSetting = 'none' | 'system'
+
 export type DownloadTaskState = 'progressing' | 'completed' | 'interrupted' | 'cancelled'
 
 export interface DownloadTask {

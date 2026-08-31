@@ -102,11 +102,10 @@ settings:
           profileSkin: 英雄背景
           customImage: 自定义壁纸
           none: 默认
-          mica: Mica
+          system: 系统材质
         tooltips:
           profileSkin: 使用当前玩家的生涯背景皮肤作为主界面背景
-          mica: 仅 Windows 高版本系统可用。如果当前平台不可用，会回退到默认背景
-          micaUnsupported: 当前平台不支持 Mica，会回退到默认背景
+          system: 在 Windows 上使用 Mica，在 macOS 上使用原生窗口模糊。当前平台不可用或启用失败时会回退到默认纯色背景
       customBackground:
         label: 自定义壁纸
         description: 使用固定的本地图片或视频作为背景。壁纸会居中裁剪
@@ -119,8 +118,8 @@ settings:
         description: 设置应用界面的背景材质，需特定系统版本支持
         options:
           none: 无
-          mica: Mica
-          micaUnsupported: Mica (不支持)
+          system: 系统材质
+          systemUnsupported: 系统材质 (不支持)
     lcConnection:
       title: LCU 连接
       autoConnect:
