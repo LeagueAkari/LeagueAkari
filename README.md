@@ -4,13 +4,14 @@
     src="https://github.com/LeagueAkari/LeagueAkari/raw/HEAD/pictures/logo.png"
     width="128"
     height="128"
+    alt="League Akari logo"
     />
   </div>
   A League of Legends client toolkit based on the LCU API
 </div>
 
 <p align="center">
-    <a href="https://github.com/LeagueAkari/LeagueAkari/releases"><img src="https://img.shields.io/github/release/LeagueAkari/LeagueAkari.svg?style=flat-square&maxAge=600" alt="Downloads"></a>
+    <a href="https://github.com/LeagueAkari/LeagueAkari/releases"><img src="https://img.shields.io/github/v/release/LeagueAkari/LeagueAkari?include_prereleases&style=flat-square&label=Version" alt="Latest version"></a>
     <a href="https://github.com/LeagueAkari/LeagueAkari/releases">
     <img src="https://img.shields.io/github/downloads/LeagueAkari/LeagueAkari/total?style=flat&label=Downloads"></a>
     <a href="https://github.com/LeagueAkari/LeagueAkari/stargazers">
@@ -18,60 +19,48 @@
   </a>
 </p>
 
-# 1. League Akari
+# League Akari
 
 A League of Legends client toolkit based on the LCU API.
 
-## 1.2 Usage Instructions
+## Download and Usage
 
-Admin privileges are not required to run, but they enable additional features.
+Download the latest Windows or macOS build from [GitHub Releases](https://github.com/LeagueAkari/LeagueAkari/releases).
 
-Supports most of the riot servers (not including Tencent).
+Administrator privileges are not required. On Windows, some native shortcuts, overlays, and client-window utilities require administrator privileges.
 
-## 1.3 Feedback Group
+Most Riot-operated regions are supported. Tencent-operated servers are not supported.
 
-Fun places for casual chats, party setups, bug reports, and suggestions.
+## Feedback and Contributing
 
-QQ Group 2: [543703181](https://qm.qq.com/q/3V9pqYEspq) (Passcode: akari)
-QQ Group 3: [1097069247](https://qm.qq.com/q/F5GG8l9HY6) (Passcode: akari)
+Use [GitHub Issues](https://github.com/LeagueAkari/LeagueAkari/issues) to report bugs or suggest improvements. Please include enough detail to reproduce the problem when filing a bug report.
 
-Telegram Group: [@KawaiiAkari](https://t.me/KawaiiAkari)
+Code contributions are welcome. Feel free to open a pull request with fixes or new features.
 
-## 1.4 Beta Versions (.rabi)
+## Development
 
-"rabi" versions with features slated for the next release are periodically shared in the group chat.
+League Akari uses Node.js 24 and Yarn 4. Enable Corepack before installing dependencies:
 
-# 2. Contributing to Development
-
-Issues are inevitable; as a user, you can:
-
-## 2.1 GitHub Issues
-
-GitHub Issues is the primary channel for feedback. Please clearly describe your requirements, issues, or suggestions.
-
-## 2.2 Contribute Code
-
-Interested in the project? Feel free to contribute by submitting PRs and adding new features.
-
-# 3. Build & Run
-
-This section describes how to build League Akari from the source code.
-
-## 3.1 Electron Main Program
-
-```bash
-yarn install
+```sh
+corepack enable
+yarn install --immutable
 yarn dev
-yarn build:win
 ```
 
-## Private Packages
+Common commands:
 
-A valid GitHub PAT is required to install private packages.
+```sh
+yarn typecheck
+yarn test
+yarn storybook
+yarn build
+yarn build:win
+yarn build:mac
+```
 
-`NODE_AUTH_TOKEN` must be set to the PAT value.
+`yarn build` creates the production application bundle. Use the platform-specific commands to create distributable packages.
 
-## 4. References
+## References
 
 The development of **League Akari** has been greatly inspired by several outstanding open-source projects. These projects provided valuable insights and guidance for various modules of the software. We would like to extend our sincere appreciation to the authors and maintainers of the following resources:
 
@@ -82,17 +71,17 @@ The development of **League Akari** has been greatly inspired by several outstan
 | [Community Dragon](https://www.communitydragon.org/documentation/assets)                           | Resource management and asset documentation reference.                               |
 | [Seraphine](https://github.com/Zzaphkiel/Seraphine)                                                | Provided integration approaches and insights into combining multiple tools.          |
 | [fix-lcu-window](https://github.com/LeagueTavern/fix-lcu-window)                                   | Resolved the issue with abnormal window size of the League of Legends client.        |
-| [Joi](https://github.com/watchingfun/Joi)                                                          | A League of Legends assistant. tool                                                  |
+| [Joi](https://github.com/watchingfun/Joi)                                                          | A League of Legends assistant.                                                       |
 | [vscode-league-respawn-timer](https://github.com/Coooookies/vscode-league-respawn-timer)           | An extension to display League of Legends player respawn time in Visual Studio Code. |
 | [LeaguePrank](https://github.com/LeagueTavern/LeaguePrank)                                         | Provided inspiration for playful and humorous features.                              |
 
-# 5. Disclaimer
+## Disclaimer
 
 This software is a tool developed based on Riot's League Client Update (LCU) API. It does not use intrusive techniques and theoretically does not directly interfere with or modify game data. However, please be aware of potential compatibility issues or risks associated with game updates or anti-cheat systems.
 
 The developer is not responsible for any consequences, such as account bans or data loss, resulting from the use of this software. Users are advised to fully understand the risks and take responsibility for their actions.
 
-Additionally, **this application is not officially supported or endorsed by Riot Games**, all right reserved by Riot Games. Use it at your own risk, as it may violate the game's terms of service.
+Additionally, **this application is not officially supported or endorsed by Riot Games**. All rights are reserved by Riot Games. Use it at your own risk, as it may violate the game's terms of service.
 
 This disclaimer is intended to provide transparency and enable users to make informed decisions. Thank you for your understanding, and please ensure fair play in the gaming environment.
 
