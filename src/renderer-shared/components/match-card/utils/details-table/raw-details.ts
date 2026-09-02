@@ -5,10 +5,78 @@ import type { Participant } from '@shared/types/league-client/match-history'
 import type { SgpParticipantLol } from '@shared/types/sgp/match-history'
 import { computed, toValue } from 'vue'
 
-import { useMatchCard } from '../../context'
+import { type MatchCardRawStat, useMatchCard } from '../../context'
+
+export function toRawDetailsFromParticipants(
+  basicInfo: ReturnType<typeof useMatchCard>['basicInfo']['value'],
+  participants: ReturnType<typeof useMatchCard>['participants']['value']
+): MatchCardRawStat[] {
+  return participants.map((participant) => {
+    const teamParticipants = participants.filter(
+      (entry) => entry.teamIdentifier === participant.teamIdentifier
+    )
+    const summaryAnalysis = computeSingleSummary(
+      basicInfo,
+      participant,
+      teamParticipants,
+      participants
+    )
+
+    return {
+      participantId: participant.participantId,
+      championId: participant.championId,
+      identity: {
+        puuid: participant.puuid,
+        gameName: participant.gameName,
+        tagLine: participant.tagLine,
+        teamIdentifier: participant.teamIdentifier
+      },
+      kills: participant.kills,
+      deaths: participant.deaths,
+      assists: participant.assists,
+      doubleKills: participant.doubleKills,
+      tripleKills: participant.tripleKills,
+      quadraKills: participant.quadraKills,
+      pentaKills: participant.pentaKills,
+      damageGoldEfficiency: participant.damageGoldEfficiency,
+      akariScore: computeSingleAkariScore(summaryAnalysis),
+      totalDamageDealtToChampions: participant.totalDamageDealtToChampions,
+      physicalDamageDealtToChampions: participant.physicalDamageDealtToChampions,
+      magicDamageDealtToChampions: participant.magicDamageDealtToChampions,
+      trueDamageDealtToChampions: participant.trueDamageDealtToChampions,
+      totalDamageTaken: participant.totalDamageTaken,
+      physicalDamageTaken: participant.physicalDamageTaken,
+      magicDamageTaken: participant.magicDamageTaken,
+      trueDamageTaken: participant.trueDamageTaken,
+      totalDamageShieldedOnTeammates: participant.totalDamageShieldedOnTeammates,
+      timeCCingOthers: participant.timeCCingOthers,
+      knockEnemyIntoTeamAndKill: participant.knockEnemyIntoTeamAndKill,
+      visionScore: participant.visionScore,
+      damageDealtToTurrets: participant.totalDamageToTowers,
+      goldEarned: participant.goldEarned,
+      goldSpent: participant.goldSpent,
+      totalMinionsKilled: participant.totalMinionsKilled,
+      neutralMinionsKilled: participant.neutralMinionsKilled,
+      maxCsAdvantageOnLaneOpponent: participant.maxCsAdvantageOnLaneOpponent,
+      totalHeal: participant.totalHeal,
+      effectiveHealAndShielding: participant.effectiveHealAndShielding,
+      ...participant.pings,
+      soloKills: participant.soloKills,
+      killsNearEnemyTurret: participant.killsNearEnemyTurret,
+      killsUnderOwnTurret: participant.killsUnderOwnTurret,
+      earliestDragonTakedown: participant.earliestDragonTakedown,
+      kda: participant.kda,
+      killParticipation: participant.killParticipation,
+      gameEndedInEarlySurrender: participant.gameEndedInEarlySurrender,
+      gameEndedInSurrender: participant.gameEndedInSurrender,
+      teamEarlySurrendered: participant.teamEarlySurrendered,
+      champLevel: participant.level
+    }
+  })
+}
 
 export function useRawDetails() {
-  const { summary, basicInfo, participants } = useMatchCard()
+  const { summary, basicInfo, participants, rawStatsOverride } = useMatchCard()
 
   const akariScoresByPuuid = computed(() => {
     const scores: Record<string, AkariScore> = {}
@@ -47,6 +115,10 @@ export function useRawDetails() {
   }
 
   return computed(() => {
+    if (rawStatsOverride.value !== null) {
+      return rawStatsOverride.value
+    }
+
     const { source, data } = toValue(summary)
 
     if (source === 'sgp') {
