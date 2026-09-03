@@ -114,7 +114,7 @@ export class AppCommonSettings {
     this.theme = s
   }
 
-  setHttpProxy(s: { strategy: 'force' | 'disable'; port: number; host: string }) {
+  setHttpProxy(s: { strategy: 'auto' | 'force' | 'disable'; port: number; host: string }) {
     this.httpProxy = s
   }
 
