@@ -12,6 +12,8 @@
     "src/renderer/src-ongoing-game-window/**/*.vue",
     "src/renderer/src-cd-timer-window/**/*",
     "src/renderer/src-cd-timer-window/**/*.vue",
+    "src/renderer/src-lan-web/**/*",
+    "src/renderer/src-lan-web/**/*.vue",
     "src/preload/*.d.ts",
     "src/shared/**/*",
     "src/renderer-shared/**/*",
@@ -28,6 +30,7 @@
       "@opgg-window/*": ["./src/renderer/src-opgg-window/*"],
       "@ongoing-game-window/*": ["./src/renderer/src-ongoing-game-window/*"],
       "@cd-timer-window/*": ["./src/renderer/src-cd-timer-window/*"],
+      "@lan-web/*": ["./src/renderer/src-lan-web/*"],
       "@shared/*": ["./src/shared/*"],
       "@renderer-shared/*": ["./src/renderer-shared/*"]
     },

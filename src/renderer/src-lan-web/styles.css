@@ -1,0 +1,22 @@
+html,
+body,
+#app {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-width: 320px;
+  background: var(--la-color-bg-primary);
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+#vue-devtools-container {
+  display: none !important;
+}
+
+.player-card,
+.match-card {
+  background: var(--la-card-surface-90);
+  border-color: rgb(var(--la-card-border-rgb) / 0.14);
+}

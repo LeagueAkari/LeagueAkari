@@ -358,6 +358,23 @@ settings:
         description: 调整计时器时间时，反转方向。滑轮上移减少，下移增加
   misc:
     title: 其他
+    lanWeb:
+      title: 局域网 Web 访问
+      enabled:
+        label: 启用局域网 Web 访问
+        description: 启动只读 Web 服务，允许同一局域网内的其他设备通过浏览器访问。
+      port:
+        label: 监听端口
+        description: 修改端口会重启 Web 服务，可用范围为 1024 到 65535。
+      status:
+        label: 服务状态和访问地址
+        description: 同一网络内持有访问地址的人可以查看已开放的游戏数据；服务每次启动时地址都会变化。
+        stopped: 已停止
+        starting: 正在启动
+        running: 运行中
+        error: 启动失败
+      copy: 复制
+      copied: 已复制访问地址
     respawnTimer:
       title: 重生倒计时
       enabled:
