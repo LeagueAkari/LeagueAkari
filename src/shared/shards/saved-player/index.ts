@@ -51,6 +51,7 @@ export interface EncounteredGame {
   rsoPlatformId: string
   updateAt: Date
   queueType: string
+  championId: number | null
 }
 
 export interface SavedPlayerQueryDto {
@@ -96,6 +97,7 @@ export interface EncounteredGameSaveDto {
   rsoPlatformId: string
   gameId: number
   queueType: string
+  championId?: number | null
 }
 
 export interface EncounteredGameQueryDto {

@@ -6,6 +6,7 @@ import type { DataSource, QueryRunner } from 'typeorm'
 import { LEAGUE_AKARI_DB_CURRENT_VERSION, type StorageMainContext } from './context'
 import { v10_LA1_2_0initializationUpgrade } from './upgrades/version-10'
 import { v15_LA1_2_2Upgrade } from './upgrades/version-15'
+import { v16_la1_2_3Upgrade } from './upgrades/version-16'
 
 const DATABASE_CORRUPTION_MESSAGES = ['database disk image is malformed', 'file is not a database']
 
@@ -58,7 +59,8 @@ export function isDatabaseCorruptionError(error: unknown) {
 export class StorageDatabaseLifecycle {
   private readonly _upgrades = {
     10: v10_LA1_2_0initializationUpgrade,
-    15: v15_LA1_2_2Upgrade
+    15: v15_LA1_2_2Upgrade,
+    16: v16_la1_2_3Upgrade
   }
 
   private _rebuildOnUpgradeFailedAttempted = false

@@ -134,6 +134,7 @@ function mergeSavedInfoWithRecentGames(ctx: PlayerCardTagContext): PlayerCardMer
           rsoPlatformId: '',
           updateAt: new Date(gameStats.date),
           queueType: '',
+          championId: gameStats.opponentChampionId,
           gameStats,
           source: 'recent'
         })
@@ -269,12 +270,20 @@ const renderParticipantStats = (
   </div>
 )
 
-const renderMissingGameStatsCells = () => (
+const renderMissingGameStatsCells = (storedChampionId?: number | null) => (
   <>
     <td class={[metTableCellClass, 'text-black/35 dark:text-white/30']}>-</td>
     <td class={[metTableCellClass, 'text-black/35 dark:text-white/30']}>-</td>
     <td class={[metTableCellClass, 'text-black/35 dark:text-white/30']}>-</td>
-    <td class={[metTableCellClass, 'text-black/35 dark:text-white/30']}>-</td>
+    <td class={[metTableCellClass, 'text-black/35 dark:text-white/30']}>
+      {storedChampionId ? (
+        <div class="flex items-center justify-center gap-1">
+          {renderChampionIcon(storedChampionId)}
+        </div>
+      ) : (
+        '-'
+      )}
+    </td>
   </>
 )
 
@@ -283,7 +292,7 @@ const renderEncounteredGameStatsCells = (
   item: PlayerCardEncounteredGame
 ) => {
   if (!item.gameStats) {
-    return renderMissingGameStatsCells()
+    return renderMissingGameStatsCells(item.championId)
   }
 
   const stats = item.gameStats
