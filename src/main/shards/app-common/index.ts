@@ -1,10 +1,7 @@
-import elevateExecutablePath from '@resources/elevate.exe?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { APP_THEME_VALUES } from '@shared/types/app-theme'
 import { app, clipboard, shell } from 'electron'
-import { exec } from 'node:child_process'
 import os from 'node:os'
-import { promisify } from 'node:util'
 import { z } from 'zod'
 
 import { AkariProtocolMain } from '../akari-protocol'
@@ -13,14 +10,13 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
+import { AdministratorRelaunchExecutor } from './administrator-relaunch-executor'
 import { APP_COMMON_MAIN_NAMESPACE, type AppCommonMainContext } from './context'
 import { AppCommonDiagnosticsController } from './diagnostics-controller'
 import { AppCommonIpcHandlers } from './ipc-handlers'
 import { RendererLinkProtocol } from './renderer-link-protocol'
 import { AppCommonSettings, AppCommonState } from './state'
 import { AppCommonThemeController } from './theme-controller'
-
-const execAsync = promisify(exec)
 
 /**
  * 一些不知道如何分类的通用功能, 可以放到这里
@@ -39,6 +35,7 @@ export class AppCommonMain implements IAkariShardInitDispose {
   private readonly _themeController: AppCommonThemeController
   private readonly _rendererLinkProtocol: RendererLinkProtocol
   private readonly _diagnosticsController: AppCommonDiagnosticsController
+  private readonly _administratorRelaunchExecutor: AdministratorRelaunchExecutor
 
   constructor(
     private readonly _shared: SharedGlobalShard,
@@ -99,6 +96,7 @@ export class AppCommonMain implements IAkariShardInitDispose {
     this._themeController = new AppCommonThemeController(this._context)
     this._rendererLinkProtocol = new RendererLinkProtocol(this._context)
     this._diagnosticsController = new AppCommonDiagnosticsController(this._context)
+    this._administratorRelaunchExecutor = new AdministratorRelaunchExecutor(this._context)
   }
 
   private _getSystemLocale() {
@@ -141,14 +139,8 @@ export class AppCommonMain implements IAkariShardInitDispose {
     return clipboard.readText()
   }
 
-  async relaunchAsAdministrator() {
-    const appPath = process.execPath
-
-    await execAsync(`"${elevateExecutablePath}" "${appPath}"`, {
-      shell: 'cmd'
-    })
-
-    app.exit()
+  relaunchAsAdministrator() {
+    return this._administratorRelaunchExecutor.relaunch()
   }
 
   async getRuntimeInfo() {

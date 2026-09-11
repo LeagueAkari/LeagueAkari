@@ -1,3 +1,4 @@
+import { wasRelaunchedAsAdministrator } from '@main/administrator-relaunch'
 import icon from '@resources/LA_ICON.ico?asset&asarUnpack'
 import type { BackgroundMaterialSetting } from '@shared/shards/window-manager'
 import { Event } from 'electron'
@@ -68,6 +69,13 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
       (ready) => {
         if (ready) {
           this.showOrRestore()
+          if (wasRelaunchedAsAdministrator()) {
+            // The bundled elevate.exe starts its target with SW_HIDE. Chromium can report a
+            // visible window after the first show even though the HWND remains hidden. Reset
+            // both states before showing again; another show/focus alone does not recover it.
+            this.hide()
+            this.showOrRestore()
+          }
         }
       }
     )
