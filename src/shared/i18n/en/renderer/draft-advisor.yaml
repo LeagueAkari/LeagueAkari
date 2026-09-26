@@ -1,0 +1,57 @@
+draftAdvisor:
+  title: Draft advisor
+  enabled: Enabled
+  includeBaseWinRate: Base win rate
+  candidateLimit: Candidates
+  self: You
+  winRate: Situational win rate
+  roster:
+    ally: Your team
+    opponent: Enemy team
+  board:
+    ally: Ours
+    opponent: Theirs
+  columns:
+    role: Role
+    champion: Champion
+    score: Score
+  position:
+    top: Top
+    jungle: Jungle
+    middle: Mid
+    bottom: Bot
+    utility: Support
+    all: All roles
+    none: Unassigned
+    unknown: Unknown
+  positionShort:
+    top: Top
+    jungle: Jgl
+    middle: Mid
+    bottom: Bot
+    utility: Sup
+    all: All
+    none: —
+  riskLevel:
+    label: Data sensitivity
+    low: Low
+    medium: Medium
+    high: High
+  signals:
+    matchup: Matchup
+    synergy: Synergy
+    base: Base
+  states:
+    disabled: The draft advisor is off. Turn it on to get champion suggestions during champion select.
+    idle: Waiting for champion select to begin.
+    loading: Working out the best picks…
+    unavailable: Champion data is unavailable right now, so no suggestions can be made.
+    noCandidates: There are no champions left to suggest for this position.
+    error: Something went wrong while computing suggestions.
+  gaps:
+    positionUnknown: Your position could not be determined, so matchup and synergy data are unavailable and scores rely on base win rate only.
+    noBaseWinRates: Base win rates are unavailable, so scores rely on matchup and synergy only.
+    missingMatchups_one: No matchup data for {{count}} enemy champion.
+    missingMatchups_other: No matchup data for {{count}} enemy champions.
+    missingSynergies_one: No synergy data for {{count}} ally champion.
+    missingSynergies_other: No synergy data for {{count}} ally champions.

@@ -2,6 +2,7 @@ import commonEn from '@shared/i18n/en/common.yaml'
 import automationEn from '@shared/i18n/en/renderer/automation.yaml'
 import auxWindowEn from '@shared/i18n/en/renderer/aux-window.yaml'
 import cdTimerEn from '@shared/i18n/en/renderer/cd-timer.yaml'
+import draftAdvisorEn from '@shared/i18n/en/renderer/draft-advisor.yaml'
 import gameAssetsEn from '@shared/i18n/en/renderer/game-assets.yaml'
 import leagueClientEn from '@shared/i18n/en/renderer/league-client.yaml'
 import matchCardEn from '@shared/i18n/en/renderer/match-card.yaml'
@@ -17,6 +18,7 @@ import commonZhCN from '@shared/i18n/zh-CN/common.yaml'
 import automationZhCN from '@shared/i18n/zh-CN/renderer/automation.yaml'
 import auxWindowZhCN from '@shared/i18n/zh-CN/renderer/aux-window.yaml'
 import cdTimerZhCN from '@shared/i18n/zh-CN/renderer/cd-timer.yaml'
+import draftAdvisorZhCN from '@shared/i18n/zh-CN/renderer/draft-advisor.yaml'
 import gameAssetsZhCN from '@shared/i18n/zh-CN/renderer/game-assets.yaml'
 import leagueClientZhCN from '@shared/i18n/zh-CN/renderer/league-client.yaml'
 import matchCardZhCN from '@shared/i18n/zh-CN/renderer/match-card.yaml'
@@ -60,7 +62,8 @@ const rendererEn = mergeRendererResources(
   auxWindowEn,
   opggEn,
   cdTimerEn,
-  notificationsEn
+  notificationsEn,
+  draftAdvisorEn
 )
 
 const rendererZhCN = mergeRendererResources(
@@ -77,7 +80,8 @@ const rendererZhCN = mergeRendererResources(
   auxWindowZhCN,
   opggZhCN,
   cdTimerZhCN,
-  notificationsZhCN
+  notificationsZhCN,
+  draftAdvisorZhCN
 )
 
 i18next.init({

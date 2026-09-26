@@ -1,0 +1,55 @@
+draftAdvisor:
+  title: 选人推荐
+  enabled: 启用
+  includeBaseWinRate: 基础胜率
+  candidateLimit: 候选数
+  self: 你
+  winRate: 处境胜率
+  roster:
+    ally: 我方阵容
+    opponent: 对方阵容
+  board:
+    ally: 我方
+    opponent: 对方
+  columns:
+    role: 位置
+    champion: 英雄
+    score: 分数
+  position:
+    top: 上单
+    jungle: 打野
+    middle: 中单
+    bottom: 下路
+    utility: 辅助
+    all: 全部位置
+    none: 未定
+    unknown: 未知
+  positionShort:
+    top: 上
+    jungle: 野
+    middle: 中
+    bottom: 下
+    utility: 辅
+    all: 全
+    none: —
+  riskLevel:
+    label: 数据敏感度
+    low: 低
+    medium: 中
+    high: 高
+  signals:
+    matchup: 对位
+    synergy: 协同
+    base: 基础
+  states:
+    disabled: 选人推荐未开启。开启后会在英雄选择阶段给出推荐。
+    idle: 等待进入英雄选择阶段。
+    loading: 正在计算推荐…
+    unavailable: 当前取不到英雄数据，无法给出推荐。
+    noCandidates: 该位置已经没有可以推荐的英雄了。
+    error: 计算推荐时出错了。
+  gaps:
+    positionUnknown: 未能判定你的位置，对位与协同数据整体不可用，评分只依据基础胜率。
+    noBaseWinRates: 缺少基础胜率，评分只依据对位与协同。
+    missingMatchups_other: 有 {{count}} 个敌方英雄缺少对位数据。
+    missingSynergies_other: 有 {{count}} 个己方英雄缺少协同数据。
