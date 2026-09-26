@@ -23,6 +23,10 @@ function session(overrides: {
   } as ChampSelectSession
 }
 
+function championIds(members: Array<{ championId: number }>) {
+  return members.map((item) => item.championId)
+}
+
 describe('draft advisor position mapping', () => {
   it('normalizes the position spellings the client actually emits', () => {
     expect(toChampionDataPosition('TOP')).toBe('top')
@@ -55,8 +59,8 @@ describe('draft advisor champ select snapshot', () => {
     )
 
     expect(snapshot.actionable).toBe(false)
-    expect(snapshot.allyChampionIds).toEqual([])
-    expect(snapshot.enemyChampionIds).toEqual([])
+    expect(snapshot.allyMembers).toEqual([])
+    expect(snapshot.opponentMembers).toEqual([])
     expect(snapshot.selfChampionId).toBeNull()
   })
 
@@ -68,7 +72,7 @@ describe('draft advisor champ select snapshot', () => {
       })
     )
 
-    expect(snapshot.allyChampionIds).toEqual([22])
+    expect(championIds(snapshot.allyMembers)).toEqual([22])
   })
 
   it('uses the pick intent when an ally has not locked in yet', () => {
@@ -79,7 +83,7 @@ describe('draft advisor champ select snapshot', () => {
       })
     )
 
-    expect(snapshot.allyChampionIds).toEqual([99])
+    expect(championIds(snapshot.allyMembers)).toEqual([99])
   })
 
   it('does not leak the enemy pick intent into the enemy team', () => {
@@ -90,7 +94,7 @@ describe('draft advisor champ select snapshot', () => {
       })
     )
 
-    expect(snapshot.enemyChampionIds).toEqual([])
+    expect(snapshot.opponentMembers).toEqual([])
     expect(snapshot.actionable).toBe(false)
   })
 
@@ -103,8 +107,8 @@ describe('draft advisor champ select snapshot', () => {
       })
     )
 
-    expect(snapshot.allyChampionIds).toEqual([22, 64])
-    expect(snapshot.enemyChampionIds).toEqual([103])
+    expect(championIds(snapshot.allyMembers)).toEqual([22, 64])
+    expect(championIds(snapshot.opponentMembers)).toEqual([103])
     expect(snapshot.actionable).toBe(true)
   })
 
@@ -117,8 +121,44 @@ describe('draft advisor champ select snapshot', () => {
       })
     )
 
-    expect(snapshot.allyChampionIds).toEqual([22])
-    expect(snapshot.enemyChampionIds).toEqual([103])
+    expect(championIds(snapshot.allyMembers)).toEqual([22])
+    expect(championIds(snapshot.opponentMembers)).toEqual([103])
+  })
+
+  it('keeps the local player in the first row regardless of team order', () => {
+    // 面板第一行永远是自己, 否则用户每次都要在阵容里找自己。
+    const snapshot = readDraftChampSelectSnapshot(
+      session({
+        localPlayerCellId: 3,
+        myTeam: [
+          member({ cellId: 0, championId: 22 }),
+          member({ cellId: 1, championId: 64 }),
+          member({ cellId: 3, championId: 81 }),
+          member({ cellId: 2, championId: 99 })
+        ]
+      })
+    )
+
+    expect(championIds(snapshot.allyMembers)).toEqual([81, 22, 64, 99])
+    expect(snapshot.allyMembers[0].isLocalPlayer).toBe(true)
+    expect(snapshot.allyMembers.slice(1).every((item) => !item.isLocalPlayer)).toBe(true)
+  })
+
+  it('carries each member own lane from the client assignment', () => {
+    const snapshot = readDraftChampSelectSnapshot(
+      session({
+        localPlayerCellId: 0,
+        myTeam: [
+          member({ cellId: 0, championId: 22, assignedPosition: 'TOP' }),
+          member({ cellId: 1, championId: 64, assignedPosition: 'JUNGLE' }),
+          member({ cellId: 2, championId: 81, assignedPosition: '' })
+        ],
+        theirTeam: [member({ cellId: 5, championId: 103, assignedPosition: 'MIDDLE' })]
+      })
+    )
+
+    expect(snapshot.allyMembers.map((item) => item.position)).toEqual(['top', 'jungle', null])
+    expect(snapshot.opponentMembers.map((item) => item.position)).toEqual(['middle'])
   })
 
   it('identifies the local player and their position', () => {
@@ -157,7 +197,7 @@ describe('draft advisor champ select snapshot', () => {
       })
     )
 
-    expect(snapshot.allyChampionIds).toEqual([])
-    expect(snapshot.enemyChampionIds).toEqual([])
+    expect(snapshot.allyMembers).toEqual([])
+    expect(snapshot.opponentMembers).toEqual([])
   })
 })

@@ -11,6 +11,9 @@ export type DraftAdvisorRiskLevel = 'low' | 'medium' | 'high'
 export const MIN_DRAFT_ADVISOR_CANDIDATE_LIMIT = 3
 export const MAX_DRAFT_ADVISOR_CANDIDATE_LIMIT = 40
 
+/** 竞选名单所属的一方。 */
+export type DraftAdvisorTeamSide = 'ally' | 'opponent'
+
 export interface DraftAdvisorSettings {
   enabled: boolean
 
@@ -40,11 +43,48 @@ export interface DraftAdvisorScoreBreakdown {
   synergySamples: number
 }
 
+/**
+ * 阵容中的一名英雄。
+ *
+ * `winRate` 是该英雄在这套具体对局里的处境胜率 (基础胜率 + 对位 + 协同),
+ * 而不是它的全局胜率 —— 同一英雄换个对手就会不同。
+ */
+export interface DraftAdvisorTeamMember {
+  championId: number
+
+  /** 该英雄在本局中的分路, 取自客户端分配结果, 无法判定时为 null */
+  position: ChampionDataPosition | null
+
+  /** 处境胜率; 数据不足时为 null */
+  winRate: number | null
+}
+
+/**
+ * 双方的阵容强度分。两者互补且恒为 100, 因此可以直接读作「这套阵容的胜率」。
+ *
+ * 50 / 50 表示双方阵容强度相当。
+ */
+export interface DraftAdvisorTeamScore {
+  ally: number
+  opponent: number
+}
+
 export interface DraftAdvisorCandidate {
   championId: number
 
-  /** 综合推荐分, 与胜率同量纲, 便于直接展示 */
-  score: number
+  /**
+   * 该候选被这一方选下之后, 这一方的阵容分。
+   *
+   * 与 `DraftAdvisorTeamScore` 同量纲, 所以列表既能排序, 也能直接读出
+   * 「选下他之后我们（或对方）的胜率会变成多少」。
+   */
+  teamScore: number
+
+  /** 该英雄在这套对局里的处境胜率, 用于解释分数来源 */
+  winRate: number
+
+  /** 该英雄的分路 */
+  role: ChampionDataPosition | null
 
   breakdown: DraftAdvisorScoreBreakdown
 }
@@ -64,6 +104,14 @@ export interface DraftAdvisorDataGaps {
 
   /** 是否拿到了任何英雄的基础胜率 */
   hasBaseWinRates: boolean
+
+  /**
+   * 是否没能判定本方位置。
+   *
+   * 对位与协同数据都是按分路组织的, 位置未知时这两类信号整体不可用, 此时分数只由
+   * 基础胜率支撑 —— 和上面"个别英雄缺数据"不是一回事, 因此单独标出来。
+   */
+  positionUnknown: boolean
 }
 
 export interface DraftAdvisorSnapshot {
@@ -74,11 +122,21 @@ export interface DraftAdvisorSnapshot {
   /** 本次推荐所依据的位置; 无法判定时为 null */
   position: ChampionDataPosition | null
 
-  allyChampionIds: number[]
+  /** 本方玩家已锁定或已意向的英雄, 尚未选择时为 null。面板用它标出阵容里的自己。 */
+  selfChampionId: number | null
 
-  enemyChampionIds: number[]
+  allyMembers: DraftAdvisorTeamMember[]
 
+  opponentMembers: DraftAdvisorTeamMember[]
+
+  /** 双方阵容分; 数据不足时为 null */
+  teamScore: DraftAdvisorTeamScore | null
+
+  /** 我方候选榜, `teamScore` 是「我方选下他之后我方的阵容分」 */
   candidates: DraftAdvisorCandidate[]
+
+  /** 对方候选榜, `teamScore` 是「对方选下他之后对方的阵容分」 */
+  opponentCandidates: DraftAdvisorCandidate[]
 
   gaps: DraftAdvisorDataGaps
 
@@ -88,16 +146,20 @@ export interface DraftAdvisorSnapshot {
 export const EMPTY_DRAFT_ADVISOR_DATA_GAPS: DraftAdvisorDataGaps = {
   missingEnemyChampionIds: [],
   missingAllyChampionIds: [],
-  hasBaseWinRates: false
+  hasBaseWinRates: false,
+  positionUnknown: false
 }
 
 export const EMPTY_DRAFT_ADVISOR_SNAPSHOT: DraftAdvisorSnapshot = {
   status: 'idle',
   patch: null,
   position: null,
-  allyChampionIds: [],
-  enemyChampionIds: [],
+  selfChampionId: null,
+  allyMembers: [],
+  opponentMembers: [],
+  teamScore: null,
   candidates: [],
+  opponentCandidates: [],
   gaps: EMPTY_DRAFT_ADVISOR_DATA_GAPS,
   updatedAt: null
 }

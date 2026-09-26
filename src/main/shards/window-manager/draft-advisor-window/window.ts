@@ -16,10 +16,12 @@ export class AkariDraftAdvisorWindow extends BaseAkariWindow<
   static readonly NAMESPACE_SUFFIX = 'draft-advisor-window'
   static readonly HTML_ENTRY = 'draft-advisor-window.html'
   static readonly TITLE = 'Akari Draft Advisor'
-  static readonly BASE_WIDTH = 420
-  static readonly BASE_HEIGHT = 600
-  static readonly MIN_WIDTH = 360
-  static readonly MIN_HEIGHT = 320
+
+  // 三栏布局：双方阵容各占一栏, 中间留给候选榜, 因此比其他小窗口宽得多。
+  static readonly BASE_WIDTH = 900
+  static readonly BASE_HEIGHT = 560
+  static readonly MIN_WIDTH = 760
+  static readonly MIN_HEIGHT = 360
 
   constructor(_context: WindowManagerMainContext) {
     const state = new DraftAdvisorWindowState()
