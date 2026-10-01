@@ -1,61 +1,57 @@
+import { createOpggSnapshot } from '@shared/shards/champion-data'
 import type {
-  ChampionDataFallbackReason,
-  ChampionDataPreferences,
-  ChampionDataSourceAvailability,
-  ChampionDataSourceId
-} from '@shared/data-adapter/champion-data'
+  OpggChampionDataPreferences,
+  Qq101ChampionDataPreferences
+} from '@shared/types/champion-data'
+import type { OpggFlashPosition } from '@shared/types/champion-data/opgg'
+import type { OpggAramBalanceItem } from '@shared/types/opgg'
 import { makeAutoObservable, observableRef } from 'mobx'
 
+export class OpggChampionDataState {
+  enabled = false
+  snapshot = createOpggSnapshot()
+  isApplying = false
+  aramBalance: OpggAramBalanceItem[] | null = null
+
+  constructor() {
+    makeAutoObservable(this, {
+      snapshot: observableRef,
+      aramBalance: observableRef
+    })
+  }
+
+  setAramBalance(aramBalance: OpggAramBalanceItem[] | null) {
+    this.aramBalance = aramBalance
+  }
+}
+
 export class ChampionDataSettings {
-  preferredSource: ChampionDataSourceId = 'opgg'
-  preferences: ChampionDataPreferences = {
+  opggFlashPosition: OpggFlashPosition = 'auto'
+  opggPreferences: OpggChampionDataPreferences = {
     mode: 'ranked',
     position: 'top',
     region: 'global',
     tier: 'all'
   }
-
-  setPreferredSource(source: ChampionDataSourceId) {
-    this.preferredSource = source
-  }
-
-  setPreferences(preferences: ChampionDataPreferences) {
-    this.preferences = preferences
-  }
-
-  constructor() {
-    makeAutoObservable(this, {
-      preferences: observableRef
-    })
-  }
-}
-
-export class ChampionDataState {
-  availability: ChampionDataSourceAvailability = {
-    preferredSource: 'opgg',
-    sources: {
-      opgg: { enabled: true },
-      qq101: { enabled: false }
-    }
-  }
-  lastEffectiveSource: ChampionDataSourceId | null = null
-  lastFallbackReason: ChampionDataFallbackReason | null = null
-
-  setAvailability(availability: ChampionDataSourceAvailability) {
-    this.availability = availability
-  }
-
-  setLastResolution(
-    effectiveSource: ChampionDataSourceId | null,
-    fallbackReason: ChampionDataFallbackReason | null
-  ) {
-    this.lastEffectiveSource = effectiveSource
-    this.lastFallbackReason = fallbackReason
+  qq101Preferences: Qq101ChampionDataPreferences = {
+    mode: 'ranked',
+    position: 'all',
+    patch: null,
+    tier: 255
   }
 
   constructor() {
     makeAutoObservable(this, {
-      availability: observableRef
+      opggPreferences: observableRef,
+      qq101Preferences: observableRef
     })
+  }
+
+  setOpggPreferences(preferences: OpggChampionDataPreferences) {
+    this.opggPreferences = preferences
+  }
+
+  setQq101Preferences(preferences: Qq101ChampionDataPreferences) {
+    this.qq101Preferences = preferences
   }
 }

@@ -72,16 +72,16 @@
     </HorizontalExpand>
 
     <!-- champion data -->
-    <HorizontalExpand :show="ows.settings.enabled" class="h-full">
+    <HorizontalExpand :show="championDataWindowStore.settings.enabled" class="h-full">
       <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
         <template #trigger>
-          <div class="common-button-outer" @click="handleShowOpggWindow">
+          <div class="common-button-outer" @click="handleShowChampionDataWindow">
             <div class="common-button-inner">
               <NIcon><ChartLineData /></NIcon>
             </div>
           </div>
         </template>
-        {{ t('titlebar.actions.opggWindow') }}
+        {{ t('titlebar.actions.championDataWindow') }}
       </NTooltip>
     </HorizontalExpand>
 
@@ -115,7 +115,7 @@ import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import {
   useAuxWindowStore,
   useMainWindowStore,
-  useOpggWindowStore
+  useChampionDataWindowStore
 } from '@renderer-shared/shards/window-manager/store'
 import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import {
@@ -141,7 +141,7 @@ const { t } = useTranslation()
 
 const mws = useMainWindowStore()
 const aws = useAuxWindowStore()
-const ows = useOpggWindowStore()
+const championDataWindowStore = useChampionDataWindowStore()
 const aks = useAkariApiStore()
 const sns = useSimpleNotificationsStore()
 const as = useAppCommonStore()
@@ -155,8 +155,8 @@ const handleShowAuxWindow = () => {
   wm.auxWindow.show()
 }
 
-const handleShowOpggWindow = () => {
-  wm.opggWindow.show()
+const handleShowChampionDataWindow = () => {
+  wm.championDataWindow.show()
 }
 
 const handleToGithub = () => {

@@ -1,0 +1,77 @@
+qq101:
+  title: 英雄榜单
+  source: 数据来自英雄联盟 101
+  mode: 游戏模式
+  modes:
+    ranked: 召唤师峡谷
+    aram_mayhem: 海克斯大乱斗
+    aram: 极地大乱斗
+    classic: 经典模式
+  boards:
+    champions: 英雄榜
+    augments: 海克斯榜
+    synergies: 最佳拍档榜
+  board: 榜单
+  tier: 段位
+  patch: 版本
+  position: 位置
+  role: 英雄类别
+  rarity: 品质
+  all: 全部
+  latest: 最新版本
+  roles:
+    tank: 坦克
+    fighter: 战士
+    assassin: 刺客
+    mage: 法师
+    marksman: 射手
+    support: 辅助
+  positions:
+    all: 全部位置
+    top: 上单
+    jungle: 打野
+    middle: 中单
+    bottom: 下路
+    utility: 辅助
+  rarities:
+    kSilver: 白银
+    kGold: 黄金
+    kPrismatic: 棱彩
+    unknown: 未知品质
+  columns:
+    rank: 排名
+    champion: 英雄
+    augment: 海克斯
+    pair: 英雄组合
+    tier: 梯队
+    winRate: 胜率
+    pickRate: 登场率
+    banRate: 禁用率
+    change: 排名变化
+  search: 搜索名称
+  date: '统计于 {{date}}'
+  undated: 暂无统计日期
+  count: '{{count}} 条结果'
+  loading: 正在更新榜单…
+  stale: 当前显示上次成功加载的数据
+  empty: 暂无符合条件的数据
+  failed: 榜单加载失败
+  retry: 重试
+  tiers:
+    '255': 全部段位
+    '1': 黑铁
+    '2': 青铜
+    '3': 白银
+    '4': 黄金
+    '5': 铂金
+    '6': 翡翠
+    '7': 钻石
+    '8': 超凡大师
+    '9': 傲世宗师
+    '10': 最强王者
+    '24': 黄金及以上
+    '25': 铂金及以上
+    '26': 翡翠及以上
+    '27': 钻石及以上
+    '28': 大师及以上
+    '88': 峡谷之巅

@@ -7,7 +7,7 @@ import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
 import { SetupInAppScopeRenderer } from '../setup-in-app-scope'
 import {
-  MAIN_SHARD_NAMESPACE,
+  RENDERER_DEBUG_MAIN_NAMESPACE,
   RENDERER_DEBUG_RENDERER_NAMESPACE,
   type RendererDebugRendererContext
 } from './context'
@@ -33,7 +33,7 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
   ) {
     this._context = {
       namespace: RendererDebugRenderer.id,
-      mainShardNamespace: MAIN_SHARD_NAMESPACE,
+      mainShardNamespace: RENDERER_DEBUG_MAIN_NAMESPACE,
       ipc: this._ipc,
       piniaMobxUtils: this._piniaMobxUtils,
       logger: this._logger,
@@ -48,7 +48,7 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
   async onInit() {
     const store = useRendererDebugStore()
 
-    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await this._piniaMobxUtils.sync(RENDERER_DEBUG_MAIN_NAMESPACE, 'state', store)
     await this._watcher.init()
   }
 
@@ -71,10 +71,10 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
   async onDispose() {}
 
   setSendAllNativeLcuEvents(value: boolean) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setSendAllNativeLcuEvents', value)
+    return this._ipc.call(RENDERER_DEBUG_MAIN_NAMESPACE, 'setSendAllNativeLcuEvents', value)
   }
 
   setLogAllLcuEvents(value: boolean) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setLogAllLcuEvents', value)
+    return this._ipc.call(RENDERER_DEBUG_MAIN_NAMESPACE, 'setLogAllLcuEvents', value)
   }
 }

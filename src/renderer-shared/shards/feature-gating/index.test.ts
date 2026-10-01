@@ -72,6 +72,46 @@ describe('FeatureGatingRenderer', () => {
     stop()
   })
 
+  it('exposes structured evaluations through a Vue watch', () => {
+    const akariApi = useAkariApiStore()
+    const appCommon = useAppCommonStore()
+    const featureGatingStore = useFeatureGatingStore()
+    const featureGating = new FeatureGatingRenderer(
+      {} as AkariApiRenderer,
+      {} as AppCommonRenderer,
+      {} as AkariIpcRenderer,
+      {} as PiniaMobxUtilsRenderer
+    )
+    const values: string[] = []
+
+    appCommon.platform = 'win32'
+    appCommon.version = '1.5.0'
+    const stop = watch(
+      () => featureGating.getEvaluation('champion-data.opgg', false),
+      (evaluation) => values.push(`${evaluation.decision}:${evaluation.enabled}`),
+      { immediate: true, flush: 'sync' }
+    )
+
+    akariApi.featureGates = snapshot({})
+    akariApi.featureGates = snapshot({ 'champion-data.opgg': {} })
+    featureGatingStore.devOverrides = { 'champion-data.opgg': { mode: 'force-off' } }
+    featureGatingStore.devOverrides = {
+      'champion-data.opgg': { mode: 'force-off' },
+      'unrelated.feature': { mode: 'force-on' }
+    }
+
+    expect(values).toEqual([
+      'default-value:false',
+      'not-configured:false',
+      'rule-matched:true',
+      'force-off:false'
+    ])
+    expect(featureGating.isEnabled('champion-data.opgg', false)).toBe(
+      featureGating.getEvaluation('champion-data.opgg', false).enabled
+    )
+    stop()
+  })
+
   it('reports the remote status independently from development overrides', () => {
     const akariApi = useAkariApiStore()
     const appCommon = useAppCommonStore()

@@ -1,11 +1,16 @@
-import { GtimgHeroListJs, GtimgKiwiAugments, Hero } from '@shared/data-sources/gtimg'
-import type { OpggAramBalanceItem } from '@shared/types/opgg'
+import {
+  GtimgClassicHero,
+  GtimgHeroListJs,
+  GtimgKiwiAugments,
+  Hero
+} from '@shared/data-sources/gtimg'
 import { defineStore } from 'pinia'
 import { computed, shallowReactive } from 'vue'
 
 export const useExtraAssetsStore = defineStore('shard:extra-assets-renderer', () => {
   const gtimg = shallowReactive({
     heroList: null as GtimgHeroListJs | null,
+    classicHeroes: null as GtimgClassicHero[] | null,
     kiwiAugments: null as GtimgKiwiAugments[] | null
   })
 
@@ -25,22 +30,6 @@ export const useExtraAssetsStore = defineStore('shard:extra-assets-renderer', ()
     }
   })
 
-  const opgg = shallowReactive({
-    aramBalance: null as OpggAramBalanceItem[] | null
-  })
-
-  const opggAramBalanceMap = computed(() => {
-    if (!opgg.aramBalance) return {}
-
-    return opgg.aramBalance.reduce(
-      (acc, balance) => {
-        acc[balance.champion_id] = balance
-        return acc
-      },
-      {} as Record<number, OpggAramBalanceItem>
-    )
-  })
-
   const heroListMap = computed(() => {
     if (!gtimg.heroList) return {}
 
@@ -57,13 +46,16 @@ export const useExtraAssetsStore = defineStore('shard:extra-assets-renderer', ()
     }
   })
 
+  const classicHeroesMap = computed(() =>
+    Object.fromEntries((gtimg.classicHeroes ?? []).map((hero) => [hero.heroId, hero]))
+  )
+
   return {
     gtimg,
-    opgg,
 
     // computed
     heroListMap,
-    kiwiAugmentsMap,
-    opggAramBalanceMap
+    classicHeroesMap,
+    kiwiAugmentsMap
   }
 })

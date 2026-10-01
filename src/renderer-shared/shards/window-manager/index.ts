@@ -6,7 +6,7 @@ import { LoggerRenderer } from '../logger'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
 import {
-  MAIN_SHARD_NAMESPACE,
+  WINDOW_MANAGER_MAIN_NAMESPACE,
   WINDOW_MANAGER_RENDERER_NAMESPACE,
   type WindowManagerRendererContext
 } from './context'
@@ -14,15 +14,15 @@ import { useWindowManagerStore } from './store'
 import {
   AkariAuxWindow,
   AkariCdTimerWindow,
+  AkariChampionDataWindow,
   AkariMainWindow,
-  AkariOngoingGameWindow,
-  AkariOpggWindow
+  AkariOngoingGameWindow
 } from './windows'
 
 export {
   AkariCdTimerWindow,
   AkariOngoingGameWindow,
-  AkariOpggWindow,
+  AkariChampionDataWindow,
   type WindowManagerRendererContext
 }
 
@@ -34,7 +34,7 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
 
   public mainWindow: AkariMainWindow
   public auxWindow: AkariAuxWindow
-  public opggWindow: AkariOpggWindow
+  public championDataWindow: AkariChampionDataWindow
   public ongoingGameWindow: AkariOngoingGameWindow
   public cdTimerWindow: AkariCdTimerWindow
 
@@ -52,28 +52,28 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
 
     this.mainWindow = new AkariMainWindow(this.context)
     this.auxWindow = new AkariAuxWindow(this.context)
-    this.opggWindow = new AkariOpggWindow(this.context)
+    this.championDataWindow = new AkariChampionDataWindow(this.context)
     this.ongoingGameWindow = new AkariOngoingGameWindow(this.context)
     this.cdTimerWindow = new AkariCdTimerWindow(this.context)
   }
 
   async onInit() {
     const store = useWindowManagerStore()
-    await this.context.pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
-    await this.context.pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+    await this.context.pm.sync(WINDOW_MANAGER_MAIN_NAMESPACE, 'state', store)
+    await this.context.pm.sync(WINDOW_MANAGER_MAIN_NAMESPACE, 'settings', store.settings)
 
     await this.mainWindow.onInit()
     await this.auxWindow.onInit()
-    await this.opggWindow.onInit()
+    await this.championDataWindow.onInit()
     await this.ongoingGameWindow.onInit()
     await this.cdTimerWindow.onInit()
   }
 
   setBackgroundMaterial(value: BackgroundMaterialSetting) {
-    return this.context.setting.set(MAIN_SHARD_NAMESPACE, 'backgroundMaterial', value)
+    return this.context.setting.set(WINDOW_MANAGER_MAIN_NAMESPACE, 'backgroundMaterial', value)
   }
 
   setContentProtection(value: boolean) {
-    return this.context.setting.set(MAIN_SHARD_NAMESPACE, 'contentProtection', value)
+    return this.context.setting.set(WINDOW_MANAGER_MAIN_NAMESPACE, 'contentProtection', value)
   }
 }

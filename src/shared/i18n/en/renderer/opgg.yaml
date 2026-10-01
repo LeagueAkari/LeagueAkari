@@ -1,4 +1,8 @@
 opgg:
+  tabs:
+    label: OP.GG pages
+    close: Close tab
+    closeOthers: Close other tabs
   titlebar:
     title: Champion Data
     close: Close
@@ -7,8 +11,6 @@ opgg:
     unpin: Unpin
     repositionToAlignLeagueClientUx: Align with League Client UX
   filters:
-    source: Data Source
-    openSource: Open {{source}}
     refresh: Refresh
     champions: Tier
     champion: Champion
@@ -18,11 +20,9 @@ opgg:
     rankTier: Rank Tier
     position: Position
     version: Version
-    sourceActive: 'Current source: {{source}}'
-    sourceFallback: 'Preferred source unavailable; switched to {{source}}'
     sources:
       opgg: OP.GG
-      qq101: 101 (CN)
+      qq101: 101
     modes:
       ranked: Ranked
       classic: Classic
@@ -52,6 +52,7 @@ opgg:
       oce: Oceania
       tr: Turkey
       ru: Russia
+      sea: Southeast Asia
       sg: Singapore
       id: Indonesia
       ph: Philippines
@@ -84,13 +85,37 @@ opgg:
       rarity: Rarity
       bestChampions: Best Champions
       combination: Combination
-  workspace:
-    data: Champion Data
-    champSelect: Champion Select
-  champSelectAssistant:
-    status: Champion select assistant
-    active: Active
-    waitingForChampion: Waiting for champion
+  sources:
+    qq101Placeholder: The independent 101 data view is still being designed and is not shown yet
+    unavailable: No champion data source is currently available
+    updateRequired: Update to version {{version}} or later
+  statistics:
+    winRate:
+      label: Win rate
+    matchupWinRate:
+      label: Matchup win rate
+    pickRate:
+      label: Selection rate
+    championPickRate:
+      label: Pick rate
+    synergyPickRate:
+      label: Pairing rate
+    banRate:
+      label: Ban rate
+    plays:
+      label: Sample size
+    averagePlace:
+      label: Average placement
+    firstPlaceRate:
+      label: First-place rate
+    performance:
+      label: Performance score
+      description: Augment performance reported by OP.GG.
+    popular:
+      label: Popularity score
+      description: Augment popularity reported by OP.GG.
+    wins: Wins
+    losses: Losses
   championTable:
     searchPlaceholder: Search for name
     columns:
@@ -102,18 +127,15 @@ opgg:
       banRate: B/R
     cancel: Cancel
   view:
+    loading: Loading data…
+    notLoaded: No data loaded yet
     replace: Provide
     create: Create
     noVersionFound: No version found
     dataUnavailable: The selected source does not support this mode or is unavailable
     settings:
       title: Champion Data Settings
-      enabled:
-        label: Enable
-        description: Enable the champion data window. If disabled, it can be re-opened in main settings
-      defaultSource:
-        label: Default Data Source
-        description: The preferred source when opening the window; unavailable sources are disabled
+      temporarilyUnavailable: Temporarily unavailable
       flashPosition:
         label: Flash Position Preference
         description: The position for Flash when setting summoner spells
@@ -149,24 +171,25 @@ opgg:
     pickRate: Pick Rate
     plays: Total Games
     banRate: Ban Rate
-    counter: Counter
-    allCounters: All
-    counterC: Counter
-    allC: All
+    matchups: Matchups
+    counter: Unfavorable matchups
+    allCounters: All matchups
     empty: No Data Available
     times: '{{times}} Games'
-    showAll: Show All
+    expand: Expand
+    collapse: Collapse
     spells: Summoner Spells
     apply: Apply
     runes: Rune Builds
     abilityBuild: Ability Leveling
+    runesFooter: Applying a build creates or replaces a rune page in the client.
     starterItemText: Starting Items
     prismItemText: Prism Tier Items
     coreItemText: Core Items
     itemText: Items
-    tierText: T{{tier}}
     applyRunes: Import Current Item Build
     applyRunesText: Build Applied
+    augments: Augments
     augmentAll: All
     augmentGold: Gold
     augmentSilver: Silver

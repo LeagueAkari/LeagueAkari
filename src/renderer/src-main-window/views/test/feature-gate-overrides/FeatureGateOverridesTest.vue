@@ -156,8 +156,13 @@ const cloudGateCount = computed(() => Object.keys(akariApi.featureGates?.gates ?
 const devOverrideCount = computed(() => Object.keys(featureGatingStore.devOverrides).length)
 const snapshotUpdatedAt = computed(() => {
   const value = akariApi.featureGates?.updatedAt
-  if (!value) return '快照不可用'
+
+  if (!value) {
+    return '快照不可用'
+  }
+
   const date = new Date(value)
+
   return Number.isNaN(date.getTime()) ? value : date.toLocaleString()
 })
 
@@ -272,6 +277,7 @@ function renderStatus(row: FeatureGateItemTableRow) {
 
 function renderSource(row: FeatureGateItemTableRow) {
   const override = row.devOverride
+
   return (
     <NTag
       size="small"
@@ -310,8 +316,14 @@ function openRowEditor(row: FeatureGateListRow) {
 }
 
 function overrideTagType(override: FeatureGateDevOverride) {
-  if (override.mode === 'force-on') return 'success' as const
-  if (override.mode === 'force-off') return 'error' as const
+  if (override.mode === 'force-on') {
+    return 'success' as const
+  }
+
+  if (override.mode === 'force-off') {
+    return 'error' as const
+  }
+
   return 'warning' as const
 }
 </script>

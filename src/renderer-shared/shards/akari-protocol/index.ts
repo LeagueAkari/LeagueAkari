@@ -1,11 +1,11 @@
-import { AKARI_PROTOCOL_MAIN_NAMESPACE } from '@shared/akari-protocol/namespace'
 import { Dep, Shard } from '@shared/akari-shard'
 import type { AxiosInstance } from 'axios'
 
 import { AkariIpcRenderer } from '../ipc'
+import { AKARI_PROTOCOL_MAIN_NAMESPACE, AKARI_PROTOCOL_RENDERER_NAMESPACE } from './context'
 import { installAkariProtocolProxyCancellation } from './proxy-cancellation'
 
-export const AKARI_PROTOCOL_RENDERER_NAMESPACE = 'akari-protocol-renderer'
+export { AKARI_PROTOCOL_RENDERER_NAMESPACE } from './context'
 
 @Shard(AkariProtocolRenderer.id)
 export class AkariProtocolRenderer {

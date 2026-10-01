@@ -90,7 +90,7 @@ export default defineConfig({
       alias: {
         '@main-window': resolve('src/renderer/src-main-window'),
         '@aux-window': resolve('src/renderer/src-aux-window'),
-        '@opgg-window': resolve('src/renderer/src-opgg-window'),
+        '@champion-data-window': resolve('src/renderer/src-champion-data-window'),
         '@ongoing-game-window': resolve('src/renderer/src-ongoing-game-window'),
         '@cd-timer-window': resolve('src/renderer/src-cd-timer-window'),
         '@shared': resolve('src/shared'),
@@ -115,7 +115,7 @@ export default defineConfig({
         input: {
           mainWindow: resolve(__dirname, 'src/renderer/main-window.html'),
           auxWindow: resolve(__dirname, 'src/renderer/aux-window.html'),
-          opggWindow: resolve(__dirname, 'src/renderer/opgg-window.html'),
+          championDataWindow: resolve(__dirname, 'src/renderer/champion-data-window.html'),
           ongoingGameWindow: resolve(__dirname, 'src/renderer/ongoing-game-window.html'),
           cdTimerWindow: resolve(__dirname, 'src/renderer/cd-timer-window.html')
         }

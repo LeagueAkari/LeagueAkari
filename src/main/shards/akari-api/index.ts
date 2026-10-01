@@ -10,6 +10,7 @@ import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { AkariApiBootstrapController } from './bootstrap-controller'
 import { AkariApiConfigLoader } from './config-loader'
+import { AKARI_API_MAIN_NAMESPACE } from './context'
 import type { AkariApiMainContext } from './context'
 import { AkariApiNoticeLoader } from './notice-loader'
 import { AkariApiProtocolController } from './protocol-controller'
@@ -18,7 +19,7 @@ import { AkariApiState } from './state'
 
 @Shard(AkariApiMain.id)
 export class AkariApiMain implements IAkariShardInitDispose {
-  static readonly id = 'akari-api-main'
+  static readonly id = AKARI_API_MAIN_NAMESPACE
 
   public readonly state = new AkariApiState()
 

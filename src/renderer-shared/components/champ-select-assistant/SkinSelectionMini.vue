@@ -28,7 +28,7 @@ import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
-import { useOpggWindowStore } from '@renderer-shared/shards/window-manager/store'
+import { useChampionDataWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { CarouselSkins } from '@shared/types/league-client/champ-select'
 import { ChampDetails } from '@shared/types/league-client/game-data'
 import { useTranslation } from 'i18next-vue'
@@ -38,7 +38,7 @@ import { computed, ref, shallowRef, watch } from 'vue'
 const { t } = useTranslation()
 const componentName = useComponentName()
 
-const ows = useOpggWindowStore()
+const ows = useChampionDataWindowStore()
 const lcs = useLeagueClientStore()
 
 const lc = useInstance(LeagueClientRenderer)

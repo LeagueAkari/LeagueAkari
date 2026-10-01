@@ -16,7 +16,7 @@ import { navigateToSetting } from '@main-window/settings-navigation'
 
 import {
   NEVER_SHOW_BAD_SGP_CONNECTION_SETTING_KEY,
-  SIMPLE_NOTIFICATIONS_RENDERER_ID,
+  SIMPLE_NOTIFICATIONS_RENDERER_NAMESPACE,
   type SimpleNotificationsRendererContext
 } from './context'
 import { useSimpleNotificationsStore } from './store'
@@ -197,7 +197,7 @@ export function watchBadSgpConnectionWarning(context: SimpleNotificationsRendere
   const saveNeverShowAgain = () => {
     if (neverShowAgainChecked.value) {
       context.settingUtils.set(
-        SIMPLE_NOTIFICATIONS_RENDERER_ID,
+        SIMPLE_NOTIFICATIONS_RENDERER_NAMESPACE,
         NEVER_SHOW_BAD_SGP_CONNECTION_SETTING_KEY,
         true
       )
@@ -209,7 +209,7 @@ export function watchBadSgpConnectionWarning(context: SimpleNotificationsRendere
     async (isBad) => {
       if (isBad) {
         const neverShow = await context.settingUtils.get(
-          SIMPLE_NOTIFICATIONS_RENDERER_ID,
+          SIMPLE_NOTIFICATIONS_RENDERER_NAMESPACE,
           NEVER_SHOW_BAD_SGP_CONNECTION_SETTING_KEY,
           false
         )

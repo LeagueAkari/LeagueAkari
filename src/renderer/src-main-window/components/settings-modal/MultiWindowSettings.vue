@@ -75,61 +75,65 @@
         </SettingsRow>
       </SettingsSection>
       <SettingsSection
-        setting-id="multi-window.opgg"
-        :title="t('settings.multiWindow.opggWindow.title')"
+        setting-id="multi-window.champion-data"
+        :title="t('settings.multiWindow.championDataWindow.title')"
       >
         <SettingsRow
-          setting-id="multi-window.opgg.enabled"
-          :label="t('settings.multiWindow.opggWindow.enabled.label')"
+          setting-id="multi-window.champion-data.enabled"
+          :label="t('settings.multiWindow.championDataWindow.enabled.label')"
           :label-width="400"
         >
           <template #labelDescription>
-            <div>{{ t('settings.multiWindow.opggWindow.enabled.description') }}</div>
+            <div>{{ t('settings.multiWindow.championDataWindow.enabled.description') }}</div>
             <div>
               <TranslationComponent
-                :translation="t('settings.multiWindow.opggWindow.enabled.descriptionWithIcon')"
+                :translation="
+                  t('settings.multiWindow.championDataWindow.enabled.descriptionWithIcon')
+                "
               >
                 <template #icon>
-                  <OpggIcon class="inline-block size-4 align-middle text-black dark:text-white" />
+                  <ChartLineData
+                    class="inline-block size-4 align-middle text-black dark:text-white"
+                  />
                 </template>
               </TranslationComponent>
             </div>
           </template>
           <NSwitch
             size="small"
-            :value="ows.settings.enabled"
-            @update:value="(val) => wm.opggWindow.setEnabled(val)"
+            :value="championDataWindowStore.settings.enabled"
+            @update:value="(val) => wm.championDataWindow.setEnabled(val)"
           />
         </SettingsRow>
         <SettingsRow
-          setting-id="multi-window.opgg.auto-show"
-          :label="t('settings.multiWindow.opggWindow.autoShow.label')"
-          :label-description="t('settings.multiWindow.opggWindow.autoShow.description')"
+          setting-id="multi-window.champion-data.auto-show"
+          :label="t('settings.multiWindow.championDataWindow.autoShow.label')"
+          :label-description="t('settings.multiWindow.championDataWindow.autoShow.description')"
           :label-width="400"
         >
           <NSwitch
             size="small"
-            :value="ows.settings.autoShow"
-            @update:value="(val) => wm.opggWindow.setAutoShow(val)"
+            :value="championDataWindowStore.settings.autoShow"
+            @update:value="(val) => wm.championDataWindow.setAutoShow(val)"
           />
         </SettingsRow>
         <SettingsRow
-          setting-id="multi-window.opgg.shortcut"
+          setting-id="multi-window.champion-data.shortcut"
           :disabled="!as.nativeSupport.nativeInput.available"
           :label-width="400"
-          :label="t('settings.multiWindow.opggWindow.showShortcut.label')"
-          :label-description="t('settings.multiWindow.opggWindow.showShortcut.description')"
+          :label="t('settings.multiWindow.championDataWindow.showShortcut.label')"
+          :label-description="t('settings.multiWindow.championDataWindow.showShortcut.description')"
         >
           <ShortcutSelector
-            :target-id="AkariOpggWindow.SHOW_WINDOW_SHORTCUT_TARGET_ID"
-            :shortcut-id="ows.settings.showShortcut"
-            @update:shortcut-id="(id) => wm.opggWindow.setShowShortcut(id)"
+            :target-id="AkariChampionDataWindow.SHOW_WINDOW_SHORTCUT_TARGET_ID"
+            :shortcut-id="championDataWindowStore.settings.showShortcut"
+            @update:shortcut-id="(id) => wm.championDataWindow.setShowShortcut(id)"
           />
         </SettingsRow>
         <SettingsRow
-          setting-id="multi-window.opgg.opacity"
-          :label="t('settings.multiWindow.opggWindow.opacity.label')"
-          :label-description="t('settings.multiWindow.opggWindow.opacity.description')"
+          setting-id="multi-window.champion-data.opacity"
+          :label="t('settings.multiWindow.championDataWindow.opacity.label')"
+          :label-description="t('settings.multiWindow.championDataWindow.opacity.description')"
           :label-width="400"
         >
           <NSlider
@@ -139,34 +143,38 @@
             :max="1"
             :step="0.01"
             :format-tooltip="(v) => `${(v * 100).toFixed()}%`"
-            @update:value="(val) => wm.opggWindow.setOpacity(val)"
-            :value="ows.settings.opacity"
+            @update:value="(val) => wm.championDataWindow.setOpacity(val)"
+            :value="championDataWindowStore.settings.opacity"
           ></NSlider>
         </SettingsRow>
         <SettingsRow
-          setting-id="multi-window.opgg.skin-selector"
-          :label="t('settings.multiWindow.opggWindow.showSkinSelector.label')"
-          :label-description="t('settings.multiWindow.opggWindow.showSkinSelector.description')"
+          setting-id="multi-window.champion-data.skin-selector"
+          :label="t('settings.multiWindow.championDataWindow.showSkinSelector.label')"
+          :label-description="
+            t('settings.multiWindow.championDataWindow.showSkinSelector.description')
+          "
           :label-width="400"
         >
           <NSwitch
             size="small"
-            :value="ows.settings.showSkinSelector"
-            @update:value="(val) => wm.opggWindow.setShowSkinSelector(val)"
+            :value="championDataWindowStore.settings.showSkinSelector"
+            @update:value="(val) => wm.championDataWindow.setShowSkinSelector(val)"
           />
         </SettingsRow>
         <SettingsRow
-          setting-id="multi-window.opgg.reset-position"
-          :label="t('settings.multiWindow.opggWindow.resetWindowPosition.label')"
-          :label-description="t('settings.multiWindow.opggWindow.resetWindowPosition.description')"
+          setting-id="multi-window.champion-data.reset-position"
+          :label="t('settings.multiWindow.championDataWindow.resetWindowPosition.label')"
+          :label-description="
+            t('settings.multiWindow.championDataWindow.resetWindowPosition.description')
+          "
           :label-width="400"
         >
           <NButton
             size="small"
             type="warning"
             secondary
-            @click="() => wm.opggWindow.resetPosition()"
-            >{{ t('settings.multiWindow.opggWindow.resetWindowPosition.button') }}</NButton
+            @click="() => wm.championDataWindow.resetPosition()"
+            >{{ t('settings.multiWindow.championDataWindow.resetWindowPosition.button') }}</NButton
           >
         </SettingsRow>
       </SettingsSection>
@@ -323,14 +331,14 @@
 </template>
 
 <script setup lang="ts">
-import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
+import { ChartLineData } from '@vicons/carbon'
 import SettingsRow from '@main-window/settings-navigation/NavigableSettingsRow.vue'
 import SettingsSection from '@main-window/settings-navigation/NavigableSettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import {
   AkariCdTimerWindow,
-  AkariOpggWindow,
+  AkariChampionDataWindow,
   WindowManagerRenderer
 } from '@renderer-shared/shards/window-manager'
 import { AkariOngoingGameWindow } from '@renderer-shared/shards/window-manager'
@@ -338,7 +346,7 @@ import {
   useAuxWindowStore,
   useCdTimerWindowStore,
   useOngoingGameWindowStore,
-  useOpggWindowStore
+  useChampionDataWindowStore
 } from '@renderer-shared/shards/window-manager/store'
 import { Window24Filled as Window24FilledIcon } from '@vicons/fluent'
 import { TranslationComponent, useTranslation } from 'i18next-vue'
@@ -350,7 +358,7 @@ const { t } = useTranslation()
 
 const as = useAppCommonStore()
 const aws = useAuxWindowStore()
-const ows = useOpggWindowStore()
+const championDataWindowStore = useChampionDataWindowStore()
 const ogws = useOngoingGameWindowStore()
 const ctws = useCdTimerWindowStore()
 

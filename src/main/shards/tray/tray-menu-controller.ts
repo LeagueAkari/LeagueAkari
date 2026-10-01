@@ -13,8 +13,8 @@ export class TrayMenuController {
   mainWindowDevTrayItem!: MenuItem
   auxWindowTrayItem!: MenuItem
   auxWindowDevTrayItem!: MenuItem
-  opggWindowTrayItem!: MenuItem
-  opggWindowDevTrayItem!: MenuItem
+  championDataWindowTrayItem!: MenuItem
+  championDataWindowDevTrayItem!: MenuItem
   ongoingGameWindowDevTrayItem!: MenuItem
   cdTimerWindowDevTrayItem!: MenuItem
   quitTrayItem!: MenuItem
@@ -47,18 +47,18 @@ export class TrayMenuController {
       click: () => windowManager.mainWindow.toggleDevtools()
     })
 
-    this.opggWindowTrayItem = new MenuItem({
-      label: i18next.t('tray.opggWindow'),
+    this.championDataWindowTrayItem = new MenuItem({
+      label: i18next.t('tray.championDataWindow'),
       type: 'normal',
-      click: () => windowManager.opggWindow.showOrRestore(),
-      enabled: windowManager.opggWindow.settings.enabled
+      click: () => windowManager.championDataWindow.showOrRestore(),
+      enabled: windowManager.championDataWindow.settings.enabled
     })
 
-    this.opggWindowDevTrayItem = new MenuItem({
-      label: i18next.t('tray.dev.toggleOpggWindowDevtools'),
+    this.championDataWindowDevTrayItem = new MenuItem({
+      label: i18next.t('tray.dev.toggleChampionDataWindowDevtools'),
       type: 'normal',
-      click: () => windowManager.opggWindow.toggleDevtools(),
-      enabled: windowManager.opggWindow.settings.enabled
+      click: () => windowManager.championDataWindow.toggleDevtools(),
+      enabled: windowManager.championDataWindow.settings.enabled
     })
 
     this.ongoingGameWindowDevTrayItem = new MenuItem({
@@ -81,7 +81,7 @@ export class TrayMenuController {
       click: () => {
         windowManager.mainWindow.repositionWindowIfInvisible()
         windowManager.auxWindow.repositionWindowIfInvisible()
-        windowManager.opggWindow.repositionWindowIfInvisible()
+        windowManager.championDataWindow.repositionWindowIfInvisible()
         windowManager.ongoingGameWindow.repositionWindowIfInvisible()
         windowManager.cdTimerWindow.repositionWindowIfInvisible()
       }
@@ -108,7 +108,7 @@ export class TrayMenuController {
         submenu: Menu.buildFromTemplate([
           this.mainWindowDevTrayItem,
           this.auxWindowDevTrayItem,
-          this.opggWindowDevTrayItem,
+          this.championDataWindowDevTrayItem,
           this.ongoingGameWindowDevTrayItem,
           this.cdTimerWindowDevTrayItem,
           {
@@ -121,7 +121,7 @@ export class TrayMenuController {
         type: 'separator'
       },
       this.auxWindowTrayItem,
-      this.opggWindowTrayItem,
+      this.championDataWindowTrayItem,
       this.quitTrayItem
     ])
 

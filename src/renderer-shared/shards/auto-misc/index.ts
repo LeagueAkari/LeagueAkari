@@ -16,8 +16,6 @@ import {
 import { syncAutoMiscSettings } from './settings-sync'
 import { useAutoMiscStore } from './store'
 
-const MAIN_SHARD_NAMESPACE = AUTO_MISC_MAIN_NAMESPACE
-
 @Shard(AutoMiscRenderer.id)
 export class AutoMiscRenderer implements IAkariShardInitDispose {
   static id = AUTO_MISC_RENDERER_NAMESPACE
@@ -37,35 +35,35 @@ export class AutoMiscRenderer implements IAkariShardInitDispose {
   }
 
   setAutoReplyEnabled(enabled: boolean) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoReplyEnabled', enabled)
+    return this._settingUtils.set(AUTO_MISC_MAIN_NAMESPACE, 'autoReplyEnabled', enabled)
   }
 
   setAutoReplyText(text: string) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoReplyText', text)
+    return this._settingUtils.set(AUTO_MISC_MAIN_NAMESPACE, 'autoReplyText', text)
   }
 
   setAutoReplyEnableOnAway(enabled: boolean) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoReplyEnableOnAway', enabled)
+    return this._settingUtils.set(AUTO_MISC_MAIN_NAMESPACE, 'autoReplyEnableOnAway', enabled)
   }
 
   setLockOfflineStatus(enabled: boolean) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'lockOfflineStatus', enabled)
+    return this._settingUtils.set(AUTO_MISC_MAIN_NAMESPACE, 'lockOfflineStatus', enabled)
   }
 
   setAutoSetStatusMessageEnabled(enabled: boolean) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoSetStatusMessageEnabled', enabled)
+    return this._settingUtils.set(AUTO_MISC_MAIN_NAMESPACE, 'autoSetStatusMessageEnabled', enabled)
   }
 
   setStatusMessage(message: string) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'statusMessage', message)
+    return this._settingUtils.set(AUTO_MISC_MAIN_NAMESPACE, 'statusMessage', message)
   }
 
   setAutoSetRankedStatusEnabled(enabled: boolean) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoSetRankedStatusEnabled', enabled)
+    return this._settingUtils.set(AUTO_MISC_MAIN_NAMESPACE, 'autoSetRankedStatusEnabled', enabled)
   }
 
   setRankedStatus(rankedStatus: AutoMiscRankedStatus) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'rankedStatus', rankedStatus)
+    return this._settingUtils.set(AUTO_MISC_MAIN_NAMESPACE, 'rankedStatus', rankedStatus)
   }
 
   setRankedQueue(queue: string) {
@@ -84,11 +82,11 @@ export class AutoMiscRenderer implements IAkariShardInitDispose {
   }
 
   applyStatusMessage(message?: string) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'applyStatusMessage', message)
+    return this._ipc.call(AUTO_MISC_MAIN_NAMESPACE, 'applyStatusMessage', message)
   }
 
   applyRankedStatus(rankedStatus?: AutoMiscRankedStatus) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'applyRankedStatus', rankedStatus)
+    return this._ipc.call(AUTO_MISC_MAIN_NAMESPACE, 'applyRankedStatus', rankedStatus)
   }
 
   async onInit() {

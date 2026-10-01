@@ -58,3 +58,40 @@ export async function migrateFrom151(context: MigrationContext) {
   await markMigration(context.manager, MIGRATION_FROM_151)
   context.logger.info(`Migration completed, to ${MIGRATION_FROM_151}`)
 }
+
+export const MIGRATION_CHAMPION_DATA_WINDOW = 'akari-migration-from-1.5.1-champion-data-window'
+
+// Only stable window preferences belong here. Do not migrate champion configuration or
+// source preferences while their contracts are still being designed.
+const WINDOW_SETTING_KEYS = [
+  'trackedBounds',
+  'enabled',
+  'autoShow',
+  'opacity',
+  'pinned',
+  'showShortcut',
+  'showSkinSelector'
+] as const
+
+export async function migrateChampionDataWindow(context: MigrationContext) {
+  const { manager, logger } = context
+  if (await hasMigration(manager, MIGRATION_CHAMPION_DATA_WINDOW)) return
+
+  logger.info('Start migrating settings', MIGRATION_CHAMPION_DATA_WINDOW)
+  for (const key of WINDOW_SETTING_KEYS) {
+    const legacy = await manager.findOneBy(Setting, {
+      key: Equal(`window-manager-main/opgg-window/${key}`)
+    })
+    if (!legacy) continue
+
+    const targetKey = `window-manager-main/champion-data-window/${key}`
+    const current = await manager.findOneBy(Setting, { key: Equal(targetKey) })
+    if (!current) {
+      await manager.save(Setting.create(targetKey, legacy.value))
+    }
+    await manager.remove(legacy)
+  }
+
+  await markMigration(manager, MIGRATION_CHAMPION_DATA_WINDOW)
+  logger.info(`Migration completed, to ${MIGRATION_CHAMPION_DATA_WINDOW}`)
+}

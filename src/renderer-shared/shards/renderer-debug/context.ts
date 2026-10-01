@@ -8,7 +8,7 @@ import type { SettingUtilsRenderer } from '../setting-utils'
 import type { SetupInAppScopeRenderer } from '../setup-in-app-scope'
 
 export const RENDERER_DEBUG_RENDERER_NAMESPACE = 'renderer-debug-renderer'
-export const MAIN_SHARD_NAMESPACE = 'renderer-debug-main'
+export const RENDERER_DEBUG_MAIN_NAMESPACE = 'renderer-debug-main'
 
 export interface RendererDebugRendererContext {
   namespace: string

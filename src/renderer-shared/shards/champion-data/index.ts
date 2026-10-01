@@ -1,65 +1,55 @@
-import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import type {
-  ChampionDataPreferences,
-  ChampionDataQuery,
-  ChampionDataSourceId
-} from '@shared/data-adapter/champion-data'
+import { Config, Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 
+import { AkariProtocolRenderer } from '../akari-protocol'
 import { AkariIpcRenderer } from '../ipc'
+import { LoggerRenderer } from '../logger'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import {
-  CHAMPION_DATA_MAIN_NAMESPACE,
   CHAMPION_DATA_RENDERER_NAMESPACE,
-  type ChampionDataRendererContext,
-  type ChampionDataRendererRequestOptions
+  type ChampionDataRendererConfig,
+  type ChampionDataRendererContext
 } from './context'
-import { ChampionDataRendererLoader } from './data-loader'
-import { syncChampionDataState } from './state-sync'
+import { createChampionDataApis } from './http-api'
+import { OpggChampionDataController } from './opgg/data-controller'
+import { Qq101ChampionDataController } from './qq101/data-controller'
+import { Qq101ChampionDataLoader } from './qq101/data-loader'
+import { syncChampionDataResources, syncChampionDataState } from './state-sync'
 
 @Shard(ChampionDataRenderer.id)
 export class ChampionDataRenderer implements IAkariShardInitDispose {
   static id = CHAMPION_DATA_RENDERER_NAMESPACE
 
+  public readonly api: ReturnType<typeof createChampionDataApis>
+  public readonly opgg: OpggChampionDataController
+  public readonly qq101: Qq101ChampionDataController
   private readonly _context: ChampionDataRendererContext
-  private readonly _loader: ChampionDataRendererLoader
 
   constructor(
     @Dep(AkariIpcRenderer) ipc: AkariIpcRenderer,
-    @Dep(PiniaMobxUtilsRenderer) piniaMobxUtils: PiniaMobxUtilsRenderer
+    @Dep(PiniaMobxUtilsRenderer) piniaMobxUtils: PiniaMobxUtilsRenderer,
+    @Dep(AkariProtocolRenderer) protocol: AkariProtocolRenderer,
+    @Dep(LoggerRenderer) logger: LoggerRenderer,
+    @Config() private readonly _config?: ChampionDataRendererConfig
   ) {
-    this._context = { ipc, piniaMobxUtils }
-    this._loader = new ChampionDataRendererLoader(this._context)
-  }
-
-  loadPatches(query: ChampionDataQuery, options?: ChampionDataRendererRequestOptions) {
-    return this._loader.loadPatches(query, options)
-  }
-
-  loadOverview(query: ChampionDataQuery, options?: ChampionDataRendererRequestOptions) {
-    return this._loader.loadOverview(query, options)
-  }
-
-  loadDetails(
-    query: ChampionDataQuery,
-    championId: number,
-    options?: ChampionDataRendererRequestOptions
-  ) {
-    return this._loader.loadDetails(query, championId, options)
-  }
-
-  setPreferredSource(source: ChampionDataSourceId) {
-    return this._context.ipc.call(CHAMPION_DATA_MAIN_NAMESPACE, 'setPreferredSource', source)
-  }
-
-  setPreferences(preferences: Partial<ChampionDataPreferences>) {
-    return this._context.ipc.call(CHAMPION_DATA_MAIN_NAMESPACE, 'setPreferences', preferences)
-  }
-
-  getCapabilities() {
-    return this._context.ipc.call(CHAMPION_DATA_MAIN_NAMESPACE, 'getCapabilities')
+    this._context = { ipc, piniaMobxUtils, logger }
+    this.api = createChampionDataApis(protocol)
+    this.opgg = new OpggChampionDataController(this._context)
+    this.qq101 = new Qq101ChampionDataController(
+      this._context,
+      new Qq101ChampionDataLoader(logger, this.api.qq101)
+    )
   }
 
   async onInit() {
-    await syncChampionDataState(this._context)
+    await syncChampionDataResources(this._context)
+
+    if (this._config?.enableFullData) {
+      await syncChampionDataState(this._context)
+      this.qq101.start()
+    }
+  }
+
+  async onDispose() {
+    this.qq101.dispose()
   }
 }

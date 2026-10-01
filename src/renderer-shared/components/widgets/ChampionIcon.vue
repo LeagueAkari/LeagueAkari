@@ -1,8 +1,6 @@
 <template>
   <div class="champion-icon-container" :class="{ round: round }">
-    <img class="plain-img" v-if="imageSource?.source === 'url'" :src="imageSource.iconPath" />
     <LcuImage
-      v-else
       class="champion-icon"
       :class="{ 'champion-icon-stretched': stretched }"
       :src="imageSource?.iconPath"
@@ -48,12 +46,6 @@ const imageSource = computed(() => resources.champions.icon(championId))
   .champion-icon-container {
     position: relative;
     overflow: hidden;
-
-    .plain-img {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
 
     /*  default size */
     width: 64px;

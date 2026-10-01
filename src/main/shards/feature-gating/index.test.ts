@@ -38,6 +38,7 @@ function createFeatureGating(persistedOverrides: FeatureGateDevOverrides = {}) {
   const settingFactory = {
     register: vi.fn((_namespace: string, _schema: unknown, settings: FeatureGatingSettings) => {
       registeredSettings = settings
+
       return settingService
     })
   } as unknown as SettingFactoryMain
@@ -77,21 +78,52 @@ describe('FeatureGatingMain', () => {
     dispose()
   })
 
+  it('exposes structured evaluations through a MobX reaction', () => {
+    const { featureGating, state } = createFeatureGating()
+    const values: string[] = []
+    const dispose = reaction(
+      () => featureGating.getEvaluation('champion-data.opgg', false),
+      (evaluation) => values.push(`${evaluation.decision}:${evaluation.enabled}`),
+      { fireImmediately: true }
+    )
+
+    state.setFeatureGates(snapshot({}))
+    state.setFeatureGates(snapshot({ 'champion-data.opgg': { minVersionInclusive: '2.0.0' } }))
+    featureGating.settings.setDevOverrides({
+      'champion-data.opgg': { mode: 'force-on' }
+    })
+    featureGating.settings.setDevOverrides({
+      'champion-data.opgg': { mode: 'force-on' },
+      'unrelated.feature': { mode: 'force-off' }
+    })
+
+    expect(values).toEqual([
+      'default-value:false',
+      'not-configured:false',
+      'rule-not-matched:false',
+      'force-on:true'
+    ])
+    expect(featureGating.isEnabled('champion-data.opgg', false)).toBe(
+      featureGating.getEvaluation('champion-data.opgg', false).enabled
+    )
+    dispose()
+  })
+
   it('distinguishes an absent gate from a configured gate', () => {
     const { featureGating, state } = createFeatureGating()
 
-    state.setFeatureGates(snapshot({ 'champion-data.source.opgg': {} }))
+    state.setFeatureGates(snapshot({ 'champion-data.opgg': {} }))
 
-    expect(featureGating.hasConfiguredGate('champion-data.source.opgg')).toBe(true)
-    expect(featureGating.hasConfiguredGate('champion-data.source.qq101')).toBe(false)
+    expect(featureGating.hasConfiguredGate('champion-data.opgg')).toBe(true)
+    expect(featureGating.hasConfiguredGate('champion-data.qq101')).toBe(false)
   })
 
   it('merges persisted development overrides before consumers evaluate gates', async () => {
     const { featureGating, mobxUtils, settingService, state } = createFeatureGating({
-      'champion-data.source.opgg': { mode: 'force-off' },
-      'champion-data.source.qq101': { mode: 'force-on' }
+      'champion-data.opgg': { mode: 'force-off' },
+      'champion-data.qq101': { mode: 'force-on' }
     })
-    state.setFeatureGates(snapshot({ 'champion-data.source.opgg': {} }))
+    state.setFeatureGates(snapshot({ 'champion-data.opgg': {} }))
 
     await featureGating.onInit()
 
@@ -102,8 +134,8 @@ describe('FeatureGatingMain', () => {
       featureGating.settings,
       'devOverrides'
     )
-    expect(featureGating.isEnabled('champion-data.source.opgg', true)).toBe(false)
-    expect(featureGating.isEnabled('champion-data.source.qq101', false)).toBe(true)
-    expect(featureGating.hasConfiguredGate('champion-data.source.qq101')).toBe(true)
+    expect(featureGating.isEnabled('champion-data.opgg', true)).toBe(false)
+    expect(featureGating.isEnabled('champion-data.qq101', false)).toBe(true)
+    expect(featureGating.hasConfiguredGate('champion-data.qq101')).toBe(true)
   })
 })

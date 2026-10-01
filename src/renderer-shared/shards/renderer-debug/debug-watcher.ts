@@ -2,7 +2,7 @@ import type { LcuEvent } from '@shared/types/league-client/event'
 import { watch } from 'vue'
 
 import {
-  MAIN_SHARD_NAMESPACE,
+  RENDERER_DEBUG_MAIN_NAMESPACE,
   RENDERER_DEBUG_RENDERER_NAMESPACE,
   type RendererDebugRendererContext
 } from './context'
@@ -36,7 +36,7 @@ export class RendererDebugWatcher {
   }
 
   private _registerLcuEventDispatch() {
-    this.context.ipc.onEvent(MAIN_SHARD_NAMESPACE, 'lc-event', (data: LcuEvent) => {
+    this.context.ipc.onEvent(RENDERER_DEBUG_MAIN_NAMESPACE, 'lc-event', (data: LcuEvent) => {
       this.context.matcher.emit(data.uri, data)
     })
   }
@@ -53,9 +53,9 @@ export class RendererDebugWatcher {
               RENDERER_DEBUG_RENDERER_NAMESPACE,
               'send all native lcu events'
             )
-            this.context.ipc.call(MAIN_SHARD_NAMESPACE, 'setSendAllNativeLcuEvents', true)
+            this.context.ipc.call(RENDERER_DEBUG_MAIN_NAMESPACE, 'setSendAllNativeLcuEvents', true)
           } else {
-            this.context.ipc.call(MAIN_SHARD_NAMESPACE, 'setSendAllNativeLcuEvents', false)
+            this.context.ipc.call(RENDERER_DEBUG_MAIN_NAMESPACE, 'setSendAllNativeLcuEvents', false)
           }
         },
         { immediate: true }

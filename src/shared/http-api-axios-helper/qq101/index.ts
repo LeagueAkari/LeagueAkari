@@ -1,11 +1,15 @@
 import {
   type Qq101ClassicPosition,
+  parseQq101AramChampions,
   parseQq101Build,
+  parseQq101ClassicLanes,
   parseQq101ClassicTierList,
   parseQq101Durations,
+  parseQq101JungleRoutes,
   parseQq101Matchups,
   parseQq101MayhemAugments,
   parseQq101MayhemChampions,
+  parseQq101MayhemDetails,
   parseQq101MayhemPairSynergies,
   parseQq101Patches,
   parseQq101Positions,
@@ -16,7 +20,7 @@ import {
   parseQq101TierList,
   parseQq101TierStats,
   parseQq101Trend
-} from '@shared/data-adapter/champion-data/qq101-protocol'
+} from '@shared/data-adapter/qq101/protocol'
 import type { AxiosInstance } from 'axios'
 
 export interface Qq101RiftQuery {
@@ -37,7 +41,9 @@ export class Qq101HttpApiAxiosHelper {
   static BASE_URL = 'https://mlol.qt.qq.com'
 
   constructor(private readonly _http: AxiosInstance) {
-    if (!_http.defaults.baseURL) this._http.defaults.baseURL = Qq101HttpApiAxiosHelper.BASE_URL
+    if (!_http.defaults.baseURL) {
+      this._http.defaults.baseURL = Qq101HttpApiAxiosHelper.BASE_URL
+    }
   }
 
   private async _get(
@@ -46,6 +52,7 @@ export class Qq101HttpApiAxiosHelper {
     options: Qq101RequestOptions
   ) {
     const response = await this._http.get<unknown>(path, { params, signal: options.signal })
+
     return response.data
   }
 
@@ -60,13 +67,50 @@ export class Qq101HttpApiAxiosHelper {
 
   async getPatches(options: Qq101RequestOptions = {}) {
     const data = await this._get('/go/database/versionlist', { zone: 'lol', from: 'h5' }, options)
+
     return parseQq101Patches(data)
   }
 
   async getLatestPatch(options: Qq101RequestOptions = {}) {
     const patches = await this.getPatches(options)
-    if (!patches[0]) throw new Error('QQ101 patch list is empty')
+
+    if (!patches[0]) {
+      throw new Error('QQ101 patch list is empty')
+    }
+
     return patches[0].name
+  }
+
+  async getClassicLanes(options: Qq101RequestOptions = {}) {
+    return parseQq101ClassicLanes(
+      await this._get(`${MAYHEM_API_PATH}/jade_hero_lane`, { itype: 255 }, options)
+    )
+  }
+
+  async getJungleRoutes(
+    query: Qq101RiftQuery,
+    championId: number,
+    options: Qq101RequestOptions = {}
+  ) {
+    return parseQq101JungleRoutes(
+      await this._get(
+        `${RIFT_API_PATH}_jungle`,
+        {
+          itier: query.tier,
+          version_id: query.patch,
+          championid: championId
+        },
+        options
+      ),
+      championId
+    )
+  }
+
+  async getMayhemDetails(championId: number, options: Qq101RequestOptions = {}) {
+    return parseQq101MayhemDetails(
+      await this._get(`${MAYHEM_API_PATH}/fuwen_hero_rank`, { championid: championId }, options),
+      championId
+    )
   }
 
   async getTierList(query: Qq101RiftQuery, options: Qq101RequestOptions = {}) {
@@ -75,11 +119,13 @@ export class Qq101HttpApiAxiosHelper {
       { ...this._riftParams(query), sort_metric: 1, sort_order: 2 },
       options
     )
+
     return parseQq101TierList(data, query.patch)
   }
 
   async getClassicTierList(position: Qq101ClassicPosition, options: Qq101RequestOptions = {}) {
     const data = await this._get(CLASSIC_API_PATH, { lane: position, itier: 255 }, options)
+
     return parseQq101ClassicTierList(data, position)
   }
 
@@ -89,6 +135,7 @@ export class Qq101HttpApiAxiosHelper {
       this._riftParams(query, championId),
       options
     )
+
     return parseQq101Trend(data, championId)
   }
 
@@ -98,6 +145,7 @@ export class Qq101HttpApiAxiosHelper {
       this._riftParams(query, championId),
       options
     )
+
     return parseQq101Matchups(data, championId)
   }
 
@@ -107,6 +155,7 @@ export class Qq101HttpApiAxiosHelper {
       this._riftParams(query, championId),
       options
     )
+
     return parseQq101Synergies(data, championId)
   }
 
@@ -120,6 +169,7 @@ export class Qq101HttpApiAxiosHelper {
       this._riftParams(query, championId),
       options
     )
+
     return parseQq101SummonerSpells(data, championId)
   }
 
@@ -133,6 +183,7 @@ export class Qq101HttpApiAxiosHelper {
       this._riftParams(query, championId),
       options
     )
+
     return parseQq101SkillOrder(data, championId)
   }
 
@@ -142,6 +193,7 @@ export class Qq101HttpApiAxiosHelper {
       { ...this._riftParams(query, championId), itier: 255 },
       options
     )
+
     return parseQq101TierStats(data, championId)
   }
 
@@ -151,6 +203,7 @@ export class Qq101HttpApiAxiosHelper {
       this._riftParams(query, championId),
       options
     )
+
     return parseQq101Build(data, championId)
   }
 
@@ -160,6 +213,7 @@ export class Qq101HttpApiAxiosHelper {
       this._riftParams(query, championId),
       options
     )
+
     return parseQq101Runes(data, championId)
   }
 
@@ -173,6 +227,7 @@ export class Qq101HttpApiAxiosHelper {
       },
       options
     )
+
     return parseQq101Positions(data, championId)
   }
 
@@ -182,6 +237,7 @@ export class Qq101HttpApiAxiosHelper {
       this._riftParams(query, championId),
       options
     )
+
     return parseQq101Durations(data, championId)
   }
 
@@ -191,16 +247,28 @@ export class Qq101HttpApiAxiosHelper {
       { dtstatdate: date },
       options
     )
+
     return parseQq101MayhemChampions(data, date)
   }
 
-  async getMayhemAugments(date: string, options: Qq101RequestOptions = {}) {
+  async getAramChampions(date: string, options: Qq101RequestOptions = {}) {
+    const data = await this._get(
+      `${MAYHEM_API_PATH}/aram_hero_overview`,
+      { dtstatdate: date },
+      options
+    )
+
+    return parseQq101AramChampions(data, date)
+  }
+
+  async getMayhemAugments(options: Qq101RequestOptions = {}) {
     const data = await this._get(
       `${MAYHEM_API_PATH}/fuwen_aram_rune_rank_v2`,
       { augmentid_level: 255 },
       options
     )
-    return parseQq101MayhemAugments(data, date)
+
+    return parseQq101MayhemAugments(data)
   }
 
   async getMayhemPairSynergies(championId = 255, options: Qq101RequestOptions = {}) {
@@ -209,6 +277,7 @@ export class Qq101HttpApiAxiosHelper {
       { role1: 255, role2: 255, championid: championId },
       options
     )
+
     return parseQq101MayhemPairSynergies(data)
   }
 }

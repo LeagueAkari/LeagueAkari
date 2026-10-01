@@ -14,11 +14,11 @@ import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { AkariAuxWindow } from './aux-window/window'
 import { AkariCdTimerWindow } from './cd-timer-window/windows'
+import { AkariChampionDataWindow } from './champion-data-window/window'
 import { WINDOW_MANAGER_MAIN_NAMESPACE, type WindowManagerMainContext } from './context'
 import { WindowManagerLifecycleController } from './lifecycle-controller'
 import { AkariMainWindow } from './main-window/window'
 import { AkariOngoingGameWindow } from './ongoing-game-window/window'
-import { AkariOpggWindow } from './opgg-window/window'
 import { WindowManagerSettings, WindowManagerState } from './state'
 
 @Shard(WindowManagerMain.id)
@@ -35,7 +35,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
 
   public readonly mainWindow: AkariMainWindow
   public readonly auxWindow: AkariAuxWindow
-  public readonly opggWindow: AkariOpggWindow
+  public readonly championDataWindow: AkariChampionDataWindow
   public readonly ongoingGameWindow: AkariOngoingGameWindow
   public readonly cdTimerWindow: AkariCdTimerWindow
 
@@ -68,13 +68,13 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._context = this.getContext()
     this.mainWindow = new AkariMainWindow(this._context)
     this.auxWindow = new AkariAuxWindow(this._context)
-    this.opggWindow = new AkariOpggWindow(this._context)
+    this.championDataWindow = new AkariChampionDataWindow(this._context)
     this.ongoingGameWindow = new AkariOngoingGameWindow(this._context)
     this.cdTimerWindow = new AkariCdTimerWindow(this._context)
     this._lifecycleController = new WindowManagerLifecycleController(this._context, {
       mainWindow: this.mainWindow,
       auxWindow: this.auxWindow,
-      opggWindow: this.opggWindow,
+      championDataWindow: this.championDataWindow,
       ongoingGameWindow: this.ongoingGameWindow,
       cdTimerWindow: this.cdTimerWindow
     })

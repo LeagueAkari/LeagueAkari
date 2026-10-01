@@ -4,6 +4,7 @@ import { AkariProtocolRenderer } from '@renderer-shared/shards/akari-protocol'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { AutoGameflowRenderer } from '@renderer-shared/shards/auto-gameflow'
 import { AutoSelectRenderer } from '@renderer-shared/shards/auto-select'
+import { ChampionDataRenderer } from '@renderer-shared/shards/champion-data'
 import { ExtraAssetsRenderer } from '@renderer-shared/shards/extra-assets'
 import { FeatureGatingRenderer } from '@renderer-shared/shards/feature-gating'
 import { AkariIpcRenderer } from '@renderer-shared/shards/ipc'
@@ -23,6 +24,7 @@ manager.use(AppCommonRenderer)
 manager.use(AutoGameflowRenderer)
 manager.use(AutoSelectRenderer)
 manager.use(ExtraAssetsRenderer)
+manager.use(ChampionDataRenderer)
 manager.use(FeatureGatingRenderer)
 manager.use(LeagueClientRenderer)
 manager.use(LoggerRenderer)

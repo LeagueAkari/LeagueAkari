@@ -1,13 +1,14 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { type HttpProxySetting, NETWORK_MAIN_NAMESPACE } from '@shared/shards/network'
+import { type HttpProxySetting } from '@shared/shards/network'
 
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
+import { NETWORK_MAIN_NAMESPACE, NETWORK_RENDERER_NAMESPACE } from './context'
 import { useNetworkStore } from './store'
 
 @Shard(NetworkRenderer.id)
 export class NetworkRenderer implements IAkariShardInitDispose {
-  static id = 'network-renderer'
+  static id = NETWORK_RENDERER_NAMESPACE
 
   constructor(
     @Dep(PiniaMobxUtilsRenderer) private readonly _piniaMobxUtils: PiniaMobxUtilsRenderer,

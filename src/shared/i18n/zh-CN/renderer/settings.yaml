@@ -295,15 +295,15 @@ settings:
         label: 重置小窗口位置
         description: 重新设置小窗口的位置，还原到默认主屏幕正中心
         button: 重置
-    opggWindow:
+    championDataWindow:
       title: 英雄数据窗口
       enabled:
-        label: 启用英雄数据功能
-        description: 使用 OP.GG 或 101 国服查看英雄数据
+        label: 启用英雄数据窗口
+        description: 使用 OP.GG 或 101 国服查看英雄数据。禁用后将关闭英雄数据窗口。
         descriptionWithIcon: 可通过标题栏右侧的快捷图标 ({icon})，或托盘区右键菜单中的“英雄数据窗口”打开
       autoShow:
-        label: 自动弹出和关闭
-        description: 在游戏流程的部分阶段，自动弹出或关闭英雄数据窗口
+        label: 自动弹出
+        description: 在英雄选择阶段，自动显示英雄数据窗口
       opacity:
         label: 英雄数据窗口不透明度
         description: 英雄数据窗口的半透明状态
@@ -313,7 +313,7 @@ settings:
         button: 重置
       showShortcut:
         label: 显示快捷键
-        description: 使用快捷键以显示或关闭英雄数据窗口。当游戏位于前台时，将自动转为置顶状态。请确保开启了游戏的无边框或窗口模式，以便此窗口正常显示
+        description: 使用快捷键以显示或隐藏英雄数据窗口。当游戏位于前台时，将自动转为置顶状态。请确保开启了游戏的无边框或窗口模式，以便此窗口正常显示
       showSkinSelector:
         label: 皮肤设置器
         description: 在选人助手中展示设置皮肤的快捷入口

@@ -72,7 +72,10 @@ const props = defineProps<{
 }>()
 
 const effectiveOverride = computed<FeatureGateDevOverride | null>(() => {
-  if (props.devOverride) return props.devOverride
+  if (props.devOverride) {
+    return props.devOverride
+  }
+
   return props.cloudConfig ? { mode: 'rule', config: props.cloudConfig } : null
 })
 
@@ -86,14 +89,27 @@ const platformText = computed(() =>
 )
 const versionText = computed(() => {
   const config = effectiveRule.value
-  if (!config) return ''
+
+  if (!config) {
+    return ''
+  }
+
   const parts: string[] = []
-  if (config.minVersionInclusive) parts.push(`≥ ${config.minVersionInclusive}`)
-  if (config.maxVersionExclusive) parts.push(`< ${config.maxVersionExclusive}`)
+
+  if (config.minVersionInclusive) {
+    parts.push(`≥ ${config.minVersionInclusive}`)
+  }
+
+  if (config.maxVersionExclusive) {
+    parts.push(`< ${config.maxVersionExclusive}`)
+  }
+
   return parts.join(' 且 ')
 })
+
 const isUnrestricted = computed(() => {
   const config = effectiveRule.value
+
   return Boolean(
     config &&
     !config.platforms &&

@@ -1,68 +1,63 @@
-import {
-  CHAMPION_DATA_CAPABILITIES,
-  type ChampionDataPreferences,
-  type ChampionDataQuery,
-  type ChampionDataSourceId
-} from '@shared/data-adapter/champion-data'
+import type { Qq101ChampionDataPreferences } from '@shared/types/champion-data'
+import type {
+  OpggApplyRecommendation,
+  OpggChampionDataQueryUpdate,
+  OpggFlashPosition
+} from '@shared/types/champion-data/opgg'
 
 import type { AkariIpcMain } from '../ipc'
-import type { ChampionDataMainContext, ChampionDataService } from './context'
-import { ChampionDataRequestController } from './request-controller'
+import type { ChampionDataMainContext } from './context'
+import type { OpggChampionDataController } from './opgg/data-controller'
+import type { OpggLoadoutExecutor } from './opgg/loadout-executor'
 
 export class ChampionDataIpcHandlers {
-  private readonly _requests = new ChampionDataRequestController()
-
   constructor(
     private readonly _context: ChampionDataMainContext,
     private readonly _ipc: AkariIpcMain,
-    private readonly _service: ChampionDataService
+    private readonly _opgg: OpggChampionDataController,
+    private readonly _loadout: OpggLoadoutExecutor
   ) {}
 
   register() {
-    const { namespace, settingService, settings, state } = this._context
-
-    this._ipc.onCall(namespace, 'getAvailability', () => state.availability)
-    this._ipc.onCall(namespace, 'getCapabilities', () => CHAMPION_DATA_CAPABILITIES)
     this._ipc.onCall(
-      namespace,
-      'loadPatches',
-      (event, requestId: string, query: ChampionDataQuery) =>
-        this._requests.run(event.sender.id, requestId, (signal) =>
-          this._service.loadPatches(query, { signal })
-        )
+      this._context.namespace,
+      'updateOpggQuery',
+      (_, query: OpggChampionDataQueryUpdate) => this._opgg.update(query)
+    )
+    this._ipc.onCall(this._context.namespace, 'openOpggChampion', (_, id: number) =>
+      this._opgg.open(id)
+    )
+    this._ipc.onCall(this._context.namespace, 'activateOpggPage', (_, id: number | null) =>
+      this._opgg.activate(id)
+    )
+    this._ipc.onCall(this._context.namespace, 'closeOpggChampion', (_, id: number) =>
+      this._opgg.close(id)
+    )
+    this._ipc.onCall(this._context.namespace, 'reorderOpggChampions', (_, ids: number[]) =>
+      this._opgg.reorder(ids)
+    )
+    this._ipc.onCall(this._context.namespace, 'refreshOpgg', (_, id?: number | null) =>
+      this._opgg.refresh(id)
+    )
+    this._ipc.onCall(this._context.namespace, 'cancelOpgg', (_, id: number | null) =>
+      this._opgg.cancelPage(id)
     )
     this._ipc.onCall(
-      namespace,
-      'loadOverview',
-      (event, requestId: string, query: ChampionDataQuery) =>
-        this._requests.run(event.sender.id, requestId, (signal) =>
-          this._service.loadOverview(query, { signal })
-        )
+      this._context.namespace,
+      'setOpggFlashPosition',
+      (_, value: OpggFlashPosition) => this._context.settingService.set('opggFlashPosition', value)
     )
     this._ipc.onCall(
-      namespace,
-      'loadDetails',
-      (event, requestId: string, query: ChampionDataQuery, championId: number) =>
-        this._requests.run(event.sender.id, requestId, (signal) =>
-          this._service.loadDetails(query, championId, { signal })
-        )
+      this._context.namespace,
+      'applyOpggRecommendation',
+      (_, request: OpggApplyRecommendation) => this._loadout.apply(request)
     )
-    this._ipc.onCall(namespace, 'cancelRequest', (event, requestId: string) =>
-      this._requests.cancel(event.sender.id, requestId)
-    )
-    this._ipc.onCall(namespace, 'setPreferredSource', async (_, source: ChampionDataSourceId) => {
-      await settingService.set('preferredSource', source)
-    })
     this._ipc.onCall(
-      namespace,
-      'setPreferences',
-      async (_, preferences: Partial<ChampionDataPreferences>) => {
-        await settingService.set('preferences', { ...settings.preferences, ...preferences })
+      this._context.namespace,
+      'setQq101Preferences',
+      async (_, preferences: Qq101ChampionDataPreferences) => {
+        await this._context.settingService.set('qq101Preferences', preferences)
       }
     )
-  }
-
-  dispose() {
-    this._requests.cancelAll()
   }
 }

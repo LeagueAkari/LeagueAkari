@@ -51,7 +51,7 @@ The renderer console is not a Node.js console. Use exposed preload APIs and rend
 
 League Akari exposes several project-specific globals in renderer windows:
 
-- `window.akariWindowType`: current window type, such as `main-window`, `aux-window`, `opgg-window`, `ongoing-game-window`, or `cd-timer-window`.
+- `window.akariWindowType`: current window type, such as `main-window`, `aux-window`, `champion-data-window`, `ongoing-game-window`, or `cd-timer-window`.
 - `window.akariManager`: renderer shard manager. Use `window.akariManager.getInstance('<shard-id>')` to access instantiated renderer shards in the selected window.
 - `window.electron`: limited preload bridge from `@electron-toolkit/preload`; use it only for low-level IPC when a renderer shard wrapper is unavailable.
 - `window.lcuApi`: League Client HTTP helper, available in windows that register `LeagueClientRenderer`.
@@ -60,13 +60,13 @@ League Akari exposes several project-specific globals in renderer windows:
 
 Window-specific availability:
 
-| Window       | Always useful globals / shards                                                                                                    |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------- |
-| Main         | `window.akariManager`, `window.lcuApi`, `window.sgpApi`, `window.selfUpdateShard`, `renderer-debug-renderer`, most feature shards |
-| Aux          | `window.akariManager`, `window.lcuApi`, `window-manager-renderer`, automation shards                                              |
-| OP.GG        | `window.akariManager`, `window.lcuApi`, `opgg-renderer`, `auto-champ-config-renderer`                                             |
-| Ongoing Game | `window.akariManager`, `window.lcuApi`, `window.sgpApi`, `ongoing-game-renderer`                                                  |
-| CD Timer     | `window.akariManager`, `window.lcuApi`, `window.sgpApi`, `additional-info` shard, `window-manager-renderer`                       |
+| Window        | Always useful globals / shards                                                                                                    |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Main          | `window.akariManager`, `window.lcuApi`, `window.sgpApi`, `window.selfUpdateShard`, `renderer-debug-renderer`, most feature shards |
+| Aux           | `window.akariManager`, `window.lcuApi`, `window-manager-renderer`, automation shards                                              |
+| Champion Data | `window.akariManager`, `window.lcuApi`, `opgg-renderer`, `auto-champ-config-renderer`                                             |
+| Ongoing Game  | `window.akariManager`, `window.lcuApi`, `window.sgpApi`, `ongoing-game-renderer`                                                  |
+| CD Timer      | `window.akariManager`, `window.lcuApi`, `window.sgpApi`, `additional-info` shard, `window-manager-renderer`                       |
 
 Convenient console helper:
 
@@ -213,7 +213,7 @@ Targets:
 - `aux-window`
 - `cd-timer-window`
 - `ongoing-game-window`
-- `opgg-window`
+- `champion-data-window`
 - `main`: dev-only main process eval. The snippet runs inside an async function with `app`, `manager`, `shared`, `logger`, and `process` parameters available.
 
 Example:
@@ -255,7 +255,7 @@ Common windows include:
 
 - Main window, usually `main-window.html`.
 - Aux window, usually `aux-window.html`.
-- OP.GG window.
+- Champion Data window.
 - Ongoing game window.
 - Cooldown timer window.
 

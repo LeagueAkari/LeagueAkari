@@ -1,8 +1,12 @@
-import braveryIcon from '@renderer-shared/assets/champions/bravery-circle.png'
+import braveryIcon from '@renderer-shared/assets/champions/bravery-circle.png?inline'
 import { i18next } from '@renderer-shared/i18n'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { useChampionDataStore } from '@renderer-shared/shards/champion-data/store'
 import { useExtraAssetsStore } from '@renderer-shared/shards/extra-assets/store'
+import { championBaseSplashUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { gtimgUrl } from '@shared/shards/extra-assets'
+import { lcuUrl } from '@shared/shards/league-client'
 
 import type {
   AkariResourceProviderValue,
@@ -24,6 +28,7 @@ function normalizeLcuPath(path: string) {
 export function createAkariResourceProvider(): AkariResourceProviderValue {
   const app = useAppCommonStore()
   const extra = useExtraAssetsStore()
+  const championData = useChampionDataStore()
   const leagueClient = useLeagueClientStore()
 
   const assets = {
@@ -99,7 +104,19 @@ export function createAkariResourceProvider(): AkariResourceProviderValue {
     assets,
 
     champions: {
+      roles(id: number) {
+        return (
+          extra.classicHeroesMap[id]?.roles ??
+          extra.heroListMap[id]?.roles ??
+          leagueClient.gameData.champions[id]?.roles ??
+          []
+        )
+      },
+
       name(id: number) {
+        if (id >= 60000) {
+          return extra.classicHeroesMap[id]?.name ?? String(id)
+        }
         if (id === -3) {
           return i18next.t('champions.bravery', { ns: 'common' })
         }
@@ -115,38 +132,54 @@ export function createAkariResourceProvider(): AkariResourceProviderValue {
           leagueClient.gameData.champions[id]?.name || extra.heroListMap[id]?.name || id.toString()
         )
       },
+
       icon(id: number) {
+        if (id >= 60000) {
+          const hero = extra.classicHeroesMap[id]
+          return hero ? { id, iconPath: hero.portrait } : null
+        }
         if (id === -3) {
           return {
             id,
-            iconPath: braveryIcon,
-            source: 'url',
-            variant: 'bravery'
+            iconPath: braveryIcon
           }
         }
 
         const gtimgHero = extra.heroListMap[id]
+
         if (!leagueClient.isConnected && gtimgHero?.alias) {
           return {
             id,
-            iconPath: `https://game.gtimg.cn/images/lol/act/img/champion/${gtimgHero.alias}.png`,
-            source: 'url',
-            variant: 'default'
+            iconPath: gtimgUrl.championIcon(gtimgHero.alias)
           }
         }
 
         return {
           id,
-          iconPath: `/lol-game-data/assets/v1/champion-icons/${id}.png`,
-          source: 'lcu',
-          variant: id === -1 ? 'unknown' : 'default'
+          iconPath: lcuUrl.championIcon(id)
         }
       },
+
+      baseSplash(id: number) {
+        const champion = leagueClient.gameData.champions[id]
+
+        if (!champion) {
+          return null
+        }
+
+        return championBaseSplashUri(champion.alias)
+      },
+
       searchKeywords(id: number) {
+        const classic = extra.classicHeroesMap[id]
+        if (classic) {
+          return [classic.name, classic.title, classic.alias, classic.baseAlias]
+        }
         return extra.heroListMap[id]?.keywords.split(',') ?? []
       },
+
       aramBalance(id: number) {
-        return extra.opggAramBalanceMap[id] ?? null
+        return championData.opggAramBalanceMap[id] ?? null
       }
     },
 

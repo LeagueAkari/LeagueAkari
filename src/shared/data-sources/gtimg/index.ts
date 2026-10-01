@@ -10,6 +10,16 @@ export interface GtimgHeroListJs {
   fileTime: string
 }
 
+export interface GtimgClassicHero {
+  heroId: number
+  name: string
+  title: string
+  alias: string
+  baseAlias: string
+  roles: string[]
+  portrait: string
+}
+
 export interface Hero {
   heroId: string
   name: string
@@ -67,17 +77,30 @@ export class GtimgApi {
     })
   }
 
-  async getHeroList() {
+  async getHeroList(signal?: AbortSignal) {
     const { data } = await this._http.get<GtimgHeroListJs>(
-      '/images/lol/act/img/js/heroList/hero_list.js'
+      '/images/lol/act/img/js/heroList/hero_list.js',
+      { signal }
     )
     return data
   }
 
-  async getKiwiAugments() {
+  async getKiwiAugments(signal?: AbortSignal) {
     const { data } = await this._http.get<GtimgKiwiAugments[]>(
-      'https://game.gtimg.cn/images/lol/act/img/js/kiwi/kiwi_augments.json'
+      'https://game.gtimg.cn/images/lol/act/img/js/kiwi/kiwi_augments.json',
+      { signal }
     )
     return data
+  }
+
+  async getClassicHeroes(signal?: AbortSignal) {
+    const { data } = await this._http.get<{ heroes: GtimgClassicHero[] }>(
+      '/images/lol/act/img/jade/js/heroes_index.js',
+      { signal }
+    )
+    if (!Array.isArray(data.heroes)) {
+      throw new Error('Invalid QQ101 classic hero catalog')
+    }
+    return data.heroes
   }
 }

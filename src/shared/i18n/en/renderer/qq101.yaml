@@ -1,0 +1,78 @@
+qq101:
+  title: Champion rankings
+  source: Statistics by League of Legends 101
+  mode: Game mode
+  modes:
+    ranked: Summoner's Rift
+    aram_mayhem: ARAM Mayhem
+    aram: ARAM
+    classic: Classic
+  boards:
+    champions: Champions
+    augments: Augments
+    synergies: Best partners
+  board: Ranking
+  tier: Rank
+  patch: Patch
+  position: Position
+  role: Class
+  rarity: Rarity
+  all: All
+  latest: Latest patch
+  roles:
+    tank: Tank
+    fighter: Fighter
+    assassin: Assassin
+    mage: Mage
+    marksman: Marksman
+    support: Support
+  positions:
+    all: All positions
+    top: Top
+    jungle: Jungle
+    middle: Mid
+    bottom: Bottom
+    utility: Support
+  rarities:
+    kSilver: Silver
+    kGold: Gold
+    kPrismatic: Prismatic
+    unknown: Unknown rarity
+  columns:
+    rank: Rank
+    champion: Champion
+    augment: Augment
+    pair: Champion pair
+    tier: Tier
+    winRate: Win rate
+    pickRate: Pick rate
+    banRate: Ban rate
+    change: Rank change
+  search: Search names
+  date: 'Statistics for {{date}}'
+  undated: Date unavailable
+  count_one: '{{count}} result'
+  count_other: '{{count}} results'
+  loading: Updating rankings…
+  stale: Showing the last successful result
+  empty: No matching data
+  failed: Could not load rankings
+  retry: Retry
+  tiers:
+    '255': All ranks
+    '1': Iron
+    '2': Bronze
+    '3': Silver
+    '4': Gold
+    '5': Platinum
+    '6': Emerald
+    '7': Diamond
+    '8': Master
+    '9': Grandmaster
+    '10': Challenger
+    '24': Gold+
+    '25': Platinum+
+    '26': Emerald+
+    '27': Diamond+
+    '28': Master+
+    '88': Super server

@@ -1,36 +1,64 @@
+import { createOpggSnapshot } from '@shared/shards/champion-data'
 import type {
-  ChampionDataFallbackReason,
-  ChampionDataPreferences,
-  ChampionDataSourceAvailability,
-  ChampionDataSourceId
-} from '@shared/data-adapter/champion-data'
+  OpggChampionDataPreferences,
+  Qq101ChampionDataPreferences
+} from '@shared/types/champion-data'
+import type { OpggFlashPosition } from '@shared/types/champion-data/opgg'
+import type { OpggAramBalanceItem } from '@shared/types/opgg'
 import { defineStore } from 'pinia'
-import { shallowReactive, shallowRef } from 'vue'
+import { computed, shallowReactive } from 'vue'
+
+import type { Qq101ChampionDataDetails, Qq101ChampionDataOverview } from './qq101/types'
 
 export const useChampionDataStore = defineStore('shard:champion-data-renderer', () => {
   const settings = shallowReactive({
-    preferredSource: 'opgg' as ChampionDataSourceId,
-    preferences: {
+    opggFlashPosition: 'auto' as OpggFlashPosition,
+    opggPreferences: {
       mode: 'ranked',
       position: 'top',
       region: 'global',
       tier: 'all'
-    } as ChampionDataPreferences
+    } as OpggChampionDataPreferences,
+    qq101Preferences: {
+      mode: 'ranked',
+      position: 'all',
+      patch: null,
+      tier: 255
+    } as Qq101ChampionDataPreferences
   })
-  const availability = shallowRef<ChampionDataSourceAvailability>({
-    preferredSource: 'opgg',
-    sources: {
-      opgg: { enabled: true },
-      qq101: { enabled: false }
+
+  const opgg = shallowReactive({
+    enabled: false,
+    snapshot: createOpggSnapshot(),
+    isApplying: false,
+    aramBalance: null as OpggAramBalanceItem[] | null
+  })
+
+  const qq101 = shallowReactive({
+    enabled: false,
+    isLoading: false,
+    patches: [] as string[],
+    requestedPreferences: null as Qq101ChampionDataPreferences | null,
+    loadedPreferences: null as Qq101ChampionDataPreferences | null,
+    overview: null as Qq101ChampionDataOverview | null,
+    details: null as Qq101ChampionDataDetails | null,
+    selectedChampionId: null as number | null,
+    error: null as string | null
+  })
+  const opggAramBalanceMap = computed(() => {
+    const map: Record<number, OpggAramBalanceItem> = {}
+
+    for (const item of opgg.aramBalance ?? []) {
+      map[item.champion_id] = item
     }
+
+    return map
   })
-  const lastEffectiveSource = shallowRef<ChampionDataSourceId | null>(null)
-  const lastFallbackReason = shallowRef<ChampionDataFallbackReason | null>(null)
 
   return {
     settings,
-    availability,
-    lastEffectiveSource,
-    lastFallbackReason
+    opgg,
+    qq101,
+    opggAramBalanceMap
   }
 })

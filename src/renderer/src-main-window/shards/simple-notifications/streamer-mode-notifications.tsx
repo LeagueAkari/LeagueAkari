@@ -11,7 +11,7 @@ import { navigateToSetting } from '@main-window/settings-navigation'
 import {
   LAST_DISMISS_LIVE_STREAMING_STREAMER_MODE_SETTING_KEY,
   NEVER_SHOW_LIVE_STREAMING_STREAMER_MODE_SETTING_KEY,
-  SIMPLE_NOTIFICATIONS_RENDERER_ID,
+  SIMPLE_NOTIFICATIONS_RENDERER_NAMESPACE,
   type SimpleNotificationsRendererContext
 } from './context'
 import WithActions from './parts/WithActions.vue'
@@ -88,7 +88,7 @@ export function setupStreamerModeNotifications(context: SimpleNotificationsRende
       }
 
       const neverShow = await context.settingUtils.get(
-        SIMPLE_NOTIFICATIONS_RENDERER_ID,
+        SIMPLE_NOTIFICATIONS_RENDERER_NAMESPACE,
         NEVER_SHOW_LIVE_STREAMING_STREAMER_MODE_SETTING_KEY,
         false
       )
@@ -98,7 +98,7 @@ export function setupStreamerModeNotifications(context: SimpleNotificationsRende
       }
 
       const lastDismissedAt = await context.settingUtils.get(
-        SIMPLE_NOTIFICATIONS_RENDERER_ID,
+        SIMPLE_NOTIFICATIONS_RENDERER_NAMESPACE,
         LAST_DISMISS_LIVE_STREAMING_STREAMER_MODE_SETTING_KEY,
         0
       )
@@ -109,7 +109,7 @@ export function setupStreamerModeNotifications(context: SimpleNotificationsRende
 
       const dismiss = () => {
         context.settingUtils.set(
-          SIMPLE_NOTIFICATIONS_RENDERER_ID,
+          SIMPLE_NOTIFICATIONS_RENDERER_NAMESPACE,
           LAST_DISMISS_LIVE_STREAMING_STREAMER_MODE_SETTING_KEY,
           Date.now()
         )
@@ -117,7 +117,7 @@ export function setupStreamerModeNotifications(context: SimpleNotificationsRende
 
       const neverShowAgain = () => {
         context.settingUtils.set(
-          SIMPLE_NOTIFICATIONS_RENDERER_ID,
+          SIMPLE_NOTIFICATIONS_RENDERER_NAMESPACE,
           NEVER_SHOW_LIVE_STREAMING_STREAMER_MODE_SETTING_KEY,
           true
         )

@@ -15,7 +15,7 @@ import type { SetupInAppScopeRenderer } from '../setup-in-app-scope'
 import type { MatchHistoryPlayer } from './store'
 
 export const ONGOING_GAME_RENDERER_NAMESPACE = 'ongoing-game-renderer'
-export const MAIN_SHARD_NAMESPACE = 'ongoing-game-main'
+export const ONGOING_GAME_MAIN_NAMESPACE = 'ongoing-game-main'
 
 export interface OngoingGameRendererContext {
   namespace: string

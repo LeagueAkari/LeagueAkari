@@ -1,0 +1,212 @@
+@reference '@renderer-shared/assets/css/tailwind.css';
+
+@property --tab-bar-left-mask-alpha {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 1;
+}
+
+@property --tab-bar-right-mask-alpha {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 1;
+}
+
+@layer components {
+  .akari-tab-bar {
+    --tab-bar-gap: --spacing(1);
+    --tab-bar-height: --spacing(7);
+    --tab-bar-divider-color: rgb(0 0 0 / 0.12);
+    @apply min-w-0 border-0 border-b border-solid border-black/10 py-1 text-(--la-color-text-primary) dark:border-white/10;
+    -webkit-app-region: no-drag;
+  }
+
+  [data-theme='dark'] .akari-tab-bar {
+    --tab-bar-divider-color: rgb(255 255 255 / 0.15);
+  }
+
+  .akari-tab-bar .tab-bar-tab {
+    @apply relative box-border flex h-(--tab-bar-height) shrink-0 cursor-pointer items-center rounded-lg border-0 bg-transparent select-none;
+  }
+
+  .akari-tab-bar .tab-bar-tab:not(.is-active):hover {
+    @apply bg-black/3 dark:bg-white/5;
+  }
+
+  .akari-tab-bar .tab-bar-tab.is-active {
+    @apply bg-black/6 dark:bg-white/10;
+  }
+
+  .akari-tab-bar .tab-bar-tab.is-dragging {
+    @apply z-10 bg-black/3 shadow-lg dark:bg-white/5;
+  }
+
+  .akari-tab-bar .tab-bar-item {
+    @apply relative h-(--tab-bar-height) w-(--tab-bar-width) flex-none;
+    transition: width 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .akari-tab-bar .tab-bar-item.is-dragging {
+    @apply z-10;
+  }
+
+  .akari-tab-bar .tab-bar-item-viewport {
+    @apply w-full;
+  }
+
+  .akari-tab-bar .tab-bar-item-viewport > .tab-bar-tab {
+    width: var(--tab-bar-content-width, var(--tab-bar-width));
+    transition: width 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .akari-tab-bar .tab-bar-item.is-transitioning .tab-bar-tab,
+  .akari-tab-bar.is-sorting .tab-bar-tab {
+    transition: none;
+  }
+
+  .akari-tab-bar .tab-bar-item.is-transitioning .tab-bar-item-viewport {
+    overflow: hidden;
+  }
+
+  .akari-tab-bar .tab-bar-item.is-transitioning .tab-bar-tab {
+    transform-origin: left bottom;
+    scale: var(--tab-bar-content-scale, 1);
+  }
+
+  .akari-tab-bar.is-sorting .tab-bar-item {
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .akari-tab-bar .tab-bar-item,
+    .akari-tab-bar .tab-bar-tab {
+      transition: none;
+    }
+  }
+
+  .akari-tab-bar .tab-bar-item + .tab-bar-item::before {
+    content: '';
+    @apply pointer-events-none absolute top-1.5 -left-0.5 h-4 w-px origin-center scale-x-50 bg-(--tab-bar-divider-color) opacity-0 transition-opacity duration-200 motion-reduce:transition-none;
+  }
+
+  .akari-tab-bar
+    .tab-bar-item:not(.is-active, .is-dragging)
+    + .tab-bar-item:not(.is-active, .is-dragging)::before {
+    @apply opacity-100;
+  }
+
+  .akari-tab-bar .tab-bar-fixed + .tab-bar-scroll-group::before {
+    content: '';
+    @apply pointer-events-none absolute top-2.5 -left-0.5 h-4 w-px origin-center scale-x-50 bg-(--tab-bar-divider-color) opacity-0 transition-opacity duration-200 motion-reduce:transition-none;
+  }
+
+  .akari-tab-bar
+    .tab-bar-fixed:has(> .tab-bar-item:last-child:not(.is-active, .is-dragging))
+    + .tab-bar-scroll-group:has(.tab-bar-item:first-child:not(.is-active, .is-dragging)):not(
+      :has(.can-scroll-left)
+    )::before {
+    @apply opacity-100;
+  }
+
+  .akari-tab-bar .tab-bar-item .tab-bar-label {
+    @apply box-border w-full flex-1 gap-1.5 px-2;
+  }
+
+  .akari-tab-bar .tab-bar-item:is(.is-active, :hover, :focus-within) .tab-bar-label {
+    padding-right: var(--tab-bar-actions-width);
+  }
+
+  .akari-tab-bar .tab-bar-tab:not(.is-active) .tab-bar-label {
+    @apply text-black/45 dark:text-white/45;
+  }
+
+  .akari-tab-bar .tab-bar-tab:not(.is-active) .tab-bar-icon {
+    @apply brightness-60;
+  }
+
+  .akari-tab-bar .tab-bar-name {
+    @apply min-w-0 flex-1 overflow-hidden text-left whitespace-nowrap;
+  }
+
+  .akari-tab-bar .tab-bar-name.is-overflowing {
+    mask-image: linear-gradient(to right, black calc(100% - 16px), transparent);
+  }
+
+  .akari-tab-bar .tab-bar-label {
+    @apply m-0 flex h-full min-w-0 items-center gap-2 rounded-xl border-0 bg-transparent px-2.5 py-0 text-xs leading-none font-medium whitespace-nowrap text-inherit outline-none;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  .akari-tab-bar .tab-bar-action {
+    @apply m-0 inline-flex size-5 shrink-0 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent p-0 text-black/45 outline-none dark:text-white/45;
+    font: inherit;
+    line-height: 1;
+  }
+
+  .akari-tab-bar .tab-bar-action:hover {
+    @apply bg-black/8 text-black/80 dark:bg-white/10 dark:text-white/90;
+  }
+
+  .akari-tab-bar .tab-bar-action:disabled {
+    @apply cursor-default;
+  }
+
+  .akari-tab-bar .tab-bar-action {
+    @apply pointer-events-none opacity-0;
+  }
+
+  .akari-tab-bar .tab-bar-tab:is(.is-active, :hover, :focus-within) .tab-bar-action {
+    @apply pointer-events-auto opacity-100;
+  }
+
+  .akari-tab-bar button:focus-visible {
+    @apply outline-2 -outline-offset-2 outline-sky-500;
+  }
+
+  .akari-tab-bar .tab-bar-groups,
+  .akari-tab-bar .tab-bar-list {
+    gap: var(--tab-bar-gap);
+  }
+
+  .akari-tab-bar.is-sorting .tab-bar-viewport .tab-bar-list {
+    /* Keep the scroll extent stable while sortable transforms move the last item. */
+    min-width: calc(
+      var(--tab-bar-count) * var(--tab-bar-min-width) + max(0, var(--tab-bar-count) - 1) *
+        var(--tab-bar-gap)
+    );
+  }
+
+  .akari-tab-bar .tab-bar-viewport {
+    @apply min-w-0 flex-1 overflow-x-auto overscroll-x-contain;
+    scrollbar-width: none;
+    mask-image: linear-gradient(
+      to right,
+      rgb(0 0 0 / var(--tab-bar-left-mask-alpha)),
+      black 24px,
+      black calc(100% - 24px),
+      rgb(0 0 0 / var(--tab-bar-right-mask-alpha))
+    );
+    transition:
+      --tab-bar-left-mask-alpha 200ms,
+      --tab-bar-right-mask-alpha 200ms;
+  }
+
+  .akari-tab-bar .tab-bar-viewport.can-scroll-left {
+    --tab-bar-left-mask-alpha: 0;
+  }
+
+  .akari-tab-bar .tab-bar-viewport.can-scroll-right {
+    --tab-bar-right-mask-alpha: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .akari-tab-bar .tab-bar-viewport {
+      transition: none;
+    }
+  }
+
+  .akari-tab-bar .tab-bar-viewport::-webkit-scrollbar {
+    display: none;
+  }
+}

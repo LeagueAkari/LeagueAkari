@@ -43,6 +43,7 @@ function createContext() {
       }))
     },
     appCommon: {},
+    shared: { global: { isReadyToQuit: false } },
     ipc: { onCall: vi.fn() },
     mobxUtils: { reaction: vi.fn(), propSync: vi.fn() },
     leagueClient: {},
@@ -77,6 +78,10 @@ class TestAkariWindow extends BaseAkariWindow<any, any> {
     )
   }
 
+  handleNativeClose(event: { preventDefault: () => void }) {
+    this.handleClose(event as any)
+  }
+
   attachWindow(window: Record<string, unknown>) {
     this._window = window as any
   }
@@ -105,6 +110,33 @@ describe('BaseAkariWindow visibility recovery', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
+
+  it.each([false, true])(
+    'preserves the close-versus-hide contract (trueClose: %s)',
+    (trueClose) => {
+      const window = new TestAkariWindow(createContext(), true)
+      const event = { preventDefault: vi.fn() }
+      const nativeWindow = {
+        ...createNativeWindow({ visible: true }),
+        close: vi.fn(() => {
+          window.handleNativeClose(event)
+        })
+      }
+      window.attachWindow(nativeWindow)
+
+      window.close(trueClose)
+
+      expect(nativeWindow.close).toHaveBeenCalledOnce()
+
+      if (trueClose) {
+        expect(event.preventDefault).not.toHaveBeenCalled()
+        expect(nativeWindow.hide).not.toHaveBeenCalled()
+      } else {
+        expect(event.preventDefault).toHaveBeenCalledOnce()
+        expect(nativeWindow.hide).toHaveBeenCalledOnce()
+      }
+    }
+  )
 
   it('reissues show when public state is hidden but the native window reports visible', () => {
     const context = createContext()

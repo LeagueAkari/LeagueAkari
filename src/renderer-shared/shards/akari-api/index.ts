@@ -5,12 +5,13 @@ import axios from 'axios'
 
 import { AkariProtocolRenderer } from '../akari-protocol'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
+import { AKARI_API_MAIN_NAMESPACE, AKARI_API_RENDERER_NAMESPACE } from './context'
 import { useAkariApiStore } from './store'
 
 @Shard(AkariApiRenderer.id)
 export class AkariApiRenderer {
-  static readonly id = 'akari-api-renderer'
-  static readonly mainId = 'akari-api-main'
+  static readonly id = AKARI_API_RENDERER_NAMESPACE
+  static readonly mainId = AKARI_API_MAIN_NAMESPACE
 
   public readonly httpClient = axios.create({
     adapter: 'fetch',
@@ -35,6 +36,6 @@ export class AkariApiRenderer {
 
   async onInit() {
     const store = useAkariApiStore()
-    await this._piniaMobxUtils.sync(AkariApiRenderer.mainId, 'state', store)
+    await this._piniaMobxUtils.sync(AKARI_API_MAIN_NAMESPACE, 'state', store)
   }
 }

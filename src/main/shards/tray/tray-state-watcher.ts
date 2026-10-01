@@ -11,7 +11,7 @@ export class TrayStateWatcher {
 
   watch() {
     this._watchAuxWindow()
-    this._watchOpggWindow()
+    this._watchChampionDataWindow()
     this._watchOngoingGameWindow()
     this._watchCdTimerWindow()
     this._watchLocale()
@@ -35,18 +35,21 @@ export class TrayStateWatcher {
     )
   }
 
-  private _watchOpggWindow() {
+  private _watchChampionDataWindow() {
     const { mobxUtils, windowManager } = this.context
 
     mobxUtils.reaction(
-      () => [windowManager.opggWindow.settings.enabled, windowManager.opggWindow.state.ready],
+      () => [
+        windowManager.championDataWindow.settings.enabled,
+        windowManager.championDataWindow.state.ready
+      ],
       ([enabled, ready]) => {
         if (enabled && ready) {
-          this.menuController.opggWindowDevTrayItem.enabled = true
-          this.menuController.opggWindowTrayItem.enabled = true
+          this.menuController.championDataWindowDevTrayItem.enabled = true
+          this.menuController.championDataWindowTrayItem.enabled = true
         } else {
-          this.menuController.opggWindowDevTrayItem.enabled = false
-          this.menuController.opggWindowTrayItem.enabled = false
+          this.menuController.championDataWindowDevTrayItem.enabled = false
+          this.menuController.championDataWindowTrayItem.enabled = false
         }
       },
       { fireImmediately: true, equals: compareShallow }

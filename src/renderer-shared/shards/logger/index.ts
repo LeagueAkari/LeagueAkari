@@ -3,11 +3,15 @@ import { Dep, Shard } from '@shared/akari-shard'
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { RendererConsoleLogEmitter } from './console-log-emitter'
-import { LOGGER_RENDERER_NAMESPACE, MAIN_SHARD_NAMESPACE, type RendererLogLevel } from './context'
+import {
+  LOGGER_FACTORY_MAIN_NAMESPACE,
+  LOGGER_RENDERER_NAMESPACE,
+  type RendererLogLevel
+} from './context'
 import { RendererLogMessageFormatter } from './log-message-formatter'
 import { useLoggerStore } from './store'
 
-export { MAIN_SHARD_NAMESPACE }
+export { LOGGER_FACTORY_MAIN_NAMESPACE, LOGGER_FACTORY_MAIN_NAMESPACE as MAIN_SHARD_NAMESPACE }
 
 @Shard(LoggerRenderer.id)
 export class LoggerRenderer {
@@ -63,24 +67,24 @@ export class LoggerRenderer {
   }
 
   openLogsDir() {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'openLogsDir')
+    return this._ipc.call(LOGGER_FACTORY_MAIN_NAMESPACE, 'openLogsDir')
   }
 
   setLogLevel(level: string) {
-    this._ipc.call(MAIN_SHARD_NAMESPACE, 'setLogLevel', level)
+    this._ipc.call(LOGGER_FACTORY_MAIN_NAMESPACE, 'setLogLevel', level)
   }
 
   async onInit() {
     const store = useLoggerStore()
 
-    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await this._piniaMobxUtils.sync(LOGGER_FACTORY_MAIN_NAMESPACE, 'state', store)
   }
 
   private _log(level: RendererLogLevel, namespace: string, ...args: any[]) {
     this._consoleEmitter.emit(level, namespace, ...args)
 
     return this._ipc.call(
-      MAIN_SHARD_NAMESPACE,
+      LOGGER_FACTORY_MAIN_NAMESPACE,
       'log',
       namespace,
       level,

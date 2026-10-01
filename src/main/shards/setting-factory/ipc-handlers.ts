@@ -2,6 +2,7 @@ import { dialog } from 'electron'
 
 import { AkariIpcError } from '../ipc'
 import type { WindowManagerMain } from '../window-manager'
+import { WINDOW_MANAGER_MAIN_NAMESPACE } from '../window-manager/context'
 import type { SettingFactoryMainContext } from './context'
 import type { SettingFactoryMain } from './index'
 import type { SettingsJsonFileService } from './settings-json-file-service'
@@ -74,7 +75,7 @@ export class SettingFactoryIpcHandlers {
 
   private _getMainWindow() {
     const windowManager = this.context.shared.manager.getInstance(
-      'window-manager-main'
+      WINDOW_MANAGER_MAIN_NAMESPACE
     ) as WindowManagerMain
 
     if (!windowManager || !windowManager.mainWindow.window) {

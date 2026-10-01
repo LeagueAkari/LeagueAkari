@@ -11,8 +11,10 @@ export interface AkariResourceProviderValue {
   }
 
   champions: {
+    roles(id: number): readonly string[]
     name(id: number): string
     icon(id: number): ChampionIconResource | null
+    baseSplash(id: number): string | null
     searchKeywords(id: number): readonly string[]
     aramBalance(id: number): ChampionAramBalanceResource | null
   }
@@ -56,8 +58,6 @@ export interface MapNameContext {
 export interface ChampionIconResource {
   id: number
   iconPath: string
-  source: 'lcu' | 'url'
-  variant?: 'default' | 'bravery' | 'unknown'
 }
 
 export interface ChampionAramBalanceResource {

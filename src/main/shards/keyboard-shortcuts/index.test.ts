@@ -9,6 +9,7 @@ const nativeInputMock = vi.hoisted(() => {
 
   return {
     pressed,
+    keyEventHandler: null as ((event: TestKeyEvent) => void) | null,
     getKeyStates: vi.fn(() =>
       Array.from({ length: 256 }, (_, vkCode) => ({
         vkCode,
@@ -48,7 +49,14 @@ vi.mock('@main/native', () => {
       },
       isModifierKey: (keyCode: number) => [17, 162, 163].includes(keyCode),
       instance: {
-        on: vi.fn(),
+        on: vi.fn((event, handler) => {
+          if (event === 'keyEvent') nativeInputMock.keyEventHandler = handler
+        }),
+        off: vi.fn((event, handler) => {
+          if (event === 'keyEvent' && nativeInputMock.keyEventHandler === handler) {
+            nativeInputMock.keyEventHandler = null
+          }
+        }),
         getKeyStates: nativeInputMock.getKeyStates
       }
     }
@@ -63,7 +71,7 @@ interface TestKeyEvent {
 }
 
 function createKeyboardShortcuts() {
-  return new KeyboardShortcutsMain(
+  const keyboardShortcuts = new KeyboardShortcutsMain(
     {
       sendEvent: vi.fn(),
       onCall: vi.fn()
@@ -77,16 +85,19 @@ function createKeyboardShortcuts() {
       })
     } as any
   )
+  void keyboardShortcuts.onInit()
+
+  return keyboardShortcuts
 }
 
-function emitKey(kbd: KeyboardShortcutsMain, event: TestKeyEvent) {
+function emitKey(event: TestKeyEvent) {
   if (event.isDown) {
     nativeInputMock.pressed.add(event.keyCode)
   } else {
     nativeInputMock.pressed.delete(event.keyCode)
   }
 
-  ;(kbd as any)._processNativeKeyEvent({
+  nativeInputMock.keyEventHandler!({
     keyCode: event.keyCode,
     isDown: event.isDown,
     isModifier: event.isModifier ?? [17, 162, 163].includes(event.keyCode),
@@ -106,10 +117,10 @@ describe('KeyboardShortcutsMain', () => {
 
     kbd.register('send-all', 'LeftControl+A', 'last-active', callback)
 
-    emitKey(kbd, { keyCode: 162, isDown: true })
-    emitKey(kbd, { keyCode: 65, isDown: true, isModifier: false })
-    emitKey(kbd, { keyCode: 65, isDown: false, isModifier: false })
-    emitKey(kbd, { keyCode: 17, isDown: false, isCommonModifier: true })
+    emitKey({ keyCode: 162, isDown: true })
+    emitKey({ keyCode: 65, isDown: true, isModifier: false })
+    emitKey({ keyCode: 65, isDown: false, isModifier: false })
+    emitKey({ keyCode: 17, isDown: false, isCommonModifier: true })
 
     expect(callback).toHaveBeenCalledOnce()
     expect(callback).toHaveBeenCalledWith(expect.objectContaining({ id: 'LeftControl+A' }))
@@ -121,9 +132,9 @@ describe('KeyboardShortcutsMain', () => {
 
     kbd.register('overlay/show', 'LeftControl+Q', 'stateful', callback)
 
-    emitKey(kbd, { keyCode: 162, isDown: true })
-    emitKey(kbd, { keyCode: 81, isDown: true, isModifier: false })
-    emitKey(kbd, { keyCode: 162, isDown: false })
+    emitKey({ keyCode: 162, isDown: true })
+    emitKey({ keyCode: 81, isDown: true, isModifier: false })
+    emitKey({ keyCode: 162, isDown: false })
 
     expect(callback).toHaveBeenNthCalledWith(1, expect.objectContaining({ pressed: true }))
     expect(callback).toHaveBeenNthCalledWith(2, expect.objectContaining({ pressed: false }))
@@ -135,8 +146,8 @@ describe('KeyboardShortcutsMain', () => {
 
     kbd.register('toggle', 'A', 'normal', callback)
 
-    emitKey(kbd, { keyCode: 65, isDown: true, isModifier: false })
-    emitKey(kbd, { keyCode: 65, isDown: true, isModifier: false })
+    emitKey({ keyCode: 65, isDown: true, isModifier: false })
+    emitKey({ keyCode: 65, isDown: true, isModifier: false })
 
     expect(callback).toHaveBeenCalledOnce()
   })
@@ -152,7 +163,7 @@ describe('KeyboardShortcutsMain', () => {
       'Shortcut A is already registered'
     )
 
-    emitKey(kbd, { keyCode: 65, isDown: true, isModifier: false })
+    emitKey({ keyCode: 65, isDown: true, isModifier: false })
 
     expect(first).toHaveBeenCalledOnce()
     expect(second).not.toHaveBeenCalled()
@@ -164,9 +175,9 @@ describe('KeyboardShortcutsMain', () => {
 
     kbd.register('send-all', 'A', 'last-active', callback)
 
-    emitKey(kbd, { keyCode: 135, isDown: true, isModifier: false })
-    emitKey(kbd, { keyCode: 65, isDown: true, isModifier: false })
-    emitKey(kbd, { keyCode: 65, isDown: false, isModifier: false })
+    emitKey({ keyCode: 135, isDown: true, isModifier: false })
+    emitKey({ keyCode: 65, isDown: true, isModifier: false })
+    emitKey({ keyCode: 65, isDown: false, isModifier: false })
 
     expect(callback).toHaveBeenCalledOnce()
     expect(callback).toHaveBeenCalledWith(expect.objectContaining({ id: 'A' }))
@@ -181,18 +192,32 @@ describe('KeyboardShortcutsMain', () => {
   })
 
   it('does not reconcile native key states for ignored non-standard key events', () => {
-    const kbd = createKeyboardShortcuts()
+    createKeyboardShortcuts()
 
-    emitKey(kbd, { keyCode: 135, isDown: true, isModifier: false })
+    emitKey({ keyCode: 135, isDown: true, isModifier: false })
 
     expect(nativeInputMock.getKeyStates).not.toHaveBeenCalled()
+  })
+
+  it('releases the native listener, event subscribers, and registrations on disposal', async () => {
+    const kbd = createKeyboardShortcuts()
+    const callback = vi.fn()
+    kbd.register('listener', 'A', 'normal', callback)
+    kbd.events.on('shortcut', callback)
+
+    expect(nativeInputMock.keyEventHandler).not.toBeNull()
+    await kbd.onDispose()
+
+    expect(nativeInputMock.keyEventHandler).toBeNull()
+    expect(kbd.events.listenerCount('shortcut')).toBe(0)
+    expect(kbd.getRegistration('A')).toBeNull()
   })
 
   it('returns a serializable debug state for supported standard keys', () => {
     const kbd = createKeyboardShortcuts()
 
-    emitKey(kbd, { keyCode: 162, isDown: true })
-    emitKey(kbd, { keyCode: 65, isDown: true, isModifier: false })
+    emitKey({ keyCode: 162, isDown: true })
+    emitKey({ keyCode: 65, isDown: true, isModifier: false })
 
     const state = kbd.getDebugState()
 

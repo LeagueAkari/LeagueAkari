@@ -87,28 +87,32 @@ export function useOverflow<T extends HTMLElement | null | undefined>(el: MaybeR
   const vertical = ref(false)
   const horizontal = ref(false)
 
-  useResizeObserver(el, () => {
-    const _el = toValue(el)
-    if (!_el) {
+  const update = () => {
+    const element = toValue(el)
+
+    if (!element) {
       vertical.value = false
       horizontal.value = false
       return
     }
 
-    const style = window.getComputedStyle(_el)
+    const style = window.getComputedStyle(element)
 
     const overflowYHidden = style.overflowY === 'hidden' || style.overflow === 'hidden'
     const overflowXHidden = style.overflowX === 'hidden' || style.overflow === 'hidden'
 
-    const verticalOverflow = overflowYHidden && _el.scrollHeight > _el.clientHeight
-    const horizontalOverflow = overflowXHidden && _el.scrollWidth > _el.clientWidth
+    const verticalOverflow = overflowYHidden && element.scrollHeight > element.clientHeight
+    const horizontalOverflow = overflowXHidden && element.scrollWidth > element.clientWidth
 
     vertical.value = verticalOverflow
     horizontal.value = horizontalOverflow
-  })
+  }
+
+  useResizeObserver(el, update)
 
   return {
     vertical: readonly(vertical),
-    horizontal: readonly(horizontal)
+    horizontal: readonly(horizontal),
+    update
   }
 }

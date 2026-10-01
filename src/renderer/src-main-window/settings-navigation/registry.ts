@@ -428,52 +428,52 @@ const targetDefinitions = [
     descriptionKey: 'settings.multiWindow.auxWindow.resetWindowPosition.description'
   },
   {
-    id: 'multi-window.opgg',
+    id: 'multi-window.champion-data',
     route: { tab: 'multi-window' },
-    labelKey: 'settings.multiWindow.opggWindow.title',
+    labelKey: 'settings.multiWindow.championDataWindow.title',
     searchable: false
   },
   {
-    id: 'multi-window.opgg.enabled',
+    id: 'multi-window.champion-data.enabled',
     route: { tab: 'multi-window' },
-    parentId: 'multi-window.opgg',
-    labelKey: 'settings.multiWindow.opggWindow.enabled.label',
-    descriptionKey: 'settings.multiWindow.opggWindow.enabled.description'
+    parentId: 'multi-window.champion-data',
+    labelKey: 'settings.multiWindow.championDataWindow.enabled.label',
+    descriptionKey: 'settings.multiWindow.championDataWindow.enabled.description'
   },
   {
-    id: 'multi-window.opgg.auto-show',
+    id: 'multi-window.champion-data.auto-show',
     route: { tab: 'multi-window' },
-    parentId: 'multi-window.opgg',
-    labelKey: 'settings.multiWindow.opggWindow.autoShow.label',
-    descriptionKey: 'settings.multiWindow.opggWindow.autoShow.description'
+    parentId: 'multi-window.champion-data',
+    labelKey: 'settings.multiWindow.championDataWindow.autoShow.label',
+    descriptionKey: 'settings.multiWindow.championDataWindow.autoShow.description'
   },
   {
-    id: 'multi-window.opgg.shortcut',
+    id: 'multi-window.champion-data.shortcut',
     route: { tab: 'multi-window' },
-    parentId: 'multi-window.opgg',
-    labelKey: 'settings.multiWindow.opggWindow.showShortcut.label',
-    descriptionKey: 'settings.multiWindow.opggWindow.showShortcut.description'
+    parentId: 'multi-window.champion-data',
+    labelKey: 'settings.multiWindow.championDataWindow.showShortcut.label',
+    descriptionKey: 'settings.multiWindow.championDataWindow.showShortcut.description'
   },
   {
-    id: 'multi-window.opgg.opacity',
+    id: 'multi-window.champion-data.opacity',
     route: { tab: 'multi-window' },
-    parentId: 'multi-window.opgg',
-    labelKey: 'settings.multiWindow.opggWindow.opacity.label',
-    descriptionKey: 'settings.multiWindow.opggWindow.opacity.description'
+    parentId: 'multi-window.champion-data',
+    labelKey: 'settings.multiWindow.championDataWindow.opacity.label',
+    descriptionKey: 'settings.multiWindow.championDataWindow.opacity.description'
   },
   {
-    id: 'multi-window.opgg.skin-selector',
+    id: 'multi-window.champion-data.skin-selector',
     route: { tab: 'multi-window' },
-    parentId: 'multi-window.opgg',
-    labelKey: 'settings.multiWindow.opggWindow.showSkinSelector.label',
-    descriptionKey: 'settings.multiWindow.opggWindow.showSkinSelector.description'
+    parentId: 'multi-window.champion-data',
+    labelKey: 'settings.multiWindow.championDataWindow.showSkinSelector.label',
+    descriptionKey: 'settings.multiWindow.championDataWindow.showSkinSelector.description'
   },
   {
-    id: 'multi-window.opgg.reset-position',
+    id: 'multi-window.champion-data.reset-position',
     route: { tab: 'multi-window' },
-    parentId: 'multi-window.opgg',
-    labelKey: 'settings.multiWindow.opggWindow.resetWindowPosition.label',
-    descriptionKey: 'settings.multiWindow.opggWindow.resetWindowPosition.description'
+    parentId: 'multi-window.champion-data',
+    labelKey: 'settings.multiWindow.championDataWindow.resetWindowPosition.label',
+    descriptionKey: 'settings.multiWindow.championDataWindow.resetWindowPosition.description'
   },
   {
     id: 'multi-window.ongoing-game',

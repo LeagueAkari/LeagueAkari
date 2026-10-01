@@ -297,15 +297,15 @@ settings:
         label: Reset Window Position
         description: Reset the position of the auxiliary window to its default location in the center of the main screen.
         button: Reset
-    opggWindow:
+    championDataWindow:
       title: Champion Data Window
       enabled:
-        label: Enable Champion Data
-        description: View champion data from OP.GG or 101 (CN)
+        label: Enable Champion Data Window
+        description: View champion data from OP.GG or 101 (CN). Disabling this closes the champion data window.
         descriptionWithIcon: Open it from the quick icon on the right side of the title bar ({icon}) or from "Champion Data Window" in the tray menu.
       autoShow:
-        label: Auto Show and Close
-        description: Automatically show or close the champion data window during specific game phases.
+        label: Auto Show
+        description: Automatically show the champion data window during champion select.
       opacity:
         label: Window Opacity
         description: Adjust the transparency level of the champion data window.

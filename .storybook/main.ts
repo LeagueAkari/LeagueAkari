@@ -61,7 +61,7 @@ const config: StorybookConfig = {
         alias: {
           '@main-window': resolve('src/renderer/src-main-window'),
           '@aux-window': resolve('src/renderer/src-aux-window'),
-          '@opgg-window': resolve('src/renderer/src-opgg-window'),
+          '@champion-data-window': resolve('src/renderer/src-champion-data-window'),
           '@ongoing-game-window': resolve('src/renderer/src-ongoing-game-window'),
           '@cd-timer-window': resolve('src/renderer/src-cd-timer-window'),
           '@shared': resolve('src/shared'),

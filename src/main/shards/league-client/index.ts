@@ -1,21 +1,6 @@
-import { NATIVE_SUPPORT, adjustLeagueClientWindowSize, getPidsByName } from '@main/native'
-import { AKARI_PROXY_REQUEST_ID_HEADER } from '@shared/akari-protocol/proxy-request-cancellation'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { SUBSCRIBED_LCU_ENDPOINTS } from '@shared/constants/subscribed-lcu-endpoints'
-import { LeagueClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/league-client'
 import { UxCommandLine } from '@shared/shards/league-client-ux'
-import { SummonerInfo } from '@shared/types/league-client/summoner'
-import { RadixEventEmitter } from '@shared/utils/event-emitter'
-import { sleep } from '@shared/utils/sleep'
-import axios, { AxiosInstance, AxiosRequestConfig, isAxiosError } from 'axios'
-import { AxiosRetry } from 'axios-retry'
-import { compareShallow } from 'mobx'
-import fs from 'node:fs'
-import { ClientRequestArgs } from 'node:http'
-import https from 'node:https'
-import path from 'node:path'
-import PQueue from 'p-queue'
-import WebSocket from 'ws'
+import { AxiosRequestConfig } from 'axios'
 import { z } from 'zod'
 
 import { AkariProtocolMain } from '../akari-protocol'
@@ -25,33 +10,34 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
+import { LeagueClientOperationsExecutor } from './client-operations-executor'
+import { LeagueClientConnectionController } from './connection-controller'
 import {
+  LEAGUE_CLIENT_CONNECT_RETRY_INTERVAL,
+  LEAGUE_CLIENT_HTTP_PING_URL,
+  LEAGUE_CLIENT_ITEM_SET_PREFIX,
   LEAGUE_CLIENT_MAIN_NAMESPACE,
+  LEAGUE_CLIENT_PROCESS_NAME,
+  LEAGUE_CLIENT_REQUEST_TIMEOUT_MS,
   LeagueClientLcuUninitializedError,
   type LeagueClientMainContext
 } from './context'
 import { LeagueClientIpcHandlers } from './ipc-handlers'
 import { LeagueClientData } from './lc-state'
+import { LeagueClientProtocolController } from './protocol-controller'
 import { LeagueClientSettings, LeagueClientState } from './state'
-
-const axiosRetry = require('axios-retry').default as AxiosRetry
 
 export { LeagueClientLcuUninitializedError }
 export type { LeagueClientMainContext }
 
-/**
- * League Client 相关功能, 包括与 LeagueClient.exe 的连接, 封装的 HTTP 请求, 以及 WebSocket 通信
- */
 @Shard(LeagueClientMain.id)
 export class LeagueClientMain implements IAkariShardInitDispose {
   static id = LEAGUE_CLIENT_MAIN_NAMESPACE
-
-  static CONNECT_TO_LC_RETRY_INTERVAL = 2000
-  static HTTP_PING_URL = '/riotclient/auth-token'
-  static REQUEST_TIMEOUT_MS = 17500
-  static FIXED_ITEM_SET_PREFIX = 'akari1'
-
-  static PROCESS_NAME = 'LeagueClient.exe'
+  static CONNECT_TO_LC_RETRY_INTERVAL = LEAGUE_CLIENT_CONNECT_RETRY_INTERVAL
+  static HTTP_PING_URL = LEAGUE_CLIENT_HTTP_PING_URL
+  static REQUEST_TIMEOUT_MS = LEAGUE_CLIENT_REQUEST_TIMEOUT_MS
+  static FIXED_ITEM_SET_PREFIX = LEAGUE_CLIENT_ITEM_SET_PREFIX
+  static PROCESS_NAME = LEAGUE_CLIENT_PROCESS_NAME
 
   public readonly settings = new LeagueClientSettings()
   public readonly state = new LeagueClientState()
@@ -60,38 +46,17 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   private readonly _settingService: SetterSettingService
   private readonly _context: LeagueClientMainContext
   private readonly _ipcHandlers: LeagueClientIpcHandlers
-
-  private _httpClient: AxiosInstance | null = null
-  private _webSocket: WebSocket | null = null
-
-  private _leagueClientApi: LeagueClientHttpApiAxiosHelper | null = null
   private _leagueClientData: LeagueClientData
-
-  private _eventBus = new RadixEventEmitter()
-
-  private _rendererSubIncrement = 1
-  private readonly _rendererSubMap = new Map<string, () => void>()
-
-  private _assetLimiter = new PQueue({ concurrency: 8 })
-
-  // 处理仅关闭 UX 而 LeagueClient 未关闭的情况
-  private _shouldHaveOneAttempt = false
-  private _manuallyDisconnected = false
+  private readonly _connectionController: LeagueClientConnectionController
+  private readonly _protocolController: LeagueClientProtocolController
+  private readonly _operationsExecutor: LeagueClientOperationsExecutor
 
   get http() {
-    if (!this._httpClient) {
-      throw new LeagueClientLcuUninitializedError()
-    }
-
-    return this._httpClient
+    return this._connectionController.http
   }
 
   get api() {
-    if (!this._leagueClientApi) {
-      throw new LeagueClientLcuUninitializedError()
-    }
-
-    return this._leagueClientApi
+    return this._connectionController.api
   }
 
   get data() {
@@ -99,7 +64,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   }
 
   get events() {
-    return this._eventBus
+    return this._connectionController.events
   }
 
   constructor(
@@ -120,102 +85,36 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     )
 
     this._context = {
+      state: this.state,
+      settings: this.settings,
+      settingService: this._settingService,
+      leagueClientUx: this._leagueClientUx,
+      protocol: this._protocol,
       ipc: this._ipc,
       leagueClient: this,
       logger: this._logger,
       mobxUtils: this._mobxUtils,
       namespace: LeagueClientMain.id
     }
+    this._connectionController = new LeagueClientConnectionController(this._context)
+    this._protocolController = new LeagueClientProtocolController(this._context)
+    this._operationsExecutor = new LeagueClientOperationsExecutor(this._context)
     this._ipcHandlers = new LeagueClientIpcHandlers(this._context)
     this._leagueClientData = new LeagueClientData(this._context)
 
-    this._registerProtocol()
+    this._protocolController.register()
   }
 
   async onInit() {
     this._leagueClientData.init()
     this._setupState()
     this._ipcHandlers.register()
-    this._watchConnection()
+    this._connectionController.start()
   }
 
   async onDispose() {
-    this._manuallyDisconnected = true
-    this._disconnect()
-    this.events.clear()
-    this._protocol.unregisterDomain('league-client')
-  }
-
-  /**
-   * 有的时候可能只会关闭 UX，但命令行是通过 UX 获取的
-   *
-   * 我们先缓存一次已经连接的信息。如果软件启动时没找到 UX 但客户端存在，则尝试连接一次
-   */
-  private async _tryResumeConnection() {
-    const lastConnectedClient = await this._settingService._getFromStorage('lastConnectedClient')
-
-    if (lastConnectedClient !== null) {
-      const p1 = await getPidsByName(LeagueClientUxMain.UX_PROCESS_NAME)
-      const p2 = await getPidsByName(LeagueClientMain.PROCESS_NAME)
-
-      if (p1.length === 0 && p2.length === 1) {
-        const { certificate, ...rest } = lastConnectedClient
-        this._logger.info('Trying to resume connection', rest)
-
-        this._shouldHaveOneAttempt = true
-        this.state.setConnectingClient(lastConnectedClient)
-      } else {
-        await this._settingService._removeFromStorage('lastConnectedClient').catch(() => {})
-      }
-    }
-  }
-
-  private _registerProtocol() {
-    this._protocol.registerDomain('league-client', async (uri, req, context) => {
-      const reqHeaders: Record<string, string> = {}
-      req.headers.forEach((value, key) => {
-        reqHeaders[key] = value
-      })
-      delete reqHeaders[AKARI_PROXY_REQUEST_ID_HEADER]
-
-      try {
-        const config: AxiosRequestConfig = {
-          method: req.method,
-          url: uri,
-          data: req.body ? AkariProtocolMain.convertWebStreamToNodeStream(req.body) : undefined,
-          validateStatus: () => true,
-          responseType: 'stream',
-          headers: reqHeaders,
-          signal: context.signal
-        }
-
-        const res = await this.request(config)
-
-        const resHeaders = Object.fromEntries(
-          Object.entries(res.headers).filter(([_, value]) => typeof value === 'string')
-        )
-
-        return new Response(AkariProtocolMain.shouldNotHaveBody(res.status) ? null : res.data, {
-          statusText: res.statusText,
-          headers: resHeaders,
-          status: res.status
-        })
-      } catch (error) {
-        this._logger.warn(`Failed to LeagueClient request`, error)
-
-        if (error instanceof LeagueClientLcuUninitializedError) {
-          return new Response(JSON.stringify({ error: error.name }), {
-            headers: { 'Content-Type': 'application/json' },
-            status: 503
-          })
-        }
-
-        return new Response((error as Error).message, {
-          headers: { 'Content-Type': 'text/plain' },
-          status: 500
-        })
-      }
-    })
+    this._connectionController.dispose()
+    this._protocolController.dispose()
   }
 
   private async _setupState() {
@@ -230,453 +129,38 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   }
 
   async requestForRenderer(config: AxiosRequestConfig) {
-    if (this.state.connectionState !== 'connected') {
-      throw new LeagueClientLcuUninitializedError()
-    }
-
-    // 通过 IPC 调用的网络请求，则是不完整的可序列化信息
-    try {
-      const { config: c, request, ...rest } = await this._httpClient!.request(config)
-      return { ...rest, config: { data: c.data, url: c.url } }
-    } catch (error) {
-      if (isAxiosError(error) && error.response) {
-        const { config: c, request, ...rest } = error.response
-        return { ...rest, config: { data: c.data, url: c.url } }
-      }
-
-      this._logger.warn('LeagueClient HTTP Client Error', error)
-      throw error
-    }
+    return this._connectionController.requestForRenderer(config)
   }
 
   async connect(auth: UxCommandLine & { force?: boolean }) {
-    if (this.state.connectionState === 'connected') {
-      this._disconnect()
-    }
-
-    if (auth.force) {
-      this._shouldHaveOneAttempt = true
-    }
-
-    await this._leagueClientUx.update()
-    this.state.setConnectingClient(auth)
+    return this._connectionController.connect(auth)
   }
 
   disconnect() {
-    this._manuallyDisconnected = true
-    this._disconnect()
+    return this._connectionController.disconnect()
   }
 
   subscribeLcuEndpoint(uri: string) {
-    const newId = `__${this._rendererSubIncrement++}`
-    const dispose = this._eventBus.on(uri, (data, params) => {
-      this._ipc.sendEvent(LeagueClientMain.id, 'extra-lcu-event', newId, data, params)
-    })
-    this._rendererSubMap.set(newId, dispose)
-
-    this._logger.debug(`Renderer subscribed to LCU event ${uri}, ID: ${newId}`)
-
-    return newId
+    return this._connectionController.subscribeLcuEndpoint(uri)
   }
 
   unsubscribeLcuEndpoint(subId: string) {
-    const dispose = this._rendererSubMap.get(subId)
-    if (dispose) {
-      dispose()
-      this._rendererSubMap.delete(subId)
-
-      this._logger.debug(`Renderer unsubscribed from LCU event, ID: ${subId}`)
-
-      return true
-    }
-
-    return false
-  }
-
-  /**
-   * 断开与 LeagueClient 的连接, 主要是 WebSocket
-   */
-  private _disconnect() {
-    if (this._webSocket) {
-      this._webSocket.close()
-    }
-
-    this._webSocket = null
-    this._httpClient = null
-    this._leagueClientApi = null
-
-    this.state.setDisconnected()
-  }
-
-  private async _watchConnection() {
-    this._mobxUtils.reaction(
-      () => this.state.connectingClient,
-      (auth) => {
-        if (!auth) {
-          return
-        }
-
-        this._doConnectingLoop()
-      }
-    )
-
-    if (this.settings.autoConnect) {
-      await this._tryResumeConnection()
-    }
-
-    // 当客户端唯一时，自动连接到该 LeagueClient
-    this._mobxUtils.reaction(
-      () =>
-        [
-          this.settings.autoConnect,
-          this._leagueClientUx.state.launchedClients,
-          this.state.connectionState
-        ] as const,
-      async ([s, c, conn], prev) => {
-        if (conn === 'connected') {
-          return
-        }
-
-        // 抖动一下可以清除该状态
-        if (prev && prev[0] === false && s === true) {
-          this._manuallyDisconnected = false
-        }
-
-        if (s) {
-          if (c.length === 1) {
-            if (!this._manuallyDisconnected) {
-              this.state.setConnectingClient(c[0])
-            }
-          } else {
-            this.state.setConnectingClient(null)
-          }
-        }
-      },
-      { fireImmediately: true }
-    )
-
-    // 仅作为日志记录
-    this._mobxUtils.reaction(
-      () => [this.state.auth, this.state.connectionState] as const,
-      ([a, s]) => {
-        if (a) {
-          const { certificate, ...rest } = a
-          this._logger.debug(`LCU state changed: ${s}`, rest)
-        } else {
-          this._logger.debug(`LCU state changed: ${s}`, a)
-        }
-      },
-      { equals: compareShallow }
-    )
-
-    /**
-     * 在连接上之后，查询的速度放缓
-     */
-    this._mobxUtils.reaction(
-      () => this.state.connectionState,
-      (state) => {
-        if (state === 'connected') {
-          this._leagueClientUx.setPollInterval(LeagueClientUxMain.CLIENT_CMD_LONG_POLL_INTERVAL)
-        } else {
-          this._leagueClientUx.setPollInterval(
-            LeagueClientUxMain.CLIENT_CMD_DEFAULT_POLL_INTERVAL,
-            true
-          )
-        }
-      }
-    )
-  }
-
-  private async _doConnectingLoop() {
-    while (true) {
-      // 连接途中，目标丢失，停止连接
-      if (!this.state.connectingClient) {
-        break
-      }
-
-      // 目标连接对象已不在当前启动列表中，停止连接
-      if (
-        !this._shouldHaveOneAttempt &&
-        !this._leagueClientUx.state.launchedClients.find(
-          (c) => c.pid === this.state.connectingClient?.pid
-        )
-      ) {
-        this.state.setConnectingClient(null)
-        break
-      }
-
-      try {
-        await this._connectToLcu(this.state.connectingClient)
-        this.state.setConnectingClient(null) // finished connecting!
-        break
-      } catch (error) {
-        if ((error as any).code !== 'ECONNREFUSED') {
-          this._ipc.sendEvent(LeagueClientMain.id, 'error-connecting', (error as any)?.message)
-          this._logger.warn(`Error connecting to LC`, error)
-          break
-        }
-      }
-
-      if (this._shouldHaveOneAttempt) {
-        this._shouldHaveOneAttempt = false
-        this.state.setConnectingClient(null)
-        break
-      }
-
-      await sleep(LeagueClientMain.CONNECT_TO_LC_RETRY_INTERVAL)
-    }
-  }
-
-  private _wsPromisified(
-    url: string,
-    options: WebSocket.ClientOptions | ClientRequestArgs = {},
-    timeout = 17500
-  ): Promise<WebSocket> {
-    return new Promise<WebSocket>((resolve, reject) => {
-      const ws = new WebSocket(url, options)
-
-      const timer = setTimeout(() => {
-        ws.close()
-        reject(new Error(`WebSocket connection timed out after ${timeout}ms`))
-      }, timeout)
-
-      ws.on('open', () => {
-        clearTimeout(timer)
-        resolve(ws)
-      })
-
-      ws.on('unexpected-response', (_req, res) => {
-        clearTimeout(timer)
-        reject(new Error(`WebSocket unexpected response: ${res.statusCode} ${res.statusMessage}`))
-      })
-
-      ws.on('close', () => clearTimeout(timer))
-
-      ws.on('error', (err) => {
-        clearTimeout(timer)
-        reject(err)
-      })
-    })
-  }
-
-  private _cleanup() {
-    if (this._webSocket && this._webSocket.readyState !== WebSocket.CLOSED) {
-      this._webSocket.close()
-      this._webSocket = null
-    }
-    this._httpClient = null
-    this._leagueClientApi = null
-  }
-
-  /**
-   * one-time attempt
-   */
-  private async _connectToLcu(cmd: UxCommandLine) {
-    if (this.state.connectionState === 'connecting' || this.state.connectionState === 'connected') {
-      return
-    }
-
-    const { certificate, ...rest } = cmd
-
-    this._logger.info('Target client', rest)
-
-    this.state.setConnecting()
-
-    const initWs = async () => {
-      try {
-        // in case of connection is not closed properly
-        if (this._webSocket) {
-          this._webSocket.close()
-          this._webSocket = null
-        }
-
-        this._webSocket = await this._wsPromisified(
-          `wss://riot:${cmd.authToken}@127.0.0.1:${cmd.port}`,
-          {
-            headers: {
-              Authorization: `Basic ${Buffer.from(`riot:${cmd.authToken}`).toString('base64')}`
-            },
-            rejectUnauthorized: false
-          }
-        )
-
-        for (const endpoint of SUBSCRIBED_LCU_ENDPOINTS) {
-          this._webSocket.send(JSON.stringify([5, endpoint]))
-        }
-
-        this._webSocket.on('message', (msg) => {
-          try {
-            const data = JSON.parse(msg.toString())
-            this._eventBus.emit(data[2].uri, data[2])
-          } catch {}
-        })
-
-        this._webSocket.on('close', () => {
-          this.state.setDisconnected()
-          this._cleanup()
-        })
-      } catch (error) {
-        throw error
-      }
-    }
-
-    try {
-      await initWs()
-      await this._initHttpInstance(cmd)
-      this.state.setConnected(cmd)
-      this._settingService._saveToStorage('lastConnectedClient', cmd).catch(() => {})
-    } catch (error) {
-      this.state.setDisconnected()
-      this._cleanup()
-      throw error
-    }
-  }
-
-  private async _initHttpInstance(auth: UxCommandLine) {
-    this._httpClient = axios.create({
-      baseURL: `https://127.0.0.1:${auth.port}`,
-      headers: {
-        Authorization: `Basic ${Buffer.from(`riot:${auth.authToken}`).toString('base64')}`
-      },
-      httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      }),
-      httpAgent: new https.Agent(),
-      timeout: LeagueClientMain.REQUEST_TIMEOUT_MS,
-      proxy: false
-    })
-
-    axiosRetry(this._httpClient, { retries: 2 })
-
-    try {
-      await this._httpClient.get(LeagueClientMain.HTTP_PING_URL)
-      this._leagueClientApi = new LeagueClientHttpApiAxiosHelper(this._httpClient)
-    } catch (error) {
-      if (isAxiosError(error) && (!error.response || (error.status && error.status >= 500))) {
-        this._logger.warn(`Failed to execute PING operation`, error)
-        throw error
-      }
-    }
+    return this._connectionController.unsubscribeLcuEndpoint(subId)
   }
 
   async request<T = any, D = any>(config: AxiosRequestConfig<D>) {
-    if (!this._httpClient) {
-      throw new LeagueClientLcuUninitializedError()
-    }
-
-    if (config.url && config.url.startsWith('lol-game-data/assets')) {
-      return this._limitedRequest(config, this._assetLimiter)
-    } else {
-      return this.http.request<T>(config)
-    }
-  }
-
-  private async _limitedRequest<T = any, D = any>(config: AxiosRequestConfig<D>, limiter: PQueue) {
-    const res = await limiter.add(() => this.http.request<T>(config))
-
-    if (!res) {
-      throw new Error('asset request failed')
-    }
-
-    return res
+    return this._connectionController.request<T, D>(config)
   }
 
   async writeItemSetsToDisk(itemSets: any[] | null, clearPrevious = true) {
-    try {
-      const { data: installDir } = await this.http.get('/data-store/v1/install-dir')
-
-      let targetPath: string
-      if (this.state.auth?.region === 'TENCENT') {
-        targetPath = path.join(installDir, '..', 'Game', 'Config', 'Global', 'Recommended')
-      } else {
-        targetPath = path.join(installDir, 'Config', 'Global', 'Recommended')
-      }
-
-      if (fs.existsSync(targetPath)) {
-        if (!fs.statSync(targetPath).isDirectory()) {
-          throw new Error(`The path ${targetPath} is not a directory`)
-        }
-      } else {
-        fs.mkdirSync(targetPath, { recursive: true })
-      }
-
-      // 清空之前的文件, 这些文件以 `akari1` 开头
-      if (clearPrevious) {
-        const files = fs.readdirSync(targetPath)
-        const akariFiles = files.filter((file) =>
-          file.startsWith(LeagueClientMain.FIXED_ITEM_SET_PREFIX)
-        )
-
-        for (const file of akariFiles) {
-          fs.unlinkSync(path.join(targetPath, file))
-        }
-      }
-
-      if (!itemSets) {
-        return
-      }
-
-      for (const itemSet of itemSets) {
-        const fileName = `${itemSet.uid}.json`
-        const filePath = path.join(targetPath, fileName)
-
-        this._logger.info(`Write item set to disk: ${filePath}`)
-
-        fs.writeFileSync(filePath, JSON.stringify(itemSet), { encoding: 'utf-8' })
-      }
-    } catch (error) {
-      this._logger.error(`Failed to write item set to local file`, error)
-      throw error
-    }
+    return this._operationsExecutor.writeItemSetsToDisk(itemSets, clearPrevious)
   }
 
-  /**
-   * 在连接之前, 先尝试获取一些召唤师信息
-   */
   async peekClient(auth: UxCommandLine) {
-    const c = axios.create({
-      baseURL: `https://127.0.0.1:${auth.port}`,
-      headers: {
-        Authorization: `Basic ${Buffer.from(`riot:${auth.authToken}`).toString('base64')}`
-      },
-      httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      }),
-      httpAgent: new https.Agent(),
-      timeout: LeagueClientMain.REQUEST_TIMEOUT_MS,
-      proxy: false
-    })
-
-    try {
-      const { data: summoner } = await c.get<SummonerInfo>('/lol-summoner/v1/current-summoner')
-      const { data: profileIcon, headers } = await c.get(
-        `/lol-game-data/assets/v1/profile-icons/${summoner.profileIconId}.jpg`,
-        { responseType: 'arraybuffer' }
-      )
-
-      const contentType = headers['content-type'] || 'image/jpeg'
-
-      return {
-        summoner,
-        profileIcon: `data:${contentType};base64,${Buffer.from(profileIcon).toString('base64')}`
-      }
-    } catch (error) {
-      this._logger.warn(`Failed to peek client`, auth.pid, error)
-      return null
-    }
+    return this._operationsExecutor.peekClient(auth)
   }
 
-  /**
-   * https://github.com/LeagueTavern/fix-lcu-window
-   * 不知道现在是否需要
-   */
   async fixWindowMethodA(config?: { baseHeight: number; baseWidth: number }) {
-    if (!NATIVE_SUPPORT.adjustLeagueClientWindowSize.available) {
-      return
-    }
-
-    const { data: zoom } = await this.http.get<number>('/riotclient/zoom-scale')
-
-    adjustLeagueClientWindowSize(zoom, config)
+    return this._operationsExecutor.fixWindowMethodA(config)
   }
 }

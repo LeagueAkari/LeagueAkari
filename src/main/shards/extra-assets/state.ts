@@ -1,10 +1,14 @@
-import { GtimgHeroListJs, GtimgKiwiAugments } from '@shared/data-sources/gtimg'
-import type { OpggAramBalanceItem } from '@shared/types/opgg'
+import { GtimgClassicHero, GtimgHeroListJs, GtimgKiwiAugments } from '@shared/data-sources/gtimg'
 import { makeAutoObservable, observableRef } from 'mobx'
 
 export class ExtraAssetsStateGtimg {
-  heroList: GtimgHeroListJs | null
-  kiwiAugments: GtimgKiwiAugments[] | null
+  heroList: GtimgHeroListJs | null = null
+  kiwiAugments: GtimgKiwiAugments[] | null = null
+  classicHeroes: GtimgClassicHero[] | null = null
+
+  setClassicHeroes(heroes: GtimgClassicHero[] | null) {
+    this.classicHeroes = heroes
+  }
 
   setHeroList(heroList: GtimgHeroListJs | null) {
     this.heroList = heroList
@@ -17,21 +21,8 @@ export class ExtraAssetsStateGtimg {
   constructor() {
     makeAutoObservable(this, {
       heroList: observableRef,
+      classicHeroes: observableRef,
       kiwiAugments: observableRef
-    })
-  }
-}
-
-export class ExtraAssetsStateOpgg {
-  aramBalance: OpggAramBalanceItem[] | null
-
-  setAramBalance(aramBalance: OpggAramBalanceItem[] | null) {
-    this.aramBalance = aramBalance
-  }
-
-  constructor() {
-    makeAutoObservable(this, {
-      aramBalance: observableRef
     })
   }
 }

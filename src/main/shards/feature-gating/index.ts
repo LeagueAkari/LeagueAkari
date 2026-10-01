@@ -3,8 +3,6 @@ import { Shard, SharedGlobalShard } from '@shared/akari-shard'
 import {
   type FeatureGateDevOverride,
   FeatureGateEvaluator,
-  isFeatureGateConfigured,
-  isFeatureGateEnabled,
   restoreFeatureGateDevOverrides
 } from '@shared/shards/feature-gating'
 import { getSgpServerId } from '@shared/utils/sgp'
@@ -15,13 +13,14 @@ import { LeagueClientMain } from '../league-client'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import type { SetterSettingService } from '../setting-factory/setter-setting-service'
+import { FEATURE_GATING_MAIN_NAMESPACE } from './context'
 import { FeatureGateDevOverrideController } from './dev-override-controller'
 import { FeatureGatingIpcHandlers } from './ipc-handlers'
 import { FeatureGatingSettings, featureGateDevOverridesSchema } from './state'
 
 @Shard(FeatureGatingMain.id)
 export class FeatureGatingMain {
-  static readonly id = 'feature-gating-main'
+  static readonly id = FEATURE_GATING_MAIN_NAMESPACE
 
   public readonly settings = new FeatureGatingSettings()
 
@@ -39,7 +38,7 @@ export class FeatureGatingMain {
     _settingFactory: SettingFactoryMain
   ) {
     this._settingService = _settingFactory.register(
-      FeatureGatingMain.id,
+      FEATURE_GATING_MAIN_NAMESPACE,
       {
         devOverrides: {
           default: this.settings.devOverrides,
@@ -54,36 +53,44 @@ export class FeatureGatingMain {
       this._settingService,
       is.dev
     )
-    this._ipcHandlers = new FeatureGatingIpcHandlers(
-      FeatureGatingMain.id,
-      _ipc,
-      this._devOverrideController
-    )
+    this._ipcHandlers = new FeatureGatingIpcHandlers(_ipc, this._devOverrideController)
   }
 
   async onInit() {
     if (is.dev) {
       await this._settingService.applyToState()
-      this._mobxUtils.propSync(FeatureGatingMain.id, 'settings', this.settings, 'devOverrides')
+      this._mobxUtils.propSync(
+        FEATURE_GATING_MAIN_NAMESPACE,
+        'settings',
+        this.settings,
+        'devOverrides'
+      )
     }
 
     this._ipcHandlers.register()
   }
 
   isEnabled(key: string, defaultValue: boolean) {
-    return isFeatureGateEnabled(key, defaultValue, this._evaluate())
+    return this.getEvaluation(key, defaultValue).enabled
+  }
+
+  getEvaluation(key: string, defaultValue: boolean) {
+    this._evaluate()
+
+    return this._evaluator.getEvaluation(key, defaultValue)
   }
 
   hasConfiguredGate(key: string) {
-    return isFeatureGateConfigured(key, this._evaluate())
+    return this.getEvaluation(key, false).configured
   }
 
-  setDevOverride(key: string, value: FeatureGateDevOverride | null) {
-    return this._devOverrideController.setDevOverride(key, value)
+  setDevOverride(key: string, value: FeatureGateDevOverride | null, previousKey?: string) {
+    return this._devOverrideController.setDevOverride(key, value, previousKey)
   }
 
   private _evaluate() {
     const auth = this._leagueClient.state.auth
+
     return this._evaluator.evaluate(
       this._akariApi.state.featureGates,
       {

@@ -15,7 +15,7 @@
         <template #icon>
           <NIcon :size="iconSize"><Filter20Regular /></NIcon>
         </template>
-        {{ label }}
+        <template v-if="label" #default>{{ label }}</template>
       </NButton>
     </template>
     {{ t('playerTabs.matchHistory.filters.title') }}

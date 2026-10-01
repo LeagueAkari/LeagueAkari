@@ -65,7 +65,9 @@ export function buildFeatureGateGroups({
   const rowsByGroup = new Map<FeatureGateGroupId, FeatureGateListRow[]>()
 
   for (const key of keys) {
-    if (normalizedQuery && !key.toLocaleLowerCase().includes(normalizedQuery)) continue
+    if (normalizedQuery && !key.toLocaleLowerCase().includes(normalizedQuery)) {
+      continue
+    }
 
     const hasCloudConfig = Object.hasOwn(cloudGates, key)
     const hasDevOverride = Object.hasOwn(devOverrides, key)
@@ -87,26 +89,44 @@ export function buildFeatureGateGroups({
 
   return GROUP_DEFINITIONS.flatMap((definition) => {
     const rows = rowsByGroup.get(definition.id)
-    if (!rows?.length) return []
+
+    if (!rows?.length) {
+      return []
+    }
 
     rows.sort((a, b) => {
-      if (a.effective !== b.effective) return a.effective ? -1 : 1
+      if (a.effective !== b.effective) {
+        return a.effective ? -1 : 1
+      }
+
       return a.key.localeCompare(b.key, 'en')
     })
+
     return [{ ...definition, rows }]
   })
 }
 
 export function formatFeatureGateRule(config: AkariFeatureGateRuntimeRule) {
   const parts: string[] = []
+
   if (config.platforms) {
     parts.push(
       `平台 ${config.platforms.map((platform) => (platform === 'win32' ? 'Windows' : 'macOS')).join('、')}`
     )
   }
-  if (config.minVersionInclusive) parts.push(`版本 ≥ ${config.minVersionInclusive}`)
-  if (config.maxVersionExclusive) parts.push(`版本 < ${config.maxVersionExclusive}`)
-  if (config.sgpServers) parts.push(`区服 ${config.sgpServers.join('、')}`)
+
+  if (config.minVersionInclusive) {
+    parts.push(`版本 ≥ ${config.minVersionInclusive}`)
+  }
+
+  if (config.maxVersionExclusive) {
+    parts.push(`版本 < ${config.maxVersionExclusive}`)
+  }
+
+  if (config.sgpServers) {
+    parts.push(`区服 ${config.sgpServers.join('、')}`)
+  }
+
   return parts.length ? parts.join(' · ') : '全部运行环境'
 }
 
@@ -120,13 +140,25 @@ export function hasFeatureGateRuleConstraints(config: AkariFeatureGateRuntimeRul
 }
 
 export function formatFeatureGateOverride(override: FeatureGateDevOverride) {
-  if (override.mode === 'force-on') return '始终开启'
-  if (override.mode === 'force-off') return '始终关闭'
+  if (override.mode === 'force-on') {
+    return '始终开启'
+  }
+
+  if (override.mode === 'force-off') {
+    return '始终关闭'
+  }
+
   return formatFeatureGateRule(override.config)
 }
 
 export function featureGateOverrideModeLabel(override: FeatureGateDevOverride) {
-  if (override.mode === 'force-on') return '强制开启'
-  if (override.mode === 'force-off') return '强制关闭'
+  if (override.mode === 'force-on') {
+    return '强制开启'
+  }
+
+  if (override.mode === 'force-off') {
+    return '强制关闭'
+  }
+
   return '按规则'
 }

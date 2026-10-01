@@ -28,8 +28,6 @@ import {
 } from './context'
 import { syncInGameSendSettings, syncInGameSendState } from './settings-sync'
 
-const MAIN_SHARD_NAMESPACE = IN_GAME_SEND_MAIN_NAMESPACE
-
 @Shard(InGameSendRenderer.id)
 export class InGameSendRenderer implements IAkariShardInitDispose {
   static id = IN_GAME_SEND_RENDERER_NAMESPACE
@@ -76,59 +74,71 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
   }
 
   setCancelShortcut(shortcut: string | null) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'cancelShortcut', shortcut)
+    return this._settingUtils.set(IN_GAME_SEND_MAIN_NAMESPACE, 'cancelShortcut', shortcut)
   }
 
   setSendInterval(interval: number) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'sendInterval', interval)
+    return this._settingUtils.set(IN_GAME_SEND_MAIN_NAMESPACE, 'sendInterval', interval)
   }
 
   sendLines(lines: string[]) {
-    return this._ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'sendLines', lines)
+    return this._ipc.call<boolean>(IN_GAME_SEND_MAIN_NAMESPACE, 'sendLines', lines)
   }
 
   generateRatingPresetLines(target: InGameSendPresetTarget) {
-    return this._ipc.call<string[]>(MAIN_SHARD_NAMESPACE, 'generateRatingPresetLines', target)
+    return this._ipc.call<string[]>(
+      IN_GAME_SEND_MAIN_NAMESPACE,
+      'generateRatingPresetLines',
+      target
+    )
   }
 
   generateJunglePresetLines(target: InGameSendPresetTarget) {
-    return this._ipc.call<string[]>(MAIN_SHARD_NAMESPACE, 'generateJunglePresetLines', target)
+    return this._ipc.call<string[]>(
+      IN_GAME_SEND_MAIN_NAMESPACE,
+      'generateJunglePresetLines',
+      target
+    )
   }
 
   generatePremadePresetLines(target: InGameSendPresetTarget) {
-    return this._ipc.call<string[]>(MAIN_SHARD_NAMESPACE, 'generatePremadePresetLines', target)
+    return this._ipc.call<string[]>(
+      IN_GAME_SEND_MAIN_NAMESPACE,
+      'generatePremadePresetLines',
+      target
+    )
   }
 
   sendRatingPreset(target: InGameSendPresetTarget) {
-    return this._ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'sendRatingPreset', target)
+    return this._ipc.call<boolean>(IN_GAME_SEND_MAIN_NAMESPACE, 'sendRatingPreset', target)
   }
 
   sendJunglePreset(target: InGameSendPresetTarget) {
-    return this._ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'sendJunglePreset', target)
+    return this._ipc.call<boolean>(IN_GAME_SEND_MAIN_NAMESPACE, 'sendJunglePreset', target)
   }
 
   sendPremadePreset(target: InGameSendPresetTarget) {
-    return this._ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'sendPremadePreset', target)
+    return this._ipc.call<boolean>(IN_GAME_SEND_MAIN_NAMESPACE, 'sendPremadePreset', target)
   }
 
   sendFixedTextPreset(id: string) {
-    return this._ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'sendFixedTextPreset', id)
+    return this._ipc.call<boolean>(IN_GAME_SEND_MAIN_NAMESPACE, 'sendFixedTextPreset', id)
   }
 
   markCustomTemplateRiskNoticeShown() {
-    return this._ipc.call<void>(MAIN_SHARD_NAMESPACE, 'markCustomTemplateRiskNoticeShown')
+    return this._ipc.call<void>(IN_GAME_SEND_MAIN_NAMESPACE, 'markCustomTemplateRiskNoticeShown')
   }
 
   createCustomTemplateItem() {
     return this._ipc.call<InGameSendCustomTemplateItem>(
-      MAIN_SHARD_NAMESPACE,
+      IN_GAME_SEND_MAIN_NAMESPACE,
       'createCustomTemplateItem'
     )
   }
 
   updateCustomTemplateItem(id: string, patch: InGameSendCustomTemplateItemPatch) {
     return this._ipc.call<InGameSendCustomTemplateItem>(
-      MAIN_SHARD_NAMESPACE,
+      IN_GAME_SEND_MAIN_NAMESPACE,
       'updateCustomTemplateItem',
       id,
       patch
@@ -136,12 +146,12 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
   }
 
   deleteCustomTemplateItem(id: string) {
-    return this._ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'deleteCustomTemplateItem', id)
+    return this._ipc.call<boolean>(IN_GAME_SEND_MAIN_NAMESPACE, 'deleteCustomTemplateItem', id)
   }
 
   reorderCustomTemplateItem(id: string, targetIndex: number) {
     return this._ipc.call<boolean>(
-      MAIN_SHARD_NAMESPACE,
+      IN_GAME_SEND_MAIN_NAMESPACE,
       'reorderCustomTemplateItem',
       id,
       targetIndex
@@ -149,47 +159,52 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
   }
 
   generateCustomTemplateLines(id: string, target: InGameSendPresetTarget) {
-    return this._ipc.call<string[]>(MAIN_SHARD_NAMESPACE, 'generateCustomTemplateLines', id, target)
+    return this._ipc.call<string[]>(
+      IN_GAME_SEND_MAIN_NAMESPACE,
+      'generateCustomTemplateLines',
+      id,
+      target
+    )
   }
 
   sendCustomTemplate(id: string, target: InGameSendPresetTarget) {
-    return this._ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'sendCustomTemplate', id, target)
+    return this._ipc.call<boolean>(IN_GAME_SEND_MAIN_NAMESPACE, 'sendCustomTemplate', id, target)
   }
 
   updateRatingPresetOptions(options: InGameSendRatingPresetOptionPatch) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'updateRatingPresetOptions', options)
+    return this._ipc.call(IN_GAME_SEND_MAIN_NAMESPACE, 'updateRatingPresetOptions', options)
   }
 
   updateJunglePresetOptions(options: InGameSendJunglePresetOptionPatch) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'updateJunglePresetOptions', options)
+    return this._ipc.call(IN_GAME_SEND_MAIN_NAMESPACE, 'updateJunglePresetOptions', options)
   }
 
   updatePremadePresetOptions(options: InGameSendPremadePresetOptionPatch) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'updatePremadePresetOptions', options)
+    return this._ipc.call(IN_GAME_SEND_MAIN_NAMESPACE, 'updatePremadePresetOptions', options)
   }
 
   setRatingPresetOptions(options: InGameSendRatingPresetOptions) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setRatingPresetOptions', options)
+    return this._ipc.call(IN_GAME_SEND_MAIN_NAMESPACE, 'setRatingPresetOptions', options)
   }
 
   setJunglePresetOptions(options: InGameSendJunglePresetOptions) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setJunglePresetOptions', options)
+    return this._ipc.call(IN_GAME_SEND_MAIN_NAMESPACE, 'setJunglePresetOptions', options)
   }
 
   setPremadePresetOptions(options: InGameSendPremadePresetOptions) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setPremadePresetOptions', options)
+    return this._ipc.call(IN_GAME_SEND_MAIN_NAMESPACE, 'setPremadePresetOptions', options)
   }
 
   createFixedTextPresetItem() {
     return this._ipc.call<InGameSendFixedTextPresetItem>(
-      MAIN_SHARD_NAMESPACE,
+      IN_GAME_SEND_MAIN_NAMESPACE,
       'createFixedTextPresetItem'
     )
   }
 
   updateFixedTextPresetItem(id: string, patch: InGameSendFixedTextPresetItemPatch) {
     return this._ipc.call<InGameSendFixedTextPresetItem>(
-      MAIN_SHARD_NAMESPACE,
+      IN_GAME_SEND_MAIN_NAMESPACE,
       'updateFixedTextPresetItem',
       id,
       patch
@@ -197,12 +212,12 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
   }
 
   deleteFixedTextPresetItem(id: string) {
-    return this._ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'deleteFixedTextPresetItem', id)
+    return this._ipc.call<boolean>(IN_GAME_SEND_MAIN_NAMESPACE, 'deleteFixedTextPresetItem', id)
   }
 
   reorderFixedTextPresetItem(id: string, targetIndex: number) {
     return this._ipc.call<boolean>(
-      MAIN_SHARD_NAMESPACE,
+      IN_GAME_SEND_MAIN_NAMESPACE,
       'reorderFixedTextPresetItem',
       id,
       targetIndex
@@ -210,18 +225,18 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
   }
 
   setRatingPuuids(puuids: string[]) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setRatingPuuids', puuids)
+    return this._ipc.call(IN_GAME_SEND_MAIN_NAMESPACE, 'setRatingPuuids', puuids)
   }
 
   setJunglePuuids(puuids: string[]) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setJunglePuuids', puuids)
+    return this._ipc.call(IN_GAME_SEND_MAIN_NAMESPACE, 'setJunglePuuids', puuids)
   }
 
   setPremadeIndices(indices: number[]) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setPremadeIndices', indices)
+    return this._ipc.call(IN_GAME_SEND_MAIN_NAMESPACE, 'setPremadeIndices', indices)
   }
 
   clearPresetSelections() {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'clearPresetSelections')
+    return this._ipc.call(IN_GAME_SEND_MAIN_NAMESPACE, 'clearPresetSelections')
   }
 }

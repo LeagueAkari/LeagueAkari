@@ -141,7 +141,7 @@ titlebar:
     noticeSeeMore: See More
     github: Project GitHub
     auxWindow: Auxiliary Window
-    opggWindow: Champion Data
+    championDataWindow: Champion Data
     backgroundTasks: Background Tasks
     themeSelector:
       title: Theme Palette

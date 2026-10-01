@@ -7,10 +7,17 @@
       'settings-section--highlighted': highlighted
     }"
   >
-    <header class="settings-section-header">
+    <header
+      v-if="title || $slots.header || $slots.headerSuffix"
+      class="settings-section-header"
+      :class="{ 'settings-section-header--with-suffix': $slots.headerSuffix }"
+    >
       <slot name="header">
         <span class="settings-section-title">{{ title }}</span>
       </slot>
+      <div v-if="$slots.headerSuffix" class="settings-section-header-suffix">
+        <slot name="headerSuffix" />
+      </div>
     </header>
     <div class="settings-section-body">
       <slot />
@@ -57,6 +64,14 @@ defineExpose({
 
   .settings-section-title {
     @apply text-sm leading-5 font-bold text-black/80 dark:text-white/90;
+  }
+
+  .settings-section-header--with-suffix {
+    @apply flex flex-wrap items-center justify-between gap-x-3 gap-y-2;
+  }
+
+  .settings-section-header-suffix {
+    @apply ml-auto flex max-w-full items-center;
   }
 
   .settings-section-body {

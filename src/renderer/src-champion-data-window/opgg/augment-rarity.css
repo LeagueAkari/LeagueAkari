@@ -1,0 +1,20 @@
+@reference '@renderer-shared/assets/css/tailwind.css';
+
+.augment-rarity-silver {
+  @apply text-slate-600 dark:text-slate-300;
+}
+
+.augment-rarity-gold {
+  @apply text-amber-700 dark:text-amber-300;
+}
+
+.augment-rarity-prismatic {
+  display: inline-block;
+  background-image: linear-gradient(110deg, #087f8c, #4963b8 35%, #ad469a 68%, #996a0d);
+  background-clip: text;
+  color: transparent;
+
+  [data-theme='dark'] & {
+    background-image: linear-gradient(110deg, #91e4dc, #aaafff 35%, #f0a6d3 68%, #ecd698);
+  }
+}

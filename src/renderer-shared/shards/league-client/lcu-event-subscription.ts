@@ -2,8 +2,8 @@ import type { LcuEvent } from '@shared/types/league-client/event'
 import { getCurrentScope, onScopeDispose } from 'vue'
 
 import {
+  LEAGUE_CLIENT_MAIN_NAMESPACE,
   type LeagueClientRendererContext,
-  MAIN_SHARD_NAMESPACE,
   type SubscribedLcuEvent
 } from './context'
 
@@ -12,7 +12,7 @@ export class LeagueClientLcuEventSubscription {
 
   registerDispatch() {
     this.context.ipc.onEvent(
-      MAIN_SHARD_NAMESPACE,
+      LEAGUE_CLIENT_MAIN_NAMESPACE,
       'extra-lcu-event',
       (subId: string, event: LcuEvent, params) => {
         this.context.emitter.emit(subId, { event, params })
@@ -62,7 +62,7 @@ export class LeagueClientLcuEventSubscription {
 
   private async _internalSubscribe(uri: string) {
     const subId = await this.context.ipc.call<string>(
-      MAIN_SHARD_NAMESPACE,
+      LEAGUE_CLIENT_MAIN_NAMESPACE,
       'subscribeLcuEndpoint',
       uri
     )
@@ -70,7 +70,11 @@ export class LeagueClientLcuEventSubscription {
     return {
       subId,
       unsubscribe: () => {
-        return this.context.ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'unsubscribeLcuEndpoint', subId)
+        return this.context.ipc.call<boolean>(
+          LEAGUE_CLIENT_MAIN_NAMESPACE,
+          'unsubscribeLcuEndpoint',
+          subId
+        )
       }
     }
   }

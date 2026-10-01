@@ -4,7 +4,7 @@ import { formatSeconds } from '@shared/utils/format'
 import { useTranslation } from 'i18next-vue'
 import { watch } from 'vue'
 
-import { SIMPLE_NOTIFICATIONS_RENDERER_ID } from './context'
+import { SIMPLE_NOTIFICATIONS_RENDERER_NAMESPACE } from './context'
 
 export function watchQueueingProgress() {
   const leagueClientStore = useLeagueClientStore()
@@ -13,7 +13,7 @@ export function watchQueueingProgress() {
     keyPrefix: 'notifications.simple.login-queue-task'
   })
 
-  const taskId = `${SIMPLE_NOTIFICATIONS_RENDERER_ID}/queueing`
+  const taskId = `${SIMPLE_NOTIFICATIONS_RENDERER_NAMESPACE}/queueing`
 
   watch(
     () => leagueClientStore.login.loginQueueState,

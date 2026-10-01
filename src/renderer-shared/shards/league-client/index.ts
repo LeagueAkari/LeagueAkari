@@ -13,16 +13,16 @@ import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
 import { SetupInAppScopeRenderer } from '../setup-in-app-scope'
 import {
+  LEAGUE_CLIENT_MAIN_NAMESPACE,
   LEAGUE_CLIENT_RENDERER_NAMESPACE,
   type LeagueClientRendererConfig,
-  type LeagueClientRendererContext,
-  MAIN_SHARD_NAMESPACE
+  type LeagueClientRendererContext
 } from './context'
 import { watchLeagueClientInitializationProgress } from './initialization-progress-watcher'
 import { LeagueClientLcuEventSubscription } from './lcu-event-subscription'
 import { syncLeagueClientState } from './state-sync'
 
-export { MAIN_SHARD_NAMESPACE }
+export { LEAGUE_CLIENT_MAIN_NAMESPACE, LEAGUE_CLIENT_MAIN_NAMESPACE as MAIN_SHARD_NAMESPACE }
 export type { LeagueClientRendererConfig }
 
 @Shard(LeagueClientRenderer.id)
@@ -57,7 +57,7 @@ export class LeagueClientRenderer {
     this.api = new LeagueClientHttpApiAxiosHelper(this.httpClient)
     this._context = {
       namespace: LeagueClientRenderer.id,
-      mainShardNamespace: MAIN_SHARD_NAMESPACE,
+      mainShardNamespace: LEAGUE_CLIENT_MAIN_NAMESPACE,
       ipc: this._ipc,
       piniaMobxUtils: this._piniaMobxUtils,
       settingUtils: this._settingUtils,
@@ -91,26 +91,26 @@ export class LeagueClientRenderer {
   }
 
   setAutoConnect(enabled: boolean) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoConnect', enabled)
+    return this._settingUtils.set(LEAGUE_CLIENT_MAIN_NAMESPACE, 'autoConnect', enabled)
   }
 
   disconnect() {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'disconnect')
+    return this._ipc.call(LEAGUE_CLIENT_MAIN_NAMESPACE, 'disconnect')
   }
 
   connect(auth: UxCommandLine) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'connect', auth)
+    return this._ipc.call(LEAGUE_CLIENT_MAIN_NAMESPACE, 'connect', auth)
   }
 
   writeItemSetsToDisk(items: any[] | null, clearPrevious?: boolean) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'writeItemSetsToDisk', items, clearPrevious)
+    return this._ipc.call(LEAGUE_CLIENT_MAIN_NAMESPACE, 'writeItemSetsToDisk', items, clearPrevious)
   }
 
   fixWindowMethodA(config?: { baseHeight: number; baseWidth: number }) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'fixWindowMethodA', config)
+    return this._ipc.call(LEAGUE_CLIENT_MAIN_NAMESPACE, 'fixWindowMethodA', config)
   }
 
   peekClient(auth: UxCommandLine): Promise<{ summoner: SummonerInfo; profileIcon: string } | null> {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'peekClient', auth)
+    return this._ipc.call(LEAGUE_CLIENT_MAIN_NAMESPACE, 'peekClient', auth)
   }
 }

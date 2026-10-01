@@ -74,23 +74,26 @@ export const useAuxWindowStore = defineStore('shard:window-manager-renderer/aux-
   }
 })
 
-export const useOpggWindowStore = defineStore('shard:window-manager-renderer/opgg-window', () => {
-  const settings = shallowReactive({
-    enabled: true,
-    autoShow: true,
-    opacity: 0.9,
-    pinned: true,
-    showShortcut: null as string | null,
-    showSkinSelector: false
-  })
+export const useChampionDataWindowStore = defineStore(
+  'shard:window-manager-renderer/champion-data-window',
+  () => {
+    const settings = shallowReactive({
+      enabled: true,
+      autoShow: true,
+      opacity: 0.9,
+      pinned: true,
+      showShortcut: null as string | null,
+      showSkinSelector: false
+    })
 
-  const basicWindowState = useBasicWindowStates()
+    const basicWindowState = useBasicWindowStates()
 
-  return {
-    settings,
-    ...basicWindowState
+    return {
+      settings,
+      ...basicWindowState
+    }
   }
-})
+)
 
 export const useOngoingGameWindowStore = defineStore(
   'shard:window-manager-renderer/ongoing-game-window',

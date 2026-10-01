@@ -2,6 +2,7 @@ import { AkariManager, Constructor } from '@shared/akari-shard'
 import { App, getCurrentInstance } from 'vue'
 
 import { LoggerRenderer } from './logger'
+import { LOGGER_RENDERER_NAMESPACE } from './logger/context'
 
 declare module 'vue' {
   export interface ComponentCustomProperties {
@@ -26,7 +27,7 @@ export function createManager() {
     install: (app: App) => {
       app.config.globalProperties.$akariManager = akariManager
       app.config.errorHandler = (err, _instance, info) => {
-        const logger = akariManager.getInstance('logger-renderer') as LoggerRenderer
+        const logger = akariManager.getInstance(LOGGER_RENDERER_NAMESPACE) as LoggerRenderer
         logger?.error('Vue', err, info)
       }
 

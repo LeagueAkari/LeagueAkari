@@ -114,7 +114,7 @@ Everything is organized as **shards** — dependency-injected, lifecycle-managed
 
 Mirror shards on the renderer side communicate with main via IPC and expose synced state to Vue
 components. Some window-specific renderer shards live under that window's own `shards/` directory
-such as `src/renderer/src-opgg-window/shards/`.
+such as `src/renderer/src-champion-data-window/shards/`.
 
 ---
 
@@ -122,13 +122,13 @@ such as `src/renderer/src-opgg-window/shards/`.
 
 There are **5 renderer windows**, each an independent Vite entry:
 
-| Window       | Entry                                   | Role                                           |
-| ------------ | --------------------------------------- | ---------------------------------------------- |
-| Main         | `src/renderer/src-main-window/`         | Primary UI: player lookup, automation, toolkit |
-| Aux          | `src/renderer/src-aux-window/`          | Lightweight secondary window                   |
-| OP.GG        | `src/renderer/src-opgg-window/`         | Embedded OP.GG champion stats                  |
-| Ongoing Game | `src/renderer/src-ongoing-game-window/` | Real-time in-game display                      |
-| CD Timer     | `src/renderer/src-cd-timer-window/`     | Floating cooldown tracker                      |
+| Window        | Entry                                    | Role                                           |
+| ------------- | ---------------------------------------- | ---------------------------------------------- |
+| Main          | `src/renderer/src-main-window/`          | Primary UI: player lookup, automation, toolkit |
+| Aux           | `src/renderer/src-aux-window/`           | Lightweight secondary window                   |
+| Champion Data | `src/renderer/src-champion-data-window/` | Champion data from multiple sources            |
+| Ongoing Game  | `src/renderer/src-ongoing-game-window/`  | Real-time in-game display                      |
+| CD Timer      | `src/renderer/src-cd-timer-window/`      | Floating cooldown tracker                      |
 
 Each window has its own HTML entry, `main.ts`, `NaiveUIProviderApp.vue`, `App.vue`, and shard
 manager. The main window uses Vue Router; the smaller windows usually compose their views directly.

@@ -8,8 +8,10 @@ import type { MigrationContext } from './context'
 import {
   BACKGROUND_MATERIAL_SETTING_KEY,
   LEGACY_AUX_SHOW_SKIN_SELECTOR_KEY,
+  MIGRATION_CHAMPION_DATA_WINDOW,
   MIGRATION_FROM_151,
   OPGG_SHOW_SKIN_SELECTOR_KEY,
+  migrateChampionDataWindow,
   migrateFrom151
 } from './from-1-5-1'
 
@@ -112,5 +114,78 @@ describe('network proxy settings migration', () => {
 
     expect(settings.get(NETWORK_KEY)?.value).toEqual(current)
     expect(settings.has(LEGACY_KEY)).toBe(false)
+  })
+})
+
+const LEGACY_NAMESPACE = 'window-manager-main/opgg-window'
+const CURRENT_NAMESPACE = 'window-manager-main/champion-data-window'
+
+describe('champion data window migration', () => {
+  it('moves only stable window preferences and leaves champion configuration untouched', async () => {
+    const preferences = {
+      trackedBounds: { x: -1200, y: 80, width: 640, height: 800 },
+      enabled: false,
+      autoShow: false,
+      opacity: 0.8,
+      pinned: false,
+      showShortcut: null,
+      showSkinSelector: true
+    }
+    const excluded = [
+      Setting.create(`${LEGACY_NAMESPACE}/autoApplyRunes`, true),
+      Setting.create(`${LEGACY_NAMESPACE}/unknownPreference`, 'keep'),
+      Setting.create('auto-champ-config-main/enabled', true),
+      Setting.create('opgg-renderer/preferences', { flashPosition: 'd' })
+    ]
+    const { settings, context } = setup([
+      ...Object.entries(preferences).map(([key, value]) =>
+        Setting.create(`${LEGACY_NAMESPACE}/${key}`, value)
+      ),
+      ...excluded
+    ])
+
+    await migrateChampionDataWindow(context)
+
+    expect(settings).toEqual(
+      new Map(
+        [
+          ...Object.entries(preferences).map(([key, value]) =>
+            Setting.create(`${CURRENT_NAMESPACE}/${key}`, value)
+          ),
+          ...excluded,
+          Setting.create(MIGRATION_CHAMPION_DATA_WINDOW, MIGRATION_CHAMPION_DATA_WINDOW)
+        ].map((setting) => [setting.key, setting])
+      )
+    )
+  })
+
+  it('preserves existing target values and does not repeat a completed migration', async () => {
+    const legacyKey = `${LEGACY_NAMESPACE}/enabled`
+    const currentKey = `${CURRENT_NAMESPACE}/enabled`
+    const { settings, context } = setup([
+      Setting.create(legacyKey, true),
+      Setting.create(currentKey, false)
+    ])
+
+    await migrateChampionDataWindow(context)
+
+    expect(settings.get(currentKey)?.value).toBe(false)
+    expect(settings.has(legacyKey)).toBe(false)
+    expect(settings.has(`${CURRENT_NAMESPACE}/trackedBounds`)).toBe(false)
+
+    settings.set(legacyKey, Setting.create(legacyKey, true))
+    const completed = new Map(settings)
+    await migrateChampionDataWindow(context)
+    expect(settings).toEqual(completed)
+  })
+
+  it('carries forward the skin selector preference produced by the previous migration', async () => {
+    const { settings, context } = setup([Setting.create(LEGACY_AUX_SHOW_SKIN_SELECTOR_KEY, true)])
+
+    await migrateFrom151(context)
+    await migrateChampionDataWindow(context)
+
+    expect(settings.get(`${CURRENT_NAMESPACE}/showSkinSelector`)?.value).toBe(true)
+    expect(settings.has(`${LEGACY_NAMESPACE}/showSkinSelector`)).toBe(false)
   })
 })

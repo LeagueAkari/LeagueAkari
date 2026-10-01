@@ -6,7 +6,7 @@ import type { LeagueClientUxRenderer } from '@renderer-shared/shards/league-clie
 import type { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
 import type { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-scope'
 
-export const SIMPLE_NOTIFICATIONS_RENDERER_ID = 'simple-notifications-renderer'
+export const SIMPLE_NOTIFICATIONS_RENDERER_NAMESPACE = 'simple-notifications-renderer'
 
 export const NEVER_SHOW_LIVE_STREAMING_STREAMER_MODE_SETTING_KEY =
   'neverShowLiveStreamingStreamerMode'

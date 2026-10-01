@@ -5,7 +5,7 @@ import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
 import { SetupInAppScopeRenderer } from '../setup-in-app-scope'
-import { APP_COMMON_RENDERER_NAMESPACE, MAIN_SHARD_NAMESPACE } from './context'
+import { APP_COMMON_MAIN_NAMESPACE, APP_COMMON_RENDERER_NAMESPACE } from './context'
 import { watchAppLocale } from './locale-watcher'
 import { syncAppCommonRendererState } from './settings-sync'
 
@@ -23,55 +23,55 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
   }
 
   onSecondInstance(fn: (commandLine: string[], workingDirectory: string) => void) {
-    return this._ipc.onEventVue(MAIN_SHARD_NAMESPACE, 'second-instance', fn)
+    return this._ipc.onEventVue(APP_COMMON_MAIN_NAMESPACE, 'second-instance', fn)
   }
 
   getVersion() {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getVersion') as Promise<string>
+    return this._ipc.call(APP_COMMON_MAIN_NAMESPACE, 'getVersion') as Promise<string>
   }
 
   openUserDataDir() {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'openUserDataDir')
+    return this._ipc.call(APP_COMMON_MAIN_NAMESPACE, 'openUserDataDir')
   }
 
   setShowFreeSoftwareDeclaration(s: boolean) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'showFreeSoftwareDeclaration', s)
+    return this._settingUtils.set(APP_COMMON_MAIN_NAMESPACE, 'showFreeSoftwareDeclaration', s)
   }
 
   setDisableHardwareAcceleration(s: boolean) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setDisableHardwareAcceleration', s)
+    return this._ipc.call(APP_COMMON_MAIN_NAMESPACE, 'setDisableHardwareAcceleration', s)
   }
 
   setLocale(s: string) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'locale', s)
+    return this._settingUtils.set(APP_COMMON_MAIN_NAMESPACE, 'locale', s)
   }
 
   setTheme(s: AppThemeSetting) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'theme', s)
+    return this._settingUtils.set(APP_COMMON_MAIN_NAMESPACE, 'theme', s)
   }
 
   setStreamerMode(s: boolean) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'streamerMode', s)
+    return this._settingUtils.set(APP_COMMON_MAIN_NAMESPACE, 'streamerMode', s)
   }
 
   setStreamerModeUseAkariStyledName(s: boolean) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'streamerModeUseAkariStyledName', s)
+    return this._settingUtils.set(APP_COMMON_MAIN_NAMESPACE, 'streamerModeUseAkariStyledName', s)
   }
 
   setPreferredLolSource(s: 'sgp' | 'lcu') {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'preferredLolSource', s)
+    return this._settingUtils.set(APP_COMMON_MAIN_NAMESPACE, 'preferredLolSource', s)
   }
 
   readClipboardText() {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'readClipboardText') as Promise<string>
+    return this._ipc.call(APP_COMMON_MAIN_NAMESPACE, 'readClipboardText') as Promise<string>
   }
 
   onApplicationMenuAboutClick(fn: () => void) {
-    return this._ipc.onEventVue(MAIN_SHARD_NAMESPACE, 'show-about-akari', fn)
+    return this._ipc.onEventVue(APP_COMMON_MAIN_NAMESPACE, 'show-about-akari', fn)
   }
 
   onApplicationMenuSettingsClick(fn: () => void) {
-    return this._ipc.onEventVue(MAIN_SHARD_NAMESPACE, 'show-settings', fn)
+    return this._ipc.onEventVue(APP_COMMON_MAIN_NAMESPACE, 'show-settings', fn)
   }
 
   async onInit() {
@@ -81,19 +81,19 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
   }
 
   getRuntimeInfo() {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getRuntimeInfo') as Promise<any>
+    return this._ipc.call(APP_COMMON_MAIN_NAMESPACE, 'getRuntimeInfo') as Promise<any>
   }
 
   exit() {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'exit')
+    return this._ipc.call(APP_COMMON_MAIN_NAMESPACE, 'exit')
   }
 
   onRendererLink(fn: (url: string) => void) {
-    return this._ipc.onEventVue(MAIN_SHARD_NAMESPACE, 'renderer-link', fn)
+    return this._ipc.onEventVue(APP_COMMON_MAIN_NAMESPACE, 'renderer-link', fn)
   }
 
   relaunchAsAdministrator() {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'relaunchAsAdministrator')
+    return this._ipc.call(APP_COMMON_MAIN_NAMESPACE, 'relaunchAsAdministrator')
   }
 
   async onDispose() {}

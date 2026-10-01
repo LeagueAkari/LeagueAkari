@@ -24,14 +24,13 @@
           <NFormItem
             label="Feature Gate Key"
             :validation-status="visibleKeyError ? 'error' : undefined"
-            :feedback="visibleKeyError"
-            :show-feedback="Boolean(visibleKeyError)"
+            :feedback="visibleKeyError || keyHint"
+            :show-feedback="Boolean(visibleKeyError || keyHint)"
           >
             <NInput
               v-model:value="draftKey"
-              :readonly="Boolean(target?.key)"
-              :disabled="saving"
-              placeholder="例如 champion-data.source.opgg"
+              :disabled="saving || keyLocked"
+              placeholder="例如 champion-data.opgg"
               @blur="keyTouched = true"
             />
           </NFormItem>
@@ -106,7 +105,7 @@
               :gap="24"
               align="start"
             >
-              <div class="grid w-[420px] grid-cols-2 gap-3">
+              <div class="grid w-105 grid-cols-2 gap-3">
                 <NFormItem
                   label="最低版本（包含）"
                   :validation-status="minVersionError ? 'error' : undefined"
@@ -272,8 +271,7 @@ import {
   FeatureGateDevOverrideSchema,
   type FeatureGateDevOverride,
   FeatureGateEvaluator,
-  type FeatureGateServerStatus,
-  isFeatureGateEnabled
+  type FeatureGateServerStatus
 } from '@shared/shards/feature-gating'
 import { useInstance } from '@renderer-shared/shards'
 import { useAkariApiStore } from '@renderer-shared/shards/akari-api/store'
@@ -357,49 +355,109 @@ const selectedModeDescription = computed(
 )
 
 const modalTitle = computed(() => {
-  if (props.target?.devOverride || resolvedDevOverride.value) return '编辑 Dev 覆盖'
-  if (props.target?.key || resolvedCloudConfig.value) return '创建 Dev 覆盖'
+  if (props.target?.devOverride || resolvedDevOverride.value) {
+    return '编辑 Dev 覆盖'
+  }
+
+  if (props.target?.key || resolvedCloudConfig.value) {
+    return '创建 Dev 覆盖'
+  }
+
   return '新增 Dev 覆盖'
 })
+
 const normalizedKey = computed(() => draftKey.value.trim())
-const editorKey = computed(() => props.target?.key ?? normalizedKey.value)
+const editorKey = computed(() => normalizedKey.value)
+const keyLocked = computed(() => Boolean(props.target?.key && props.target.cloudConfig))
+const keyHint = computed(() => {
+  if (keyLocked.value) {
+    return '云端 Key 不可改名；这里仅编辑它的本地 Dev 覆盖。'
+  }
+
+  if (props.target?.devOverride) {
+    return '修改 Key 后，保存会将当前 Dev 项迁移到新名称。'
+  }
+
+  return ''
+})
+
 const resolvedCloudConfig = computed<AkariFeatureGateRuntimeRule | null>(() => {
-  if (props.target?.key) return props.target.cloudConfig
+  if (props.target?.key === normalizedKey.value) {
+    return props.target.cloudConfig
+  }
+
   const key = normalizedKey.value
+
   return key && Object.hasOwn(akariApi.featureGates?.gates ?? {}, key)
     ? (akariApi.featureGates?.gates[key] ?? null)
     : null
 })
+
 const resolvedDevOverride = computed<FeatureGateDevOverride | null>(() => {
-  if (props.target?.key) return props.target.devOverride
+  if (props.target?.key === normalizedKey.value) {
+    return props.target.devOverride
+  }
+
   const key = normalizedKey.value
+
   return key && Object.hasOwn(featureGatingStore.devOverrides, key)
     ? featureGatingStore.devOverrides[key]
     : null
 })
+
 const keyError = computed(() => {
-  if (!normalizedKey.value) return '请输入 Feature Gate key。'
+  if (!normalizedKey.value) {
+    return '请输入 Feature Gate key。'
+  }
+
+  if (
+    props.target?.devOverride &&
+    normalizedKey.value !== props.target.key &&
+    Object.hasOwn(featureGatingStore.devOverrides, normalizedKey.value)
+  ) {
+    return '目标 Key 已有 Dev 覆盖，请使用其他名称。'
+  }
+
   return AkariFeatureGateKeySchema.safeParse(normalizedKey.value).success
     ? ''
-    : 'Key 必须是合法的点分名称，例如 champion-data.source.opgg。'
+    : 'Key 必须是合法的点分名称，例如 champion-data.opgg。'
 })
+
 const visibleKeyError = computed(() => {
-  if (!normalizedKey.value && !keyTouched.value) return ''
+  if (!normalizedKey.value && !keyTouched.value) {
+    return ''
+  }
+
   return keyError.value
 })
 
 const draftOverride = computed<FeatureGateDevOverride>(() => {
-  if (draftMode.value !== 'rule') return { mode: draftMode.value }
+  if (draftMode.value !== 'rule') {
+    return { mode: draftMode.value }
+  }
 
   const config: AkariFeatureGateRuntimeRule = {}
-  if (draftPlatforms.value.length) config.platforms = [...draftPlatforms.value]
+
+  if (draftPlatforms.value.length) {
+    config.platforms = [...draftPlatforms.value]
+  }
 
   const minVersion = draftMinVersion.value.trim()
   const maxVersion = draftMaxVersion.value.trim()
   const sgpServers = uniqueTrimmed(draftSgpServers.value)
-  if (minVersion) config.minVersionInclusive = minVersion
-  if (maxVersion) config.maxVersionExclusive = maxVersion
-  if (sgpServers.length) config.sgpServers = sgpServers
+
+  if (minVersion) {
+    config.minVersionInclusive = minVersion
+  }
+
+  if (maxVersion) {
+    config.maxVersionExclusive = maxVersion
+  }
+
+  if (sgpServers.length) {
+    config.sgpServers = sgpServers
+  }
+
   return { mode: 'rule', config }
 })
 
@@ -418,20 +476,34 @@ const canSave = computed(
     overrideValidation.value.success
 )
 const saveActionLabel = computed(() => {
-  if (props.target?.devOverride || resolvedDevOverride.value) return '更新 Dev 覆盖'
-  if (resolvedCloudConfig.value) return '创建 Dev 覆盖'
+  if (props.target?.devOverride || resolvedDevOverride.value) {
+    return '更新 Dev 覆盖'
+  }
+
+  if (resolvedCloudConfig.value) {
+    return '创建 Dev 覆盖'
+  }
+
   return '保存 Dev 覆盖'
 })
+
 const draftMatchesCloudBaseline = computed(() => {
-  if (!resolvedCloudConfig.value || !overrideValidation.value.success) return false
+  if (!resolvedCloudConfig.value || !overrideValidation.value.success) {
+    return false
+  }
+
   return areOverridesEqual(
     overrideValidation.value.data,
     overrideFromCloud(resolvedCloudConfig.value)
   )
 })
+
 const draftPreviewEnabled = computed<boolean | null>(() => {
-  if (!overrideValidation.value.success) return null
-  const evaluation = previewEvaluator.evaluate(
+  if (!overrideValidation.value.success) {
+    return null
+  }
+
+  previewEvaluator.evaluate(
     null,
     {
       platform: appCommon.platform,
@@ -440,8 +512,10 @@ const draftPreviewEnabled = computed<boolean | null>(() => {
     },
     { [PREVIEW_KEY]: overrideValidation.value.data }
   )
-  return isFeatureGateEnabled(PREVIEW_KEY, false, evaluation)
+
+  return previewEvaluator.getEvaluation(PREVIEW_KEY, false).enabled
 })
+
 const currentEnvironmentSummary = computed(() => {
   const platform =
     appCommon.platform === 'win32'
@@ -449,11 +523,13 @@ const currentEnvironmentSummary = computed(() => {
       : appCommon.platform === 'darwin'
         ? 'macOS'
         : appCommon.platform
+
   return `${platform} · ${appCommon.version} · ${sgp.availability.sgpServerId || 'SGP 未连接'}`
 })
 
 const sgpServerOptions = computed(() => {
   const localeNames = sgp.leagueServers.serverNames[appCommon.settings.locale] ?? {}
+
   return Object.keys(sgp.leagueServers.servers)
     .sort((a, b) => a.localeCompare(b, 'en'))
     .map((serverId) => ({
@@ -463,9 +539,13 @@ const sgpServerOptions = computed(() => {
 })
 
 const cloudStatus = computed<FeatureGateServerStatus>(() => {
-  if (!editorKey.value) return 'not-configured'
+  if (!editorKey.value) {
+    return 'not-configured'
+  }
+
   return featureGating.getServerStatus(editorKey.value)
 })
+
 const cloudStatusLabel = computed(() => {
   switch (cloudStatus.value) {
     case 'enabled':
@@ -478,6 +558,7 @@ const cloudStatusLabel = computed(() => {
       return '云端未配置'
   }
 })
+
 const cloudStatusType = computed(() => {
   switch (cloudStatus.value) {
     case 'enabled':
@@ -498,7 +579,9 @@ const removeActionLabel = computed(() =>
 watch(
   () => [props.show, props.target] as const,
   ([show]) => {
-    if (show) resetDraft()
+    if (show) {
+      resetDraft()
+    }
   },
   { immediate: true }
 )
@@ -528,20 +611,27 @@ function overrideFromCloud(
       }
     }
   }
+
   return { mode: 'force-on' }
 }
 
 function loadCloudBaseline() {
-  if (!resolvedCloudConfig.value) return
+  if (!resolvedCloudConfig.value) {
+    return
+  }
+
   applyOverrideToDraft(overrideFromCloud(resolvedCloudConfig.value))
 }
 
 function loadExistingDevOverride() {
-  if (resolvedDevOverride.value) applyOverrideToDraft(resolvedDevOverride.value)
+  if (resolvedDevOverride.value) {
+    applyOverrideToDraft(resolvedDevOverride.value)
+  }
 }
 
 function applyOverrideToDraft(override: FeatureGateDevOverride) {
   draftMode.value = override.mode
+
   if (override.mode === 'rule') {
     draftPlatforms.value = [...(override.config.platforms ?? [])]
     draftMinVersion.value = override.config.minVersionInclusive ?? ''
@@ -557,9 +647,16 @@ function applyOverrideToDraft(override: FeatureGateDevOverride) {
 
 function issueMessage(path: string) {
   const validation = overrideValidation.value
-  if (validation.success) return ''
+
+  if (validation.success) {
+    return ''
+  }
+
   const issue = validation.error.issues.find((item) => item.path.join('.') === path)
-  if (!issue) return ''
+
+  if (!issue) {
+    return ''
+  }
 
   switch (path) {
     case 'config.minVersionInclusive':
@@ -582,9 +679,15 @@ function uniqueTrimmed(values: string[]) {
 }
 
 function handleShowUpdate(value: boolean) {
-  if (saving.value) return
-  if (value) emit('update:show', true)
-  else forceClose()
+  if (saving.value) {
+    return
+  }
+
+  if (value) {
+    emit('update:show', true)
+  } else {
+    forceClose()
+  }
 }
 
 function forceClose() {
@@ -592,15 +695,27 @@ function forceClose() {
 }
 
 async function handleSave() {
-  if (!canSave.value || !overrideValidation.value.success) return
+  if (!canSave.value || !overrideValidation.value.success) {
+    return
+  }
+
   saving.value = true
   saveFeedback.value = null
   const key = normalizedKey.value
   const override = overrideValidation.value.data
+  const previousKey =
+    props.target?.devOverride && props.target.key !== key
+      ? (props.target.key ?? undefined)
+      : undefined
 
   try {
-    await featureGating.setDevOverride(key, override)
+    await featureGating.setDevOverride(key, override, previousKey)
     await waitForSyncedOverride(key, override)
+
+    if (previousKey) {
+      await waitForSyncedOverride(previousKey, null)
+    }
+
     emit('saved')
     forceClose()
   } catch (error) {
@@ -612,7 +727,11 @@ async function handleSave() {
 
 async function handleRemove() {
   const key = props.target?.key
-  if (!key || saving.value) return
+
+  if (!key || saving.value) {
+    return
+  }
+
   saving.value = true
   saveFeedback.value = null
 
@@ -629,7 +748,9 @@ async function handleRemove() {
 }
 
 async function waitForSyncedOverride(key: string, expected: FeatureGateDevOverride | null) {
-  if (isSyncedOverride(key, expected)) return
+  if (isSyncedOverride(key, expected)) {
+    return
+  }
 
   await new Promise<void>((resolve, reject) => {
     const timeout = window.setTimeout(() => {
@@ -639,7 +760,10 @@ async function waitForSyncedOverride(key: string, expected: FeatureGateDevOverri
     const stop = watch(
       () => featureGatingStore.devOverrides,
       () => {
-        if (!isSyncedOverride(key, expected)) return
+        if (!isSyncedOverride(key, expected)) {
+          return
+        }
+
         window.clearTimeout(timeout)
         stop()
         resolve()
@@ -650,14 +774,26 @@ async function waitForSyncedOverride(key: string, expected: FeatureGateDevOverri
 
 function isSyncedOverride(key: string, expected: FeatureGateDevOverride | null) {
   const hasOverride = Object.hasOwn(featureGatingStore.devOverrides, key)
-  if (expected === null) return !hasOverride
-  if (!hasOverride) return false
+
+  if (expected === null) {
+    return !hasOverride
+  }
+
+  if (!hasOverride) {
+    return false
+  }
+
   return areOverridesEqual(featureGatingStore.devOverrides[key], expected)
 }
 
 function areOverridesEqual(actual: FeatureGateDevOverride, expected: FeatureGateDevOverride) {
-  if (actual.mode !== expected.mode) return false
-  if (actual.mode !== 'rule' || expected.mode !== 'rule') return true
+  if (actual.mode !== expected.mode) {
+    return false
+  }
+
+  if (actual.mode !== 'rule' || expected.mode !== 'rule') {
+    return true
+  }
 
   return (
     areArraysEqual(actual.config.platforms, expected.config.platforms) &&
@@ -668,8 +804,14 @@ function areOverridesEqual(actual: FeatureGateDevOverride, expected: FeatureGate
 }
 
 function areArraysEqual<T>(actual: T[] | undefined, expected: T[] | undefined) {
-  if (actual === expected) return true
-  if (!actual || !expected || actual.length !== expected.length) return false
+  if (actual === expected) {
+    return true
+  }
+
+  if (!actual || !expected || actual.length !== expected.length) {
+    return false
+  }
+
   return actual.every((value, index) => value === expected[index])
 }
 
@@ -681,6 +823,7 @@ function handleWriteError(error: unknown) {
       title: '已写入，等待同步超时',
       message: '主进程已经接受并持久化配置，请关闭后检查页面状态，不要重复保存。'
     }
+
     return
   }
 

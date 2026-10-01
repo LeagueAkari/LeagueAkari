@@ -5,3 +5,7 @@ export interface InitializationProgress {
   finished: string[]
   all: string[]
 }
+
+export const lcuUrl = {
+  championIcon: (id: number) => `/lol-game-data/assets/v1/champion-icons/${id}.png`
+}

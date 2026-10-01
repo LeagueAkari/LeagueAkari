@@ -1,37 +1,55 @@
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import type { ChampionDataPreferences } from '@shared/data-adapter/champion-data'
-import { OpggHttpApiAxiosHelper } from '@shared/http-api-axios-helper/opgg'
-import { Qq101HttpApiAxiosHelper } from '@shared/http-api-axios-helper/qq101'
-import type { AxiosInstance } from 'axios'
-import type { AxiosRetry } from 'axios-retry'
+import type {
+  OpggChampionDataPreferences,
+  Qq101ChampionDataPreferences
+} from '@shared/types/champion-data'
+import {
+  OPGG_CHAMPION_DATA_MODES,
+  OPGG_RANKED_POSITIONS,
+  OPGG_REGIONS,
+  OPGG_TIER_FILTERS
+} from '@shared/types/opgg'
+import { makeAutoObservable } from 'mobx'
 import { z } from 'zod'
 
+import { AkariProtocolMain } from '../akari-protocol'
+import { ExtraAssetsMain } from '../extra-assets'
 import { FeatureGatingMain } from '../feature-gating'
 import { AkariIpcMain } from '../ipc'
+import { LeagueClientMain } from '../league-client'
 import { type AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { NetworkMain } from '../network'
 import { SettingFactoryMain } from '../setting-factory'
 import type { SetterSettingService } from '../setting-factory/setter-setting-service'
+import { WindowManagerMain } from '../window-manager'
 import {
   CHAMPION_DATA_MAIN_NAMESPACE,
   CHAMPION_DATA_OPGG_FEATURE_GATE,
+  CHAMPION_DATA_OPGG_NAMESPACE,
   CHAMPION_DATA_QQ101_FEATURE_GATE,
-  type ChampionDataMainContext,
-  resolveChampionDataSourceGateAvailability
+  type ChampionDataMainContext
 } from './context'
 import { ChampionDataIpcHandlers } from './ipc-handlers'
-import { ChampionDataServiceController } from './service-controller'
-import { ChampionDataMainSourceLoader } from './source-loader'
-import { ChampionDataSettings, ChampionDataState } from './state'
+import { OpggAramBalanceLoader } from './opgg/aram-balance-loader'
+import { OpggChampionDataController } from './opgg/data-controller'
+import { OpggChampionDataLoader } from './opgg/data-loader'
+import { OpggLoadoutExecutor } from './opgg/loadout-executor'
+import { ChampionDataProtocolController } from './protocol-controller'
+import { ChampionDataSettings, OpggChampionDataState } from './state'
 
-const axiosRetry = require('axios-retry').default as AxiosRetry
+const opggPreferencesSchema: z.ZodType<OpggChampionDataPreferences> = z.object({
+  mode: z.enum(OPGG_CHAMPION_DATA_MODES),
+  position: z.enum(OPGG_RANKED_POSITIONS),
+  region: z.enum(OPGG_REGIONS),
+  tier: z.enum(OPGG_TIER_FILTERS)
+})
 
-const preferencesSchema: z.ZodType<ChampionDataPreferences> = z.object({
-  mode: z.enum(['ranked', 'classic', 'aram', 'aram_mayhem', 'arena', 'nexus_blitz', 'urf']),
-  position: z.enum(['all', 'top', 'jungle', 'middle', 'bottom', 'utility', 'none']),
-  region: z.string().min(1),
-  tier: z.union([z.string(), z.number()])
+const qq101PreferencesSchema: z.ZodType<Qq101ChampionDataPreferences> = z.object({
+  mode: z.enum(['ranked', 'classic', 'aram', 'aram_mayhem']),
+  position: z.enum(['all', 'top', 'jungle', 'middle', 'bottom', 'utility']),
+  patch: z.string().min(1).nullable(),
+  tier: z.number().int()
 })
 
 @Shard(ChampionDataMain.id)
@@ -39,128 +57,131 @@ export class ChampionDataMain implements IAkariShardInitDispose {
   static id = CHAMPION_DATA_MAIN_NAMESPACE
 
   public readonly settings = new ChampionDataSettings()
-  public readonly state = new ChampionDataState()
+  public readonly opgg = new OpggChampionDataState()
+  public readonly qq101 = makeAutoObservable({ enabled: false })
+  private readonly _protocolController: ChampionDataProtocolController
 
   private readonly _logger: AkariLogger
   private readonly _settingService: SetterSettingService<ChampionDataSettings>
   private readonly _context: ChampionDataMainContext
-  private readonly _opggHttpClient: AxiosInstance
-  private readonly _qq101HttpClient: AxiosInstance
-  private readonly _sourceLoader: ChampionDataMainSourceLoader
-  private readonly _service: ChampionDataServiceController
   private readonly _ipcHandlers: ChampionDataIpcHandlers
+  private readonly _opggAramBalanceLoader: OpggAramBalanceLoader
+  private readonly _opggController: OpggChampionDataController
+  private readonly _opggLoadout: OpggLoadoutExecutor
 
   constructor(
     private readonly _network: NetworkMain,
+    private readonly _protocol: AkariProtocolMain,
     private readonly _featureGating: FeatureGatingMain,
     private readonly _ipc: AkariIpcMain,
     loggerFactory: LoggerFactoryMain,
     private readonly _mobxUtils: MobxUtilsMain,
-    settingFactory: SettingFactoryMain
+    settingFactory: SettingFactoryMain,
+    leagueClient: LeagueClientMain,
+    extraAssets: ExtraAssetsMain,
+    windowManager: WindowManagerMain
   ) {
     this._logger = loggerFactory.create(ChampionDataMain.id)
     this._settingService = settingFactory.register(
       ChampionDataMain.id,
       {
-        preferredSource: {
-          default: this.settings.preferredSource,
-          schema: z.enum(['opgg', 'qq101'])
+        opggFlashPosition: {
+          default: this.settings.opggFlashPosition,
+          schema: z.enum(['auto', 'd', 'f'])
         },
-        preferences: { default: this.settings.preferences, schema: preferencesSchema }
+        opggPreferences: {
+          default: this.settings.opggPreferences,
+          schema: opggPreferencesSchema
+        },
+        qq101Preferences: {
+          default: this.settings.qq101Preferences,
+          schema: qq101PreferencesSchema
+        }
       },
       this.settings
     )
-    this._opggHttpClient = this._createHttpClient()
-    this._qq101HttpClient = this._createHttpClient({
-      Accept: 'application/json, text/plain, */*',
-      Referer: 'https://101.qq.com/',
-      'User-Agent': 'LeagueAkari'
-    })
-    const opggApi = new OpggHttpApiAxiosHelper(this._opggHttpClient)
-    const qq101Api = new Qq101HttpApiAxiosHelper(this._qq101HttpClient)
-    this._sourceLoader = new ChampionDataMainSourceLoader(this._logger, opggApi, qq101Api)
+
     this._context = {
       namespace: ChampionDataMain.id,
+      featureGating: this._featureGating,
       logger: this._logger,
-      mobxUtils: this._mobxUtils,
-      settings: this.settings,
-      state: this.state,
       settingService: this._settingService
     }
-    this._service = new ChampionDataServiceController(this._context, this._sourceLoader)
-    this._ipcHandlers = new ChampionDataIpcHandlers(this._context, this._ipc, this._service)
+
+    this._protocolController = new ChampionDataProtocolController(
+      this._context,
+      this._protocol,
+      this._network
+    )
+    const opggContext = {
+      ...this._context,
+      settings: this.settings,
+      state: this.opgg,
+      leagueClient,
+      extraAssets,
+      windowManager,
+      mobxUtils: this._mobxUtils
+    }
+    this._opggAramBalanceLoader = new OpggAramBalanceLoader(
+      opggContext,
+      this._protocolController.opggApi
+    )
+    this._opggController = new OpggChampionDataController(
+      opggContext,
+      new OpggChampionDataLoader(this._protocolController.opggApi)
+    )
+    this._opggLoadout = new OpggLoadoutExecutor(opggContext)
+    this._ipcHandlers = new ChampionDataIpcHandlers(
+      this._context,
+      this._ipc,
+      this._opggController,
+      this._opggLoadout
+    )
   }
 
   async onInit() {
     await this._settingService.applyToState()
+
     this._mobxUtils.propSync(ChampionDataMain.id, 'settings', this.settings, [
-      'preferredSource',
-      'preferences'
+      'opggFlashPosition',
+      'opggPreferences',
+      'qq101Preferences'
     ])
-    this._mobxUtils.propSync(ChampionDataMain.id, 'state', this.state, [
-      'availability',
-      'lastEffectiveSource',
-      'lastFallbackReason'
+    this._mobxUtils.propSync(CHAMPION_DATA_OPGG_NAMESPACE, 'state', this.opgg, [
+      'enabled',
+      'snapshot',
+      'isApplying'
     ])
-    this._watchAvailability()
+    this._mobxUtils.propSync(ChampionDataMain.id + '/qq101', 'state', this.qq101, ['enabled'])
+
+    this._mobxUtils.propSync(CHAMPION_DATA_OPGG_NAMESPACE, 'resources', this.opgg, ['aramBalance'])
+
+    this._opggAramBalanceLoader.start()
+    this._watchFeatureGates()
+    this._opggController.start()
+
     this._ipcHandlers.register()
+    this._protocolController.register()
   }
 
   async onDispose() {
-    this._ipcHandlers.dispose()
+    this._opggAramBalanceLoader.dispose()
+    this._opggController.dispose()
+    this._protocolController.unregister()
   }
 
-  loadOverview(query: Parameters<ChampionDataServiceController['loadOverview']>[0]) {
-    return this._service.loadOverview(query)
-  }
-
-  loadPatches(query: Parameters<ChampionDataServiceController['loadPatches']>[0]) {
-    return this._service.loadPatches(query)
-  }
-
-  loadDetails(
-    query: Parameters<ChampionDataServiceController['loadDetails']>[0],
-    championId: number
-  ) {
-    return this._service.loadDetails(query, championId)
-  }
-
-  private _createHttpClient(headers?: Record<string, string>) {
-    const client = this._network.createAxiosClient({ timeout: 8_000, headers })
-    axiosRetry(client, {
-      retries: 1,
-      shouldResetTimeout: true,
-      retryDelay: axiosRetry.exponentialDelay,
-      retryCondition: axiosRetry.isNetworkOrIdempotentRequestError
-    })
-    return client
-  }
-
-  private _watchAvailability() {
+  private _watchFeatureGates() {
     this._mobxUtils.reaction(
-      () => {
-        const opggConfigured = this._featureGating.hasConfiguredGate(
-          CHAMPION_DATA_OPGG_FEATURE_GATE
-        )
-        const qq101Configured = this._featureGating.hasConfiguredGate(
-          CHAMPION_DATA_QQ101_FEATURE_GATE
-        )
-        const sourceGates = resolveChampionDataSourceGateAvailability({
-          opggConfigured,
-          qq101Configured,
-          opggEnabled: this._featureGating.isEnabled(CHAMPION_DATA_OPGG_FEATURE_GATE, false),
-          qq101Enabled: this._featureGating.isEnabled(CHAMPION_DATA_QQ101_FEATURE_GATE, false)
-        })
-        return {
-          preferredSource: this.settings.preferredSource,
-          ...sourceGates
-        }
+      () => this._featureGating.getEvaluation(CHAMPION_DATA_OPGG_FEATURE_GATE, false),
+      (evaluation) => {
+        this.opgg.enabled = evaluation.enabled
       },
-      ({ preferredSource, opgg, qq101 }) => {
-        this.state.setAvailability({
-          preferredSource,
-          sources: { opgg: { enabled: opgg }, qq101: { enabled: qq101 } }
-        })
+      { fireImmediately: true }
+    )
+    this._mobxUtils.reaction(
+      () => this._featureGating.getEvaluation(CHAMPION_DATA_QQ101_FEATURE_GATE, false),
+      (evaluation) => {
+        this.qq101.enabled = evaluation.enabled
       },
       { fireImmediately: true }
     )

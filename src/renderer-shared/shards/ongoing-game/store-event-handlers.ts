@@ -2,7 +2,7 @@ import { markRaw } from 'vue'
 
 import {
   type LcuOrSgpGameSummary,
-  MAIN_SHARD_NAMESPACE,
+  ONGOING_GAME_MAIN_NAMESPACE,
   type OngoingGameAllData,
   type OngoingGameRendererContext
 } from './context'
@@ -15,7 +15,7 @@ export class OngoingGameStoreEventHandlers {
     const store = useOngoingGameStore()
     const { ipc } = this.context
 
-    ipc.onEvent(MAIN_SHARD_NAMESPACE, 'clear', () => {
+    ipc.onEvent(ONGOING_GAME_MAIN_NAMESPACE, 'clear', () => {
       store.summoner = {}
       store.matchHistory = {}
       store.rankedStats = {}
@@ -25,7 +25,7 @@ export class OngoingGameStoreEventHandlers {
       store.gameDetails = {}
     })
 
-    ipc.onEvent(MAIN_SHARD_NAMESPACE, 'clear-player', (puuid: string) => {
+    ipc.onEvent(ONGOING_GAME_MAIN_NAMESPACE, 'clear-player', (puuid: string) => {
       delete store.summoner[puuid]
       delete store.matchHistory[puuid]
       delete store.rankedStats[puuid]
@@ -33,58 +33,58 @@ export class OngoingGameStoreEventHandlers {
       delete store.savedInfo[puuid]
     })
 
-    ipc.onEvent(MAIN_SHARD_NAMESPACE, 'summoner-removed', (puuid: string) => {
+    ipc.onEvent(ONGOING_GAME_MAIN_NAMESPACE, 'summoner-removed', (puuid: string) => {
       delete store.summoner[puuid]
     })
 
-    ipc.onEvent(MAIN_SHARD_NAMESPACE, 'ranked-stats-removed', (puuid: string) => {
+    ipc.onEvent(ONGOING_GAME_MAIN_NAMESPACE, 'ranked-stats-removed', (puuid: string) => {
       delete store.rankedStats[puuid]
     })
 
-    ipc.onEvent(MAIN_SHARD_NAMESPACE, 'champion-mastery-removed', (puuid: string) => {
+    ipc.onEvent(ONGOING_GAME_MAIN_NAMESPACE, 'champion-mastery-removed', (puuid: string) => {
       delete store.championMastery[puuid]
     })
 
-    ipc.onEvent(MAIN_SHARD_NAMESPACE, 'match-history-removed', (puuid: string) => {
+    ipc.onEvent(ONGOING_GAME_MAIN_NAMESPACE, 'match-history-removed', (puuid: string) => {
       delete store.matchHistory[puuid]
     })
 
-    ipc.onEvent(MAIN_SHARD_NAMESPACE, 'saved-info-removed', (puuid: string) => {
+    ipc.onEvent(ONGOING_GAME_MAIN_NAMESPACE, 'saved-info-removed', (puuid: string) => {
       delete store.savedInfo[puuid]
     })
 
-    ipc.onEvent(MAIN_SHARD_NAMESPACE, 'match-history-loaded', (puuid: string, data) => {
+    ipc.onEvent(ONGOING_GAME_MAIN_NAMESPACE, 'match-history-loaded', (puuid: string, data) => {
       store.matchHistory[puuid] = markRaw(data)
 
       const games = data.data as LcuOrSgpGameSummary[]
       games.forEach((game) => (store.cachedGames[game.gameId] = markRaw(game)))
     })
 
-    ipc.onEvent(MAIN_SHARD_NAMESPACE, 'additional-game-loaded', (gameId: number, data) => {
+    ipc.onEvent(ONGOING_GAME_MAIN_NAMESPACE, 'additional-game-loaded', (gameId: number, data) => {
       store.cachedGames[gameId] = markRaw(data)
     })
 
-    ipc.onEvent(MAIN_SHARD_NAMESPACE, 'game-details-loaded', (gameId: number, data) => {
+    ipc.onEvent(ONGOING_GAME_MAIN_NAMESPACE, 'game-details-loaded', (gameId: number, data) => {
       store.gameDetails[gameId] = markRaw(data)
     })
 
-    ipc.onEvent(MAIN_SHARD_NAMESPACE, 'game-details-removed', (gameId: number) => {
+    ipc.onEvent(ONGOING_GAME_MAIN_NAMESPACE, 'game-details-removed', (gameId: number) => {
       delete store.gameDetails[gameId]
     })
 
-    ipc.onEvent(MAIN_SHARD_NAMESPACE, 'summoner-loaded', (puuid: string, data) => {
+    ipc.onEvent(ONGOING_GAME_MAIN_NAMESPACE, 'summoner-loaded', (puuid: string, data) => {
       store.summoner[puuid] = markRaw(data)
     })
 
-    ipc.onEvent(MAIN_SHARD_NAMESPACE, 'ranked-stats-loaded', (puuid: string, data) => {
+    ipc.onEvent(ONGOING_GAME_MAIN_NAMESPACE, 'ranked-stats-loaded', (puuid: string, data) => {
       store.rankedStats[puuid] = markRaw(data)
     })
 
-    ipc.onEvent(MAIN_SHARD_NAMESPACE, 'champion-mastery-loaded', (puuid: string, data) => {
+    ipc.onEvent(ONGOING_GAME_MAIN_NAMESPACE, 'champion-mastery-loaded', (puuid: string, data) => {
       store.championMastery[puuid] = markRaw(data)
     })
 
-    ipc.onEvent(MAIN_SHARD_NAMESPACE, 'saved-info-loaded', (puuid: string, data) => {
+    ipc.onEvent(ONGOING_GAME_MAIN_NAMESPACE, 'saved-info-loaded', (puuid: string, data) => {
       store.savedInfo[puuid] = markRaw(data)
     })
   }

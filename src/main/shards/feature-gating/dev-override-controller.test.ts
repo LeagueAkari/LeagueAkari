@@ -27,18 +27,60 @@ function createController(isDevelopment: boolean, initial: FeatureGateDevOverrid
 }
 
 describe('FeatureGateDevOverrideController', () => {
+  it('renames an override with one persisted update', async () => {
+    const { controller, settingService, settings } = createController(true, {
+      'old.feature': { mode: 'force-on' },
+      'other.feature': { mode: 'force-off' }
+    })
+
+    await controller.setDevOverride('new.feature', { mode: 'force-off' }, 'old.feature')
+
+    expect(settings.devOverrides).toEqual({
+      'new.feature': { mode: 'force-off' },
+      'other.feature': { mode: 'force-off' }
+    })
+    expect(settingService.set).toHaveBeenCalledOnce()
+  })
+
+  it('rejects a rename that would overwrite another override', async () => {
+    const initial: FeatureGateDevOverrides = {
+      'old.feature': { mode: 'force-on' },
+      'existing.feature': { mode: 'force-off' }
+    }
+    const { controller, settingService, settings } = createController(true, initial)
+
+    await expect(
+      controller.setDevOverride('existing.feature', { mode: 'force-on' }, 'old.feature')
+    ).rejects.toMatchObject({ code: 'FeatureGateDevOverrideExists' })
+
+    expect(settings.devOverrides).toEqual(initial)
+    expect(settingService.set).not.toHaveBeenCalled()
+  })
+
+  it('keeps the old override when persisting a rename fails', async () => {
+    const initial: FeatureGateDevOverrides = { 'old.feature': { mode: 'force-on' } }
+    const { controller, settingService, settings } = createController(true, initial)
+    vi.mocked(settingService.set).mockRejectedValueOnce(new Error('write failed'))
+
+    await expect(
+      controller.setDevOverride('new.feature', { mode: 'force-off' }, 'old.feature')
+    ).rejects.toThrow('write failed')
+
+    expect(settings.devOverrides).toEqual(initial)
+  })
+
   it('persists normalized additions, replacements, and removals', async () => {
     const { controller, settingService, settings } = createController(true, {
       'existing.feature': { mode: 'force-on' }
     })
 
-    await controller.setDevOverride('  champion-data.source.opgg  ', {
+    await controller.setDevOverride('  champion-data.opgg  ', {
       mode: 'rule',
       config: { platforms: ['darwin'] }
     })
     expect(settings.devOverrides).toEqual({
       'existing.feature': { mode: 'force-on' },
-      'champion-data.source.opgg': {
+      'champion-data.opgg': {
         mode: 'rule',
         config: { platforms: ['darwin'] }
       }
@@ -46,7 +88,7 @@ describe('FeatureGateDevOverrideController', () => {
 
     await controller.setDevOverride('existing.feature', null)
     expect(settings.devOverrides).toEqual({
-      'champion-data.source.opgg': {
+      'champion-data.opgg': {
         mode: 'rule',
         config: { platforms: ['darwin'] }
       }

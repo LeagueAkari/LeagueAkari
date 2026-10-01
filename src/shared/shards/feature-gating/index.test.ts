@@ -1,13 +1,7 @@
 import type { AkariFeatureGateSnapshot } from '@shared/shards/akari-api'
 import { describe, expect, it } from 'vitest'
 
-import {
-  type FeatureGateContext,
-  type FeatureGateDevOverrides,
-  FeatureGateEvaluator,
-  isFeatureGateConfigured,
-  isFeatureGateEnabled
-} from '.'
+import { type FeatureGateContext, type FeatureGateDevOverrides, FeatureGateEvaluator } from '.'
 
 const config: AkariFeatureGateSnapshot = {
   updatedAt: '2026-07-25T04:00:00.000Z',
@@ -32,25 +26,30 @@ const evaluate = (
   snapshot: AkariFeatureGateSnapshot | null,
   contextOverrides: Partial<FeatureGateContext> = {},
   devOverrides?: FeatureGateDevOverrides
-) => new FeatureGateEvaluator().evaluate(snapshot, context(contextOverrides), devOverrides)
+) => {
+  const evaluator = new FeatureGateEvaluator()
+  evaluator.evaluate(snapshot, context(contextOverrides), devOverrides)
+
+  return evaluator
+}
 
 describe('feature gate evaluation', () => {
   it('enables a gate when every configured condition matches', () => {
-    expect(isFeatureGateEnabled('match-history.bulk-collection', false, evaluate(config))).toBe(
+    expect(evaluate(config).getEvaluation('match-history.bulk-collection', false).enabled).toBe(
       true
     )
   })
 
   it('uses the caller fallback until a snapshot is available', () => {
-    expect(isFeatureGateEnabled('unknown.feature', true, evaluate(null))).toBe(true)
-    expect(isFeatureGateEnabled('unknown.feature', false, evaluate(null))).toBe(false)
+    expect(evaluate(null).getEvaluation('unknown.feature', true).enabled).toBe(true)
+    expect(evaluate(null).getEvaluation('unknown.feature', false).enabled).toBe(false)
   })
 
   it('treats a gate omitted from an available snapshot as off', () => {
     const evaluation = evaluate(config)
 
-    expect(isFeatureGateEnabled('unknown.feature', true, evaluation)).toBe(false)
-    expect(isFeatureGateEnabled('self-update.automatic', false, evaluation)).toBe(false)
+    expect(evaluation.getEvaluation('unknown.feature', true).enabled).toBe(false)
+    expect(evaluation.getEvaluation('self-update.automatic', false).enabled).toBe(false)
   })
 
   it('replaces same-name remote configurations with development overrides', () => {
@@ -62,15 +61,15 @@ describe('feature gate evaluation', () => {
           mode: 'rule',
           config: { platforms: ['darwin'] }
         },
-        'champion-data.source.opgg': { mode: 'force-on' },
-        'champion-data.source.qq101': { mode: 'force-off' }
+        'champion-data.opgg': { mode: 'force-on' },
+        'champion-data.qq101': { mode: 'force-off' }
       }
     )
 
-    expect(isFeatureGateEnabled('match-history.bulk-collection', true, evaluation)).toBe(false)
-    expect(isFeatureGateEnabled('champion-data.source.opgg', false, evaluation)).toBe(true)
-    expect(isFeatureGateEnabled('champion-data.source.qq101', true, evaluation)).toBe(false)
-    expect(isFeatureGateConfigured('champion-data.source.opgg', evaluation)).toBe(true)
+    expect(evaluation.getEvaluation('match-history.bulk-collection', true).enabled).toBe(false)
+    expect(evaluation.getEvaluation('champion-data.opgg', false).enabled).toBe(true)
+    expect(evaluation.getEvaluation('champion-data.qq101', true).enabled).toBe(false)
+    expect(evaluation.getEvaluation('champion-data.opgg', false).configured).toBe(true)
   })
 
   it('evaluates a same-name rule replacement without inheriting remote fields', () => {
@@ -85,7 +84,7 @@ describe('feature gate evaluation', () => {
       }
     )
 
-    expect(isFeatureGateEnabled('match-history.bulk-collection', false, evaluation)).toBe(true)
+    expect(evaluation.getEvaluation('match-history.bulk-collection', false).enabled).toBe(true)
   })
 
   it('keeps caller defaults for unoverridden gates when the remote snapshot is unavailable', () => {
@@ -93,70 +92,54 @@ describe('feature gate evaluation', () => {
       null,
       {},
       {
-        'champion-data.source.opgg': { mode: 'force-off' },
-        'champion-data.source.rule': {
+        'champion-data.opgg': { mode: 'force-off' },
+        'champion-data.rule': {
           mode: 'rule',
           config: { platforms: ['win32'] }
         },
-        'champion-data.source.unmatched': {
+        'champion-data.unmatched': {
           mode: 'rule',
           config: { platforms: ['darwin'] }
         }
       }
     )
 
-    expect(isFeatureGateEnabled('champion-data.source.opgg', true, evaluation)).toBe(false)
-    expect(isFeatureGateEnabled('champion-data.source.rule', false, evaluation)).toBe(true)
-    expect(isFeatureGateEnabled('champion-data.source.unmatched', true, evaluation)).toBe(false)
-    expect(isFeatureGateEnabled('unknown.feature', true, evaluation)).toBe(true)
-    expect(isFeatureGateEnabled('another.feature', false, evaluation)).toBe(false)
+    expect(evaluation.getEvaluation('champion-data.opgg', true).enabled).toBe(false)
+    expect(evaluation.getEvaluation('champion-data.rule', false).enabled).toBe(true)
+    expect(evaluation.getEvaluation('champion-data.unmatched', true).enabled).toBe(false)
+    expect(evaluation.getEvaluation('unknown.feature', true).enabled).toBe(true)
+    expect(evaluation.getEvaluation('another.feature', false).enabled).toBe(false)
   })
 
   it('requires platform and SGP server matches', () => {
     expect(
-      isFeatureGateEnabled(
-        'match-history.bulk-collection',
-        false,
-        evaluate(config, { platform: 'darwin' })
-      )
+      evaluate(config, { platform: 'darwin' }).getEvaluation('match-history.bulk-collection', false)
+        .enabled
     ).toBe(false)
     expect(
-      isFeatureGateEnabled(
-        'match-history.bulk-collection',
-        false,
-        evaluate(config, { sgpServerId: '' })
-      )
+      evaluate(config, { sgpServerId: '' }).getEvaluation('match-history.bulk-collection', false)
+        .enabled
     ).toBe(false)
     expect(
-      isFeatureGateEnabled(
-        'match-history.bulk-collection',
-        false,
-        evaluate(config, { sgpServerId: 'EUW' })
-      )
+      evaluate(config, { sgpServerId: 'EUW' }).getEvaluation('match-history.bulk-collection', false)
+        .enabled
     ).toBe(false)
   })
 
   it('uses an inclusive minimum and exclusive maximum version', () => {
     expect(
-      isFeatureGateEnabled(
+      evaluate(config, { version: '1.5.0-rabi.1' }).getEvaluation(
         'match-history.bulk-collection',
-        false,
-        evaluate(config, { version: '1.5.0-rabi.1' })
-      )
+        false
+      ).enabled
     ).toBe(false)
     expect(
-      isFeatureGateEnabled(
-        'match-history.bulk-collection',
-        false,
-        evaluate(config, { version: '1.5.9' })
-      )
+      evaluate(config, { version: '1.5.9' }).getEvaluation('match-history.bulk-collection', false)
+        .enabled
     ).toBe(true)
     expect(
-      isFeatureGateEnabled(
-        'match-history.bulk-collection',
-        false,
-        evaluate(config, { version: '1.6.0' })
-      )
+      evaluate(config, { version: '1.6.0' }).getEvaluation('match-history.bulk-collection', false)
+        .enabled
     ).toBe(false)
   })
 
@@ -164,7 +147,7 @@ describe('feature gate evaluation', () => {
     const evaluator = new FeatureGateEvaluator()
     const currentContext = context()
     const devOverrides = {
-      'champion-data.source.opgg': { mode: 'force-on' as const }
+      'champion-data.opgg': { mode: 'force-on' as const }
     }
     const first = evaluator.evaluate(config, currentContext, devOverrides)
 
@@ -173,5 +156,86 @@ describe('feature gate evaluation', () => {
       evaluator.evaluate(config, { ...currentContext, platform: 'darwin' }, devOverrides)
     ).not.toBe(first)
     expect(evaluator.evaluate(config, currentContext, { ...devOverrides })).not.toBe(first)
+  })
+
+  it('returns a structured decision with every rule mismatch in stable order', () => {
+    const evaluator = new FeatureGateEvaluator()
+    evaluator.evaluate(
+      config,
+      context({ platform: 'darwin', version: '1.4.9', sgpServerId: 'EUW' })
+    )
+
+    expect(evaluator.getEvaluation('match-history.bulk-collection', false)).toEqual({
+      key: 'match-history.bulk-collection',
+      enabled: false,
+      configured: true,
+      snapshotStatus: 'available',
+      origin: 'server',
+      decision: 'rule-not-matched',
+      effectiveRule: config.gates['match-history.bulk-collection'],
+      mismatches: [
+        { kind: 'platform', actual: 'darwin', expected: ['win32'] },
+        { kind: 'min-version', actual: '1.4.9', minVersionInclusive: '1.5.0-rabi.2' },
+        { kind: 'sgp-server', actual: 'EUW', expected: ['NA1'] }
+      ]
+    })
+  })
+
+  it('reports an invalid current version without inventing boundary mismatches', () => {
+    const evaluator = new FeatureGateEvaluator()
+    evaluator.evaluate(config, context({ version: 'development' }))
+
+    expect(evaluator.getEvaluation('match-history.bulk-collection', false).mismatches).toEqual([
+      { kind: 'invalid-version', actual: 'development' }
+    ])
+  })
+
+  it('describes defaults, absent keys, and development overrides', () => {
+    const evaluator = new FeatureGateEvaluator()
+    evaluator.evaluate(null, context())
+    expect(evaluator.getEvaluation('unknown.feature', true)).toMatchObject({
+      enabled: true,
+      configured: false,
+      snapshotStatus: 'unavailable',
+      origin: 'default',
+      decision: 'default-value'
+    })
+
+    evaluator.evaluate(config, context())
+    expect(evaluator.getEvaluation('unknown.feature', true)).toMatchObject({
+      enabled: false,
+      configured: false,
+      snapshotStatus: 'available',
+      origin: 'default',
+      decision: 'not-configured'
+    })
+
+    evaluator.evaluate(config, context(), {
+      'unknown.feature': { mode: 'force-on' }
+    })
+    expect(evaluator.getEvaluation('unknown.feature', false)).toMatchObject({
+      enabled: true,
+      configured: true,
+      origin: 'dev-override',
+      decision: 'force-on'
+    })
+  })
+
+  it('reuses an equivalent structured result across unrelated snapshot updates', () => {
+    const evaluator = new FeatureGateEvaluator()
+    evaluator.evaluate(config, context())
+    const first = evaluator.getEvaluation('match-history.bulk-collection', false)
+
+    evaluator.evaluate(
+      {
+        ...config,
+        gates: { ...config.gates, 'unrelated.feature': { platforms: ['darwin'] } }
+      },
+      context()
+    )
+
+    expect(evaluator.getEvaluation('match-history.bulk-collection', false)).toBe(first)
+    expect(Object.isFrozen(first)).toBe(true)
+    expect(Object.isFrozen(first.mismatches)).toBe(true)
   })
 })

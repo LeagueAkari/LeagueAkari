@@ -1,5 +1,7 @@
-import braveryIcon from '@renderer-shared/assets/champions/bravery-circle.png'
+import braveryIcon from '@renderer-shared/assets/champions/bravery-circle.png?inline'
 import { i18next } from '@renderer-shared/i18n'
+import { championBaseSplashUri } from '@renderer-shared/shards/league-client/game-data-assets'
+import type { GtimgClassicHero } from '@shared/data-sources/gtimg'
 import type {
   Augment,
   ChampionSimple,
@@ -192,6 +194,16 @@ export function createStorybookAkariResourceProvider(
   options: StorybookAkariResourceProviderOptions
 ): AkariResourceProviderValue {
   const state = shallowRef(createEmptyState())
+  const classicHeroes = shallowRef(new Map<number, GtimgClassicHero>())
+  void fetchJson<{ heroes: GtimgClassicHero[] }>(
+    'https://game.gtimg.cn/images/lol/act/img/jade/js/heroes_index.js'
+  )
+    .then((catalog) => {
+      classicHeroes.value = new Map(catalog.heroes.map((hero) => [hero.heroId, hero]))
+    })
+    .catch(() => {
+      // Optional catalog; ordinary Storybook resources load independently.
+    })
   let loadingId = 0
 
   watchEffect(() => {
@@ -240,7 +252,13 @@ export function createStorybookAkariResourceProvider(
     },
 
     champions: {
+      roles(id) {
+        return classicHeroes.value.get(id)?.roles ?? state.value.champions.get(id)?.roles ?? []
+      },
       name(id) {
+        if (id >= 60000) {
+          return classicHeroes.value.get(id)?.name ?? String(id)
+        }
         if (id === -3) {
           return i18next.t('champions.bravery', { ns: 'common' })
         }
@@ -254,21 +272,30 @@ export function createStorybookAkariResourceProvider(
         return state.value.champions.get(id)?.name || id.toString()
       },
       icon(id) {
+        if (id >= 60000) {
+          const hero = classicHeroes.value.get(id)
+          return hero ? { id, iconPath: hero.portrait } : null
+        }
         if (id === -3) {
           return {
             id,
-            iconPath: braveryIcon,
-            source: 'url',
-            variant: 'bravery'
+            iconPath: braveryIcon
           }
         }
 
         return {
           id,
-          iconPath: `/lol-game-data/assets/v1/champion-icons/${id}.png`,
-          source: 'lcu',
-          variant: id === -1 ? 'unknown' : 'default'
+          iconPath: `/lol-game-data/assets/v1/champion-icons/${id}.png`
         }
+      },
+      baseSplash(id) {
+        const champion = state.value.champions.get(id)
+
+        if (!champion) {
+          return null
+        }
+
+        return championBaseSplashUri(champion.alias)
       },
       searchKeywords() {
         return []

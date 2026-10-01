@@ -1,6 +1,7 @@
 import { is } from '@electron-toolkit/utils'
 import { type WebContents, app } from 'electron'
 
+import { WINDOW_MANAGER_MAIN_NAMESPACE } from '../window-manager/context'
 import type { AppCommonMainContext } from './context'
 
 export class RendererLinkProtocol {
@@ -40,7 +41,7 @@ export class RendererLinkProtocol {
       return
     }
 
-    const windowManager = this.context.shared.manager.getInstance('window-manager-main')
+    const windowManager = this.context.shared.manager.getInstance(WINDOW_MANAGER_MAIN_NAMESPACE)
 
     if (!windowManager) {
       return
@@ -67,8 +68,12 @@ export class RendererLinkProtocol {
         )
         break
 
-      case 'opgg-window':
-        this._evaluateRendererProcess(target, windowManager.opggWindow.window?.webContents, code)
+      case 'champion-data-window':
+        this._evaluateRendererProcess(
+          target,
+          windowManager.championDataWindow.window?.webContents,
+          code
+        )
         break
     }
   }

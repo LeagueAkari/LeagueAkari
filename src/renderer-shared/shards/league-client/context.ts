@@ -9,7 +9,7 @@ import type { SettingUtilsRenderer } from '../setting-utils'
 import type { SetupInAppScopeRenderer } from '../setup-in-app-scope'
 
 export const LEAGUE_CLIENT_RENDERER_NAMESPACE = 'league-client-renderer'
-export const MAIN_SHARD_NAMESPACE = 'league-client-main'
+export const LEAGUE_CLIENT_MAIN_NAMESPACE = 'league-client-main'
 
 export interface LeagueClientRendererConfig {
   subscribeState?: {

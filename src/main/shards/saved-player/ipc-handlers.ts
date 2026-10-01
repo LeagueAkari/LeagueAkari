@@ -13,6 +13,7 @@ import { dialog } from 'electron'
 
 import { AkariIpcError } from '../ipc'
 import { WindowManagerMain } from '../window-manager'
+import { WINDOW_MANAGER_MAIN_NAMESPACE } from '../window-manager/context'
 import type { SavedPlayerMainContext } from './context'
 import type { SavedPlayerMain } from './index'
 import type { TaggedPlayersFileService } from './tagged-players-file-service'
@@ -110,7 +111,7 @@ export class SavedPlayerIpcHandlers {
 
   private _getMainWindow() {
     const windowManager = this.context.shared.manager.getInstance(
-      'window-manager-main'
+      WINDOW_MANAGER_MAIN_NAMESPACE
     ) as WindowManagerMain
 
     if (!windowManager || !windowManager.mainWindow.window) {

@@ -1,6 +1,6 @@
 import type { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import type { SettingUtilsRenderer } from '../setting-utils'
-import { APP_COMMON_RENDERER_NAMESPACE, MAIN_SHARD_NAMESPACE } from './context'
+import { APP_COMMON_MAIN_NAMESPACE, APP_COMMON_RENDERER_NAMESPACE } from './context'
 import { useAppCommonStore } from './store'
 
 export async function syncAppCommonRendererState(
@@ -18,6 +18,6 @@ export async function syncAppCommonRendererState(
     (v) => (store.tempAkariSubscriptionInfo = v)
   )
 
-  await piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
-  await piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+  await piniaMobxUtils.sync(APP_COMMON_MAIN_NAMESPACE, 'state', store)
+  await piniaMobxUtils.sync(APP_COMMON_MAIN_NAMESPACE, 'settings', store.settings)
 }

@@ -24,7 +24,7 @@ export class FeatureGateDevOverrideController {
     return this._isDevelopment ? this._settings.devOverrides : undefined
   }
 
-  async setDevOverride(key: string, value: FeatureGateDevOverride | null) {
+  async setDevOverride(key: string, value: FeatureGateDevOverride | null, previousKey?: string) {
     if (!this._isDevelopment) {
       throw new AkariIpcError(
         'Feature gate development overrides are unavailable outside development mode',
@@ -57,6 +57,28 @@ export class FeatureGateDevOverrideController {
     }
 
     const devOverrides = { ...this._settings.devOverrides }
+    if (previousKey !== undefined && previousKey !== normalizedKey) {
+      if (
+        !AkariFeatureGateKeySchema.safeParse(previousKey).success ||
+        !Object.hasOwn(devOverrides, previousKey) ||
+        normalizedOverride === null
+      ) {
+        throw new AkariIpcError(
+          'The original Dev override no longer exists or is invalid',
+          INVALID_FEATURE_GATE_KEY_ERROR
+        )
+      }
+
+      if (Object.hasOwn(devOverrides, normalizedKey)) {
+        throw new AkariIpcError(
+          'The target key already has a Dev override',
+          'FeatureGateDevOverrideExists'
+        )
+      }
+
+      delete devOverrides[previousKey]
+    }
+
     if (normalizedOverride === null) {
       delete devOverrides[normalizedKey]
     } else {

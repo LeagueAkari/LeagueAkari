@@ -12,7 +12,7 @@ import { SettingUtilsRenderer } from '../setting-utils'
 import { SetupInAppScopeRenderer } from '../setup-in-app-scope'
 import {
   type DraftOptions,
-  MAIN_SHARD_NAMESPACE,
+  ONGOING_GAME_MAIN_NAMESPACE,
   ONGOING_GAME_RENDERER_NAMESPACE,
   type OngoingGameAllData,
   type OngoingGameMatchHistoryQueryTagParams,
@@ -37,7 +37,7 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
   ) {
     this._context = {
       namespace: OngoingGameRenderer.id,
-      mainShardNamespace: MAIN_SHARD_NAMESPACE,
+      mainShardNamespace: ONGOING_GAME_MAIN_NAMESPACE,
       ipc: this._ipc,
       piniaMobxUtils: this._piniaMobxUtils,
       settingUtils: this._settingUtils,
@@ -47,94 +47,98 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
   }
 
   setConcurrency(value: number) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'concurrency', value)
+    return this._settingUtils.set(ONGOING_GAME_MAIN_NAMESPACE, 'concurrency', value)
   }
 
   setEnabled(value: boolean) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'enabled', value)
+    return this._settingUtils.set(ONGOING_GAME_MAIN_NAMESPACE, 'enabled', value)
   }
 
   setMatchHistoryLoadCount(value: number) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'matchHistoryLoadCount', value)
+    return this._settingUtils.set(ONGOING_GAME_MAIN_NAMESPACE, 'matchHistoryLoadCount', value)
   }
 
   setMatchHistoryTagParams(value: OngoingGameMatchHistoryQueryTagParams) {
-    this._ipc.call(MAIN_SHARD_NAMESPACE, 'setMatchHistoryTagParams', value)
+    this._ipc.call(ONGOING_GAME_MAIN_NAMESPACE, 'setMatchHistoryTagParams', value)
   }
 
   setDraft(value: DraftOptions) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setDraft', value)
+    return this._ipc.call(ONGOING_GAME_MAIN_NAMESPACE, 'setDraft', value)
   }
 
   clearDraft() {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'clearDraft')
+    return this._ipc.call(ONGOING_GAME_MAIN_NAMESPACE, 'clearDraft')
   }
 
   setMatchHistoryTagPreference(value: OngoingGameMatchHistoryTagPreference) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'matchHistoryTagPreference', value)
+    return this._settingUtils.set(ONGOING_GAME_MAIN_NAMESPACE, 'matchHistoryTagPreference', value)
   }
 
   setGameDetailsLoadCount(value: number) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'gameDetailsLoadCount', value)
+    return this._settingUtils.set(ONGOING_GAME_MAIN_NAMESPACE, 'gameDetailsLoadCount', value)
   }
 
   setOrderPlayerBy(value: OngoingGamePanelOrderPlayerBy) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'orderPlayerBy', value)
+    return this._settingUtils.set(ONGOING_GAME_MAIN_NAMESPACE, 'orderPlayerBy', value)
   }
 
   setShowChampionUsage(value: OngoingGamePanelChampionUsage) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'showChampionUsage', value)
+    return this._settingUtils.set(ONGOING_GAME_MAIN_NAMESPACE, 'showChampionUsage', value)
   }
 
   setShowMatchHistoryItemBorder(value: boolean) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'showMatchHistoryItemBorder', value)
+    return this._settingUtils.set(ONGOING_GAME_MAIN_NAMESPACE, 'showMatchHistoryItemBorder', value)
   }
 
   setShowJunglePathing(value: boolean) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'showJunglePathing', value)
+    return this._settingUtils.set(ONGOING_GAME_MAIN_NAMESPACE, 'showJunglePathing', value)
   }
 
   setShowJunglePathingForAllPlayers(value: boolean) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'showJunglePathingForAllPlayers', value)
+    return this._settingUtils.set(
+      ONGOING_GAME_MAIN_NAMESPACE,
+      'showJunglePathingForAllPlayers',
+      value
+    )
   }
 
   setAutoRouteWhenGameStarts(value: boolean) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'autoRouteWhenGameStarts', value)
+    return this._settingUtils.set(ONGOING_GAME_MAIN_NAMESPACE, 'autoRouteWhenGameStarts', value)
   }
 
   setPlayerCardTags(value: OngoingGamePanelPlayerCardTagSettings) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'playerCardTags', value)
+    return this._settingUtils.set(ONGOING_GAME_MAIN_NAMESPACE, 'playerCardTags', value)
   }
 
   setQueryInLobbyPhase(value: boolean) {
-    return this._settingUtils.set(MAIN_SHARD_NAMESPACE, 'queryInLobbyPhase', value)
+    return this._settingUtils.set(ONGOING_GAME_MAIN_NAMESPACE, 'queryInLobbyPhase', value)
   }
 
   setPremadeTeamInferMatchCountThreshold(value: number) {
     return this._settingUtils.set(
-      MAIN_SHARD_NAMESPACE,
+      ONGOING_GAME_MAIN_NAMESPACE,
       'premadeTeamInferMatchCountThreshold',
       value
     )
   }
 
   reload() {
-    this._ipc.call(MAIN_SHARD_NAMESPACE, 'reload')
+    this._ipc.call(ONGOING_GAME_MAIN_NAMESPACE, 'reload')
   }
 
   reloadPlayer(puuid: string, options?: OngoingGamePlayerReloadOptions) {
-    this._ipc.call(MAIN_SHARD_NAMESPACE, 'reloadPlayer', puuid, options)
+    this._ipc.call(ONGOING_GAME_MAIN_NAMESPACE, 'reloadPlayer', puuid, options)
   }
 
   getAll() {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getAll') as Promise<OngoingGameAllData>
+    return this._ipc.call(ONGOING_GAME_MAIN_NAMESPACE, 'getAll') as Promise<OngoingGameAllData>
   }
 
   async onInit() {
     const store = useOngoingGameStore()
 
-    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
-    await this._piniaMobxUtils.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await this._piniaMobxUtils.sync(ONGOING_GAME_MAIN_NAMESPACE, 'settings', store.settings)
+    await this._piniaMobxUtils.sync(ONGOING_GAME_MAIN_NAMESPACE, 'state', store)
 
     this._storeEventHandlers.register()
     await this._storeEventHandlers.loadInitialData(await this.getAll())
