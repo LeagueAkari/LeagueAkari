@@ -142,8 +142,8 @@ export const RENDER_GROUPS: RenderGroup[] = [
   {
     group: 'economy',
     items: [
-      { key: 'goldEarned', render: 'compat' },
-      { key: 'goldSpent', render: 'compat' },
+      { key: 'goldEarned', render: 'integer' },
+      { key: 'goldSpent', render: 'integer' },
       { key: 'bountyGold', render: 'integer' },
       { key: 'totalMinionsKilled', render: 'integer' },
       { key: 'laneMinionsFirst10Minutes', render: 'integer' },
@@ -258,7 +258,7 @@ export const RENDER_GROUPS: RenderGroup[] = [
       { key: 'kda', render: 'float' },
       { key: 'killParticipation', render: 'percentage' },
       { key: 'damagePerMinute', render: 'compat' },
-      { key: 'goldPerMinute', render: 'compat' },
+      { key: 'goldPerMinute', render: 'float' },
       { key: 'damageTakenOnTeamPercentage', render: 'integer' },
       { key: 'teamDamagePercentage', render: 'integer' }
     ]

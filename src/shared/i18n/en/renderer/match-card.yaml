@@ -1,6 +1,15 @@
 matchCard:
   damageMetrics:
-    total: Total
+    teamShare: Share of team total
+    shareOfOwnTotal: '% of own total'
+    dealt:
+      total: Damage to champions
+      teamTotal: 'Team damage to champions: {{total}}'
+      composition: Own damage breakdown
+    taken:
+      total: Damage taken
+      teamTotal: 'Team damage taken: {{total}}'
+      composition: Own damage taken breakdown
     physical: Physical
     magic: Magic
     'true': 'True'

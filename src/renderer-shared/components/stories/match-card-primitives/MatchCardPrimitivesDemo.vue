@@ -27,6 +27,7 @@
             :magic-damage="9200"
             :true-damage="2100"
             :total-damage="30000"
+            :team-total-damage="120000"
             :baseline-damage="36000"
             :width="180"
             :height="10"

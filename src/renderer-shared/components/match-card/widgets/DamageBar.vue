@@ -52,7 +52,7 @@ const calcMetricBar = (baseWidth: number) => {
     },
     { type: 'magic', x: 0, width: (magicDamage / (baselineDamage || 1)) * baseWidth },
     { type: 'true', x: 0, width: (trueDamage / (baselineDamage || 1)) * baseWidth }
-  ].sort((d1, d2) => d2.width - d1.width)
+  ]
 
   for (let i = 1; i < list.length; i++) {
     list[i].x = list[i - 1].x + list[i - 1].width
