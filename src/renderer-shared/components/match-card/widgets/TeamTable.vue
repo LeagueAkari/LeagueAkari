@@ -31,7 +31,7 @@
       </div>
 
       <div class="text-xs text-black/80 dark:text-white/80">
-        {{ (team.totalGoldEarned / 1000).toFixed(2) }}k
+        {{ team.totalGoldEarned.toLocaleString() }}
       </div>
 
       <!-- objective -->
@@ -129,7 +129,7 @@
       class="box-border flex h-12 items-center border-t border-r-0 border-b-0 border-l-0 border-solid border-t-black/5 px-2 py-1 dark:border-t-white/5"
     >
       <!-- name line -->
-      <div class="flex min-w-0 flex-1 items-center gap-1">
+      <div class="flex min-w-0 grow-2 basis-52 items-center gap-1">
         <!-- left champion icon -->
         <NPopover placement="right">
           <template #trigger>
@@ -218,7 +218,7 @@
 
       <template v-for="column in extraColumns" :key="column.name">
         <!-- kda -->
-        <div v-if="column.name === 'kda'" :class="column.class">
+        <div v-if="column.name === 'kda'" class="grow" :class="column.class">
           <div class="text-xs">
             {{ participant.kills }}/{{ participant.deaths }}/{{ participant.assists }} ({{
               (participant.killParticipation * 100).toFixed(0)
@@ -230,7 +230,11 @@
         </div>
 
         <!-- augments (5) -->
-        <div v-else-if="column.name === 'augments' && participant.augments" :class="column.class">
+        <div
+          v-else-if="column.name === 'augments' && participant.augments"
+          class="grow"
+          :class="column.class"
+        >
           <AugmentDisplay
             v-for="aug in participant.augments.slice(0, someoneHas6Augments ? 6 : 5)"
             :key="aug"
@@ -240,16 +244,19 @@
         </div>
 
         <!-- dmg dealt / dmg taken -->
-        <div v-else-if="column.name === 'damage'" :class="column.class">
+        <div v-else-if="column.name === 'damage'" class="grow" :class="column.class">
           <DamageBarWithPopover
             :total-damage="participant.totalDamageDealtToChampions"
+            :team-total-damage="team.totalDamageDealtToChampions"
             :physical-damage="participant.physicalDamageDealtToChampions"
             :magic-damage="participant.magicDamageDealtToChampions"
             :true-damage="participant.trueDamageDealtToChampions"
             :baseline-damage="teams.allTeamStats.maxDamageDealtToChampions"
           />
           <DamageBarWithPopover
+            metric="taken"
             :total-damage="participant.totalDamageTaken"
+            :team-total-damage="team.totalDamageTaken"
             :physical-damage="participant.physicalDamageTaken"
             :magic-damage="participant.magicDamageTaken"
             :true-damage="participant.trueDamageTaken"
@@ -258,7 +265,7 @@
         </div>
 
         <!-- cs -->
-        <div v-else-if="column.name === 'cs'" :class="column.class">
+        <div v-else-if="column.name === 'cs'" class="grow" :class="column.class">
           <div class="text-xs">{{ participant.cs }} {{ t('matchCard.teamTable.cs') }}</div>
           <div class="text-[11px] text-black/60 dark:text-white/60">
             {{ (participant.cs / (basicInfo.gameDuration / 60)).toFixed(1) }}
@@ -267,8 +274,8 @@
         </div>
 
         <!-- gold -->
-        <div v-else-if="column.name === 'gold'" :class="column.class">
-          <div class="text-xs">{{ (participant.goldEarned / 1000).toFixed(2) }}k</div>
+        <div v-else-if="column.name === 'gold'" class="grow" :class="column.class">
+          <div class="text-xs">{{ participant.goldEarned.toLocaleString() }}</div>
           <div class="text-[11px] text-black/60 dark:text-white/60">
             {{ (participant.goldEarned / (basicInfo.gameDuration / 60)).toFixed(1) }}
             {{ t('matchCard.teamTable.perMinuteSuffix') }}
@@ -276,7 +283,7 @@
         </div>
 
         <!-- items -->
-        <div v-else-if="column.name === 'items'" :class="column.class">
+        <div v-else-if="column.name === 'items'" class="grow" :class="column.class">
           <ItemDisplay
             :item-id="item"
             :size="20"
@@ -341,31 +348,31 @@ const extraColumns = computed<ColumnConfig[]>(() => {
   switch (basicInfo.value.gameMode) {
     case 'CHERRY':
       return [
-        { name: 'kda', class: 'min-w-[6.5rem] text-center' },
-        { name: 'augments', class: 'min-w-[7.5rem] flex gap-0.5 justify-center' },
-        { name: 'damage', class: 'min-w-32 flex gap-2 justify-center' },
-        { name: 'cs', class: 'hidden @[740px]:block min-w-[4.5rem] text-center' },
-        { name: 'gold', class: 'hidden @[700px]:block min-w-[4.5rem] text-xs text-center' },
-        { name: 'items', class: 'w-40 flex gap-0.5 justify-center' }
+        { name: 'kda', class: 'basis-26 min-w-26 text-center' },
+        { name: 'augments', class: 'basis-30 min-w-30 flex gap-0.5 justify-center' },
+        { name: 'damage', class: 'basis-32 min-w-32 flex gap-2 justify-center' },
+        { name: 'cs', class: 'hidden @[740px]:block basis-18 min-w-18 text-center' },
+        { name: 'gold', class: 'hidden @[700px]:block basis-18 min-w-18 text-xs text-center' },
+        { name: 'items', class: 'basis-40 w-40 flex gap-0.5 justify-center' }
       ]
     case 'KIWI':
       return [
-        { name: 'kda', class: 'min-w-[6.5rem] text-center' },
-        { name: 'augments', class: 'min-w-[7.25rem] flex gap-0.5 justify-center' },
-        { name: 'damage', class: 'min-w-[7.5rem] flex gap-2 justify-center' },
-        { name: 'cs', class: 'hidden @[740px]:block min-w-[4.5rem] text-center' },
-        { name: 'gold', class: 'hidden @[700px]:block min-w-[4.5rem] text-xs text-center' },
-        { name: 'items', class: 'min-w-40 flex gap-0.5 justify-center' }
+        { name: 'kda', class: 'basis-26 min-w-26 text-center' },
+        { name: 'augments', class: 'basis-29 min-w-29 flex gap-0.5 justify-center' },
+        { name: 'damage', class: 'basis-30 min-w-30 flex gap-2 justify-center' },
+        { name: 'cs', class: 'hidden @[740px]:block basis-18 min-w-18 text-center' },
+        { name: 'gold', class: 'hidden @[700px]:block basis-18 min-w-18 text-xs text-center' },
+        { name: 'items', class: 'basis-40 min-w-40 flex gap-0.5 justify-center' }
       ]
     default:
       return [
-        { name: 'kda', class: 'min-w-[6.5rem] text-center' },
-        { name: 'damage', class: 'min-w-32 flex gap-2 justify-center' },
-        { name: 'cs', class: 'hidden @[700px]:block w-[4.5rem] text-center' },
-        { name: 'gold', class: 'min-w-[4.5rem] text-xs text-center' },
+        { name: 'kda', class: 'basis-26 min-w-26 text-center' },
+        { name: 'damage', class: 'basis-32 min-w-32 flex gap-2 justify-center' },
+        { name: 'cs', class: 'hidden @[700px]:block basis-18 w-18 text-center' },
+        { name: 'gold', class: 'basis-18 min-w-18 text-xs text-center' },
         {
           name: 'items',
-          class: `${hasRoleBoundItems ? 'min-w-45' : 'min-w-40'} flex gap-0.5 justify-center`
+          class: `${hasRoleBoundItems.value ? 'basis-45 min-w-45' : 'basis-40 min-w-40'} flex gap-0.5 justify-center`
         }
       ]
   }

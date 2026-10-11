@@ -243,7 +243,7 @@
       </div>
 
       <!-- player list (5x5 team only) -->
-      <div v-if="basicInfo.isTwoTeam" class="z-2 my-1 flex w-42 max-w-42 gap-2">
+      <div v-if="basicInfo.isTwoTeam" class="player-list z-2 my-1 flex gap-2">
         <!-- teams -->
         <div
           v-for="team of twoTeams"
@@ -299,7 +299,7 @@
 
       <div
         v-else-if="basicInfo.isCherrySubteam && !isThreePlayerCherryMode"
-        class="z-2 my-1 grid w-42 max-w-42 grid-flow-col grid-cols-2 grid-rows-2 gap-x-2"
+        class="player-list z-2 my-1 grid grid-flow-col grid-cols-2 grid-rows-2 gap-x-2"
       >
         <!-- teams -->
         <div
@@ -359,7 +359,7 @@
 
       <div
         v-else-if="basicInfo.isCherrySubteam"
-        class="z-2 my-3 grid w-42 max-w-42 grid-flow-col grid-cols-2 grid-rows-3 content-center gap-x-2 gap-y-1"
+        class="player-list z-2 my-3 grid grid-flow-col grid-cols-2 grid-rows-3 content-center gap-x-2 gap-y-1"
       >
         <!-- teams -->
         <div
@@ -607,4 +607,10 @@ const handleMouseUp = (event: MouseEvent, puuid: string) => {
 
 <style scoped>
 @import './match-card.css';
+
+.player-list {
+  /* Grow into the extra card width while preserving the stats area at compact sizes. */
+  width: clamp(168px, calc(100cqw - 584px), 280px);
+  flex-shrink: 0;
+}
 </style>

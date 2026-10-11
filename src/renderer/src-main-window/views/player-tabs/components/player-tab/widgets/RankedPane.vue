@@ -3,7 +3,7 @@
     <!-- Cross Region Unsupported Card -->
     <div
       v-if="isCrossRegion"
-      class="relative flex h-27 w-30 flex-col items-center justify-center rounded-lg bg-black/5 text-xs text-gray-700 @[1064px]:w-60 dark:bg-white/5 dark:text-gray-400"
+      class="relative flex h-27 w-36 flex-col items-center justify-center rounded-lg bg-black/5 text-xs text-gray-700 @[1280px]:w-60 dark:bg-white/5 dark:text-gray-400"
     >
       <div>{{ t('playerTabs.ranked.crossRegion', 'Cross Region') }}</div>
       <div>{{ t('playerTabs.ranked.unavailable', 'Unavailable') }}</div>
@@ -14,13 +14,13 @@
       <div
         v-for="entry in displayedRankedEntries"
         :key="entry.queueType"
-        class="relative flex h-27 w-30 items-center justify-center rounded-lg bg-black/5 @[1064px]:w-60 dark:bg-white/5"
+        class="relative flex h-27 w-36 items-center justify-center rounded-lg bg-black/5 @[1280px]:w-60 dark:bg-white/5"
       >
         <!-- Queue Type Label -->
         <div
-          class="absolute top-0 left-0 flex max-w-full items-center gap-1.5 px-2 py-1 text-xs text-gray-500 dark:text-gray-400"
+          class="absolute top-0 left-0 box-border flex w-full items-center gap-1.5 px-2 py-1 text-xs text-gray-500 dark:text-gray-400"
         >
-          <span class="shrink-0">
+          <span class="min-w-0 truncate">
             {{
               t(`queueTypes.${entry.queueType}`, {
                 defaultValue: entry.queueType,
@@ -30,7 +30,7 @@
           </span>
           <span
             v-if="hasEntryTopRecord(entry)"
-            class="rounded bg-black/8 px-1.5 py-px text-[10px] leading-4 text-gray-600 dark:bg-white/10 dark:text-gray-300"
+            class="shrink-0 rounded bg-black/8 px-1.5 py-px text-[10px] leading-4 whitespace-nowrap text-gray-600 dark:bg-white/10 dark:text-gray-300"
           >
             {{ formatEntryTopRecord(entry) }}
           </span>
@@ -39,7 +39,7 @@
         <!-- Main Content -->
         <div class="relative top-1 flex w-full items-center justify-center gap-2">
           <!-- Image Container -->
-          <div class="relative hidden h-12 w-16 @[1064px]:block">
+          <div class="relative hidden h-12 w-16 @[1280px]:block">
             <img
               class="absolute top-1/2 left-1/2 h-[144%] w-[144%] -translate-x-1/2 -translate-y-1/2 object-contain"
               :src="rankedImageMap[getCurrentTier(entry)] || rankedImageMap['UNRANKED']"
@@ -106,9 +106,9 @@
         >
           <!-- Queue Type Label -->
           <div
-            class="absolute top-0 left-0 flex max-w-full items-center gap-1.5 px-2 py-1 text-xs text-gray-500 dark:text-gray-400"
+            class="absolute top-0 left-0 box-border flex w-full items-center gap-1.5 px-2 py-1 text-xs text-gray-500 dark:text-gray-400"
           >
-            <span class="shrink-0">
+            <span class="min-w-0 truncate">
               {{
                 t(`queueTypes.${entry.queueType}`, {
                   defaultValue: entry.queueType,
@@ -118,7 +118,7 @@
             </span>
             <span
               v-if="hasEntryTopRecord(entry)"
-              class="rounded bg-black/8 px-1.5 py-px text-[10px] leading-4 text-gray-600 dark:bg-white/10 dark:text-gray-300"
+              class="shrink-0 rounded bg-black/8 px-1.5 py-px text-[10px] leading-4 whitespace-nowrap text-gray-600 dark:bg-white/10 dark:text-gray-300"
             >
               {{ formatEntryTopRecord(entry) }}
             </span>

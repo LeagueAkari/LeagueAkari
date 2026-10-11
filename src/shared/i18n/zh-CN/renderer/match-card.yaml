@@ -1,6 +1,15 @@
 matchCard:
   damageMetrics:
-    total: 伤害总计
+    teamShare: 队伍占比
+    shareOfOwnTotal: 各类型占自身总量
+    dealt:
+      total: 对英雄伤害总计
+      teamTotal: '队伍对英雄伤害总计：{{total}}'
+      composition: 自身伤害构成
+    taken:
+      total: 承伤总计
+      teamTotal: '队伍承伤总计：{{total}}'
+      composition: 自身承伤构成
     physical: 物理伤害
     magic: 魔法伤害
     'true': 真实伤害
