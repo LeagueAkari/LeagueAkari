@@ -1,8 +1,6 @@
-import { useInstance } from '@renderer-shared/shards'
 import { useAkariNavigation } from '@renderer-shared/shards/akari-navigation'
-import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
+import { useAdministratorRelaunch } from '@renderer-shared/shards/app-common/administrator-relaunch-controller'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { LeagueClientUxRenderer } from '@renderer-shared/shards/league-client-ux'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
@@ -29,10 +27,12 @@ export function watchAskUserToRunAsAdministrator() {
     keyPrefix: 'notifications.simple.wmiRequiresAdministrator'
   })
 
-  const appCommon = useInstance(AppCommonRenderer)
+  const relaunchAsAdministrator = useAdministratorRelaunch()
 
   const shouldAsk = computed(() => {
-    return leagueClientUxStore.settings.useWmi && !appCommonStore.isElevated
+    return (
+      appCommonStore.isWindows && leagueClientUxStore.settings.useWmi && !appCommonStore.isElevated
+    )
   })
 
   watch(
@@ -47,9 +47,7 @@ export function watchAskUserToRunAsAdministrator() {
           onNegativeClick: () => {
             dialogReactive.destroy()
           },
-          onPositiveClick: () => {
-            appCommon.relaunchAsAdministrator()
-          }
+          onPositiveClick: relaunchAsAdministrator
         })
       }
     },
@@ -59,7 +57,6 @@ export function watchAskUserToRunAsAdministrator() {
 
 export function watchCannotGetUxCommandLine() {
   const leagueClientStore = useLeagueClientStore()
-  const leagueClientUx = useInstance(LeagueClientUxRenderer)
   const leagueClientUxStore = useLeagueClientUxStore()
   const appCommonStore = useAppCommonStore()
   const dialog = useDialog()
@@ -67,7 +64,7 @@ export function watchCannotGetUxCommandLine() {
     keyPrefix: 'notifications.simple.cannotGetUxCommandLine'
   })
 
-  const appCommon = useInstance(AppCommonRenderer)
+  const relaunchAsAdministrator = useAdministratorRelaunch()
 
   let dialogReactive: DialogReactive | null = null
   watch(
@@ -77,7 +74,7 @@ export function watchCannotGetUxCommandLine() {
         leagueClientStore.isDisconnected /* 在退出 leagueClientUx 后，leagueClient 仍然会短暂停留并处理善后工作，考虑仅限未连接才会触发此提示 */
     ],
     ([hasClientButNoCommandLine, isDisconnected]) => {
-      if (hasClientButNoCommandLine && isDisconnected) {
+      if (appCommonStore.isWindows && hasClientButNoCommandLine && isDisconnected) {
         if (leagueClientUxStore.settings.useWmi) {
           dialogReactive = dialog.warning({
             style: { width: '600px' },
@@ -103,13 +100,11 @@ export function watchCannotGetUxCommandLine() {
             ? t('withAdminPositiveText')
             : t('noAdminPositiveText'),
           onPositiveClick: () => {
-            if (appCommonStore.isElevated) {
-              leagueClientUx.setUseWmi(true).then(() => {
-                appCommon.relaunchAsAdministrator()
-              })
-            } else {
-              dialogReactive?.destroy()
+            if (!appCommonStore.isElevated) {
+              return relaunchAsAdministrator()
             }
+            dialogReactive?.destroy()
+            return true
           }
         })
       } else {

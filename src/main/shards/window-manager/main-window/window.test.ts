@@ -1,3 +1,4 @@
+import { wasRelaunchedAsAdministrator } from '@main/administrator-relaunch'
 import { BrowserWindow } from 'electron'
 import { reaction } from 'mobx'
 import { EventEmitter } from 'node:events'
@@ -9,6 +10,9 @@ import { repositionWindowIfInvisible } from '../window-position-service'
 import { AkariMainWindow } from './window'
 
 vi.mock('@resources/LA_ICON.ico?asset&asarUnpack', () => ({ default: 'akari-icon.ico' }))
+vi.mock('@main/administrator-relaunch', () => ({
+  wasRelaunchedAsAdministrator: vi.fn(() => false)
+}))
 vi.mock('@electron-toolkit/utils', () => ({ is: { dev: false } }))
 vi.mock('@main/i18n', () => ({ i18next: { t: (key: string) => key } }))
 vi.mock('../window-position-service', () => ({ repositionWindowIfInvisible: vi.fn() }))
@@ -183,6 +187,31 @@ afterEach(async () => {
   await Promise.all(windows.splice(0).map((window) => window.onDispose()))
   vi.useRealTimers()
   vi.clearAllMocks()
+  vi.mocked(wasRelaunchedAsAdministrator).mockReturnValue(false)
+})
+
+describe('elevated main-window startup', () => {
+  it('recovers from SW_HIDE even when Chromium incorrectly reports visible, preserving maximization', async () => {
+    vi.mocked(wasRelaunchedAsAdministrator).mockReturnValue(true)
+    const { mainWindow, nativeWindow } = await launch(new Map([[maximizedKey, true]]), false)
+    let hwndVisible = false
+    let hiddenAgain = false
+    vi.spyOn(nativeWindow, 'hide').mockImplementation(() => {
+      hiddenAgain = true
+      nativeWindow.visible = false
+      nativeWindow.emit('hide')
+    })
+    vi.spyOn(nativeWindow, 'show').mockImplementation(() => {
+      nativeWindow.visible = true
+      hwndVisible = hiddenAgain
+      nativeWindow.emit('show')
+    })
+    nativeWindow.emit('ready-to-show')
+    await Promise.resolve()
+    expect(hwndVisible).toBe(true)
+    expect(mainWindow.state.show).toBe(true)
+    expect(nativeWindow.isMaximized()).toBe(true)
+  })
 })
 
 describe('main window maximized-state persistence', () => {

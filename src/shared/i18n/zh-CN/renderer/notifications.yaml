@@ -14,6 +14,7 @@ notifications:
     ignoreThisVersion: 忽略此版本
     noUpdate: 无更新
   simple:
+    administratorRelaunchFailed: 提权已取消或启动失败，当前应用未退出。可重试，或关闭应用后右键“以管理员身份运行”；若仍失败请查看日志。
     elevatedStartup:
       title: 正在以管理员身份运行
       content: $t(common:appName) 当前正在以高权限运行
