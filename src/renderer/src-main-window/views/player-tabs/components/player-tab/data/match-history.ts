@@ -1,5 +1,6 @@
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import type { SgpApiStatus } from '@renderer-shared/composables/useSgpApiStatus'
+import { ALL_SGPTAG_VALUE } from '@renderer-shared/composables/useSgpTagOptions'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
@@ -387,7 +388,12 @@ export function provideMatchHistory(
     lcuCompleteGameQueue.clear()
     isLoading.value = true
 
+    const defaultTag = pts.frontendSettings.defaultMatchHistoryTag
     params = {
+      tag:
+        !page.value && decision.source === 'sgp' && defaultTag !== ALL_SGPTAG_VALUE
+          ? defaultTag
+          : undefined,
       ...page.value?.queryParams,
       ...params
     }
