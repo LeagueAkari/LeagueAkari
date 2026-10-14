@@ -126,6 +126,7 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
     encounteredGame.selfPuuid = dto.selfPuuid
     encounteredGame.puuid = dto.puuid
     encounteredGame.queueType = dto.queueType || ''
+    encounteredGame.championId = dto.championId ?? null
     encounteredGame.updateAt = new Date()
 
     return this.storage.dataSource.manager.save(encounteredGame)

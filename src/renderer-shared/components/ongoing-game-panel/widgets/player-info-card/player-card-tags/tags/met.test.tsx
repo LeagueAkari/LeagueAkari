@@ -109,7 +109,8 @@ function createSavedInfo(overrides: Partial<SavedInfo> = {}): SavedInfo {
           region: 'NA',
           rsoPlatformId: 'NA1',
           queueType: 'RANKED_SOLO_5x5',
-          updateAt: new Date(0)
+          updateAt: new Date(0),
+          championId: 1
         }
       ],
       page: 1,
