@@ -57,7 +57,7 @@ This applies especially when the work was authored or reviewed with AI assistanc
 /
 ├── src/
 │   ├── main/               # Electron main process
-│   ├── renderer/           # 5 independent renderer windows
+│   ├── renderer/           # 6 independent renderer windows
 │   ├── renderer-shared/    # Shared renderer components, composables, shards, assets
 │   ├── shared/             # Code shared between main and renderer (types, HTTP clients, shard framework)
 │   └── preload/            # Electron preload script (exposes limited API to renderer)
@@ -120,15 +120,16 @@ such as `src/renderer/src-opgg-window/shards/`.
 
 ## Windows
 
-There are **5 renderer windows**, each an independent Vite entry:
+There are **6 renderer windows**, each an independent Vite entry:
 
-| Window       | Entry                                   | Role                                           |
-| ------------ | --------------------------------------- | ---------------------------------------------- |
-| Main         | `src/renderer/src-main-window/`         | Primary UI: player lookup, automation, toolkit |
-| Aux          | `src/renderer/src-aux-window/`          | Lightweight secondary window                   |
-| OP.GG        | `src/renderer/src-opgg-window/`         | Embedded OP.GG champion stats                  |
-| Ongoing Game | `src/renderer/src-ongoing-game-window/` | Real-time in-game display                      |
-| CD Timer     | `src/renderer/src-cd-timer-window/`     | Floating cooldown tracker                      |
+| Window        | Entry                                    | Role                                           |
+| ------------- | ---------------------------------------- | ---------------------------------------------- |
+| Main          | `src/renderer/src-main-window/`          | Primary UI: player lookup, automation, toolkit |
+| Aux           | `src/renderer/src-aux-window/`           | Lightweight secondary window                   |
+| OP.GG         | `src/renderer/src-opgg-window/`          | Embedded OP.GG champion stats                  |
+| Ongoing Game  | `src/renderer/src-ongoing-game-window/`  | Real-time in-game display                      |
+| CD Timer      | `src/renderer/src-cd-timer-window/`      | Floating cooldown tracker                      |
+| Draft Advisor | `src/renderer/src-draft-advisor-window/` | Champion suggestions during champion select    |
 
 Each window has its own HTML entry, `main.ts`, `NaiveUIProviderApp.vue`, `App.vue`, and shard
 manager. The main window uses Vue Router; the smaller windows usually compose their views directly.
