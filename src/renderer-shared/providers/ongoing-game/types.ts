@@ -1,3 +1,5 @@
+import type { MatchBasicInfo } from '@shared/data-adapter/match-history/match-basic'
+import type { MatchParticipant } from '@shared/data-adapter/match-history/participants'
 import type { LcuOrSgpGameDetails, LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import type {
   DraftOptions,
@@ -23,6 +25,15 @@ export interface OngoingGamePanelMatchHistory {
   data: LcuOrSgpGameSummary[]
 }
 
+export interface OngoingGamePanelMatchHistoryView {
+  gameId: number
+  basicInfo: Pick<MatchBasicInfo, 'gameMode' | 'queueId' | 'gameCreation'>
+  participant: Pick<
+    MatchParticipant,
+    'championId' | 'kills' | 'deaths' | 'assists' | 'winResult' | 'subteamPlacement'
+  >
+}
+
 export interface OngoingGameProviderValue {
   readonly settings: OngoingGamePanelSettings
   readonly queryStage: QueryStage
@@ -41,6 +52,7 @@ export interface OngoingGameProviderValue {
   readonly cachedGames: Record<number, LcuOrSgpGameSummary>
   readonly gameDetails: Record<number, LcuOrSgpGameDetails>
   readonly matchHistory: Record<string, OngoingGamePanelMatchHistory>
+  readonly matchHistoryViews?: Record<string, OngoingGamePanelMatchHistoryView[]>
   readonly matchHistoryLoadingState: Record<string, string>
 
   readonly spells: Record<string, OngoingGamePanelSummonerSpellSelection>

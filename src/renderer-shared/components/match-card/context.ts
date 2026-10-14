@@ -30,6 +30,7 @@ export type MatchCardContext = {
   participants: Ref<ReturnType<typeof toParticipants>>
   teams: Ref<ReturnType<typeof toTeams>>
   frames: Ref<ReturnType<typeof toFrames>>
+  rawStatsOverride: Ref<MatchCardRawStat[] | null>
 
   participant: Ref<ReturnType<typeof toParticipants>[number] | null>
   team: Ref<ReturnType<typeof toTeams>['teamStatMap'][string] | null>
@@ -40,6 +41,18 @@ export type MatchCardContext = {
   watchReplay: (gameId: number) => void
   loadDetails: (gameId: number) => void
   dryRunOngoingGame: () => void
+}
+
+export type MatchCardRawStat = {
+  participantId: number
+  championId: number
+  identity: {
+    puuid: string
+    gameName: string
+    tagLine: string
+    teamIdentifier: string
+  }
+  [key: string]: unknown
 }
 
 export const MatchCardContextKey: InjectionKey<MatchCardContext> = Symbol('MatchCardContext')
@@ -145,6 +158,7 @@ export function provideMatchCard(props: {
     participants,
     teams,
     frames,
+    rawStatsOverride: computed(() => null),
 
     participant,
     team,
