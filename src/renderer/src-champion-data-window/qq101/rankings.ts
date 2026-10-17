@@ -2,10 +2,10 @@ import type { AkariResourceProviderValue } from '@renderer-shared/providers/akar
 import type { Qq101ChampionDataOverview } from '@renderer-shared/shards/champion-data/qq101/types'
 
 export type RankingBoard = 'champions' | 'augments' | 'synergies'
-export interface RankingRow {
+
+interface RankingBase {
   key: string
   ids: number[]
-  kind: 'champion' | 'augment' | 'pair'
   rank: number | null
   change: number | null
   winRate: number | null
@@ -18,6 +18,18 @@ export interface RankingRow {
   winChange?: number | null
 }
 
+export type RankingRow = RankingBase &
+  (
+    | { kind: 'augment'; info: { championIds: number[] } }
+    | { kind: 'pair' }
+    | {
+        kind: 'champion'
+        info:
+          | { mode: 'ranked'; isHot: boolean; counterIds: number[] }
+          | { mode: 'classic' | 'aram' | 'aram_mayhem' }
+      }
+  )
+
 // QQ101 derives Mayhem tiers within each profession, before search or sorting.
 function tierAt(index: number, total: number) {
   let boundary = 1
@@ -27,6 +39,7 @@ function tierAt(index: number, total: number) {
       return tier
     }
   }
+
   return 4
 }
 
@@ -44,6 +57,7 @@ export function projectRankings(
       key: String(row.augmentId),
       ids: [row.augmentId],
       kind: 'augment',
+      info: { championIds: row.bestChampions.map((hero) => hero.championId) },
       rank: row.pickRank,
       change: row.pickRankImprovement,
       winRank: row.winRank,
@@ -72,6 +86,10 @@ export function projectRankings(
       key: `${row.championId}:${row.position}`,
       ids: ['classicChampionId' in row ? row.classicChampionId : row.championId],
       kind: 'champion' as const,
+      info:
+        'isHot' in row
+          ? { mode: 'ranked' as const, isHot: row.isHot, counterIds: row.counterChampionIds }
+          : { mode: 'classic' as const },
       rank: row.rank,
       change: row.rankChange,
       tier: row.strengthTier,
@@ -95,20 +113,24 @@ export function projectRankings(
       new Map(members.map((row, index) => [row.championId, tierAt(index, members.length)]))
     )
   }
+
   return champions.flatMap((row, index) => {
     const roles = resources.champions.roles(row.championId)
     if (role !== 'all' && !roles.includes(role)) {
       return []
     }
+
     const tiers = (role === 'all' ? roles : [role]).flatMap((profession) => {
       const tier = tierByRole.get(profession)?.get(row.championId)
       return tier === undefined ? [] : [tier]
     })
+
     return [
       {
         key: String(row.championId),
         ids: [row.championId],
         kind: 'champion' as const,
+        info: { mode: overview.mode },
         rank: row.rank,
         change: row.rankChange,
         winRate: row.winRate,

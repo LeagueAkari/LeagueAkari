@@ -4,11 +4,17 @@
     class="tab-bar-item group"
     :class="{ 'is-active': active, 'is-dragging': isDragSource }"
     :data-tab-id="tab.id"
-    :style="{ '--tab-bar-actions-width': `${actionsWidth}px` }"
+    :style="{ '--tab-width': `${width}px`, '--tab-action-count': actions.length }"
+    @contextmenu="emit('contextmenu', $event)"
   >
     <div class="tab-bar-item-viewport">
       <div class="tab-bar-tab" :class="{ 'is-active': active, 'is-dragging': isDragSource }">
-        <NPopover trigger="hover" placement="top" :delay="600" :disabled="isDragSource">
+        <NPopover
+          trigger="hover"
+          placement="top"
+          :delay="TAB_INPUT.tooltipDelayMs"
+          :disabled="isDragSource"
+        >
           <template #trigger>
             <button
               ref="handle"
@@ -18,6 +24,7 @@
               :aria-selected="active"
               :tabindex="active ? 0 : -1"
               @click="emit('activate')"
+              @keydown="emit('keydown', $event)"
             >
               <span
                 v-if="tab.icon || slots.icon"
@@ -27,20 +34,23 @@
                   <component :is="tab.icon" v-if="tab.icon" class="size-3.5 shrink-0" />
                 </slot>
               </span>
-              <span ref="name" class="tab-bar-name" :class="{ 'is-overflowing': nameOverflows }"
-                ><slot name="text" :tab="tab" :active="active">{{ tab.name }}</slot></span
-              >
+              <span ref="name" class="tab-bar-name" :class="{ 'is-overflowing': nameOverflows }">
+                <slot name="text" :tab="tab" :active="active">{{ tab.name }}</slot>
+              </span>
             </button>
           </template>
-          {{ tab.name }}
+          <slot name="tooltip" :tab="tab" :active="active">{{ tab.name }}</slot>
         </NPopover>
-        <div class="pointer-events-none absolute inset-y-0 right-1 flex items-center gap-0.5">
+
+        <div
+          class="tab-bar-actions pointer-events-none absolute inset-y-0 right-1 flex items-center"
+        >
           <NPopover
             v-for="action in actions"
             :key="action.id"
             trigger="hover"
             placement="top"
-            :delay="600"
+            :delay="TAB_INPUT.tooltipDelayMs"
             :disabled="isDragSource"
           >
             <template #trigger>
@@ -75,33 +85,46 @@ import { NPopover } from 'naive-ui'
 import { computed, useTemplateRef, watch } from 'vue'
 
 import type { TabBarTab } from './tab-order'
+import { TAB_INPUT, TAB_MOTION } from './tab-settings'
 
-const { tab, index, active } = defineProps<{
+const { tab, index, active, width } = defineProps<{
   tab: TabBarTab
   index: number
   active: boolean
+  width: number
 }>()
 
 const slots = defineSlots<{
   icon(props: { tab: TabBarTab; active: boolean }): unknown
+  tooltip(props: { tab: TabBarTab; active: boolean }): unknown
   text(props: { tab: TabBarTab; active: boolean }): unknown
 }>()
 
-const emit = defineEmits<{ activate: [] }>()
+const emit = defineEmits<{
+  activate: []
+  keydown: [event: KeyboardEvent]
+  contextmenu: [event: MouseEvent]
+}>()
 
 const element = useTemplateRef<HTMLElement>('element')
 const handle = useTemplateRef<HTMLElement>('handle')
 const name = useTemplateRef<HTMLElement>('name')
+
+defineExpose({
+  getElement: () => element.value,
+  focus: () => handle.value?.focus({ preventScroll: true })
+})
 
 const { horizontal: nameOverflows, update: updateNameOverflow } = useOverflow(name)
 
 const actions = computed(() =>
   (tab.actions ?? []).filter((action) => action.kind !== 'close' || tab.closable !== false)
 )
-const actionsWidth = computed(() => actions.value.length * 22 + 8)
+
 const isFixed = computed(() => tab.fixedPosition !== undefined)
 
 watch(() => tab.name, updateNameOverflow, { flush: 'post' })
+
 useMutationObserver(name, updateNameOverflow, {
   childList: true,
   characterData: true,
@@ -117,6 +140,6 @@ const { isDragSource } = useSortable({
   group: computed(() => (isFixed.value ? 'akari-fixed-tabs' : 'akari-tab-bar')),
   type: computed(() => (isFixed.value ? 'akari-fixed-tab' : 'akari-tab')),
   accept: 'akari-tab',
-  transition: { duration: 180, easing: 'ease-out', idle: false }
+  transition: { duration: TAB_MOTION.sortMs, easing: 'ease-out', idle: false }
 })
 </script>

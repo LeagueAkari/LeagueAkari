@@ -1,11 +1,22 @@
+import { useChampionDataStore } from '@renderer-shared/shards/champion-data/store'
+import { useChampionDataWindowStore } from '@renderer-shared/shards/window-manager/store'
+import { createChampionDataSourcePreferences } from '@shared/shards/champion-data/source-preferences'
 import type { FeatureGateEvaluationResult } from '@shared/shards/feature-gating'
-import { describe, expect, it } from 'vitest'
+import { createPinia, setActivePinia } from 'pinia'
+import { describe, expect, it, onTestFinished, vi } from 'vitest'
+import { effectScope } from 'vue'
 
 import {
   resolveActiveChampionDataSource,
+  resolveChampionDataSourceOptions,
   resolveEnabledChampionDataSources,
-  resolveMinimumUpgradeVersion
+  resolveMinimumUpgradeVersion,
+  useChampionDataSources
 } from './use-champion-data-sources'
+
+vi.mock('@renderer-shared/shards', () => ({
+  useInstance: () => ({ getEvaluation: () => ({ enabled: true }) })
+}))
 
 function evaluation(overrides: Partial<FeatureGateEvaluationResult>): FeatureGateEvaluationResult {
   return {
@@ -22,6 +33,80 @@ function evaluation(overrides: Partial<FeatureGateEvaluationResult>): FeatureGat
 }
 
 describe('champion data source selection', () => {
+  it.each([
+    { opgg: true, qq101: true, order: ['opgg', 'qq101'] },
+    { opgg: false, qq101: true, order: ['qq101', 'opgg'] },
+    { opgg: true, qq101: false, order: ['opgg', 'qq101'] },
+    { opgg: false, qq101: false, order: ['opgg', 'qq101'] }
+  ])(
+    'keeps disabled sources last and preserves the fixed order: $opgg / $qq101',
+    ({ opgg, qq101, order }) => {
+      const preferences = { enabled: { opgg, qq101 }, defaultSource: 'qq101' as const }
+      const evaluations = {
+        opgg: evaluation({ enabled: true }),
+        qq101: evaluation({ enabled: true })
+      }
+      const options = resolveChampionDataSourceOptions(evaluations, preferences)
+
+      expect(options.map((source) => source.id)).toEqual(order)
+      expect(options.filter((source) => source.enabled).map((source) => source.id)).toEqual(
+        resolveEnabledChampionDataSources(evaluations, preferences)
+      )
+    }
+  )
+
+  it('uses the saved default on startup and each reopen, without saving manual navigation', () => {
+    setActivePinia(createPinia())
+    const store = useChampionDataStore()
+    const windowStore = useChampionDataWindowStore()
+    store.settings.sourcePreferences = {
+      enabled: { opgg: true, qq101: true },
+      defaultSource: 'qq101'
+    }
+    const scope = effectScope()
+    onTestFinished(() => {
+      scope.stop()
+      setActivePinia(undefined)
+    })
+    const sources = scope.run(() => useChampionDataSources())!
+
+    expect(sources.activeSource.value).toBe('qq101')
+    windowStore.show = true
+    sources.selectSource('opgg')
+    expect(sources.activeSource.value).toBe('opgg')
+    expect(store.settings.sourcePreferences.defaultSource).toBe('qq101')
+    windowStore.show = false
+    windowStore.show = true
+    expect(sources.activeSource.value).toBe('qq101')
+
+    store.settings.sourcePreferences = {
+      enabled: { opgg: false, qq101: false },
+      defaultSource: null
+    }
+    expect(sources.activeSource.value).toBeNull()
+    expect(sources.allSourcesDisabled.value).toBe(true)
+    sources.selectSource('opgg')
+    expect(sources.activeSource.value).toBeNull()
+    store.settings.sourcePreferences = createChampionDataSourcePreferences()
+    expect(sources.activeSource.value).toBe('opgg')
+  })
+
+  it('falls back from a remotely unavailable default without rewriting the saved preference', () => {
+    const preferences = createChampionDataSourcePreferences()
+    const evaluations = {
+      opgg: evaluation({ enabled: false }),
+      qq101: evaluation({ enabled: true })
+    }
+    expect(
+      resolveActiveChampionDataSource(
+        'opgg',
+        resolveEnabledChampionDataSources(evaluations, preferences),
+        preferences.defaultSource
+      )
+    ).toBe('qq101')
+    expect(preferences.defaultSource).toBe('opgg')
+  })
+
   it('shows only sources whose structured evaluation is enabled', () => {
     expect(
       resolveEnabledChampionDataSources({

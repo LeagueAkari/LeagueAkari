@@ -61,17 +61,16 @@ export interface ChampionIconResource {
 }
 
 export interface ChampionAramBalanceResource {
-  champion_id: number
-  attack_speed: number
-  damage_dealt: number
-  damage_taken: number
-  cooldown_reduction: number
+  championId: number
+  attackSpeed: number
+  damageDealt: number
+  damageTaken: number
+  abilityHaste: number
   healing: number
   tenacity: number
-  shield_amount: number
-  energy_regen: number
-  area_of_effect_damage: number
-  default: boolean
+  shieldAmount: number
+  energyRegen: number
+  areaOfEffectDamage: number
 }
 
 export interface ItemInlineResource {

@@ -1,3 +1,3 @@
 export { default as TabBar } from './TabBar.vue'
 
-export type { TabBarTab, TabBarTabAction, TabBarTabReorder } from './tab-order'
+export type { TabBarItems, TabBarTab, TabBarTabAction, TabBarAddOption } from './tab-order'

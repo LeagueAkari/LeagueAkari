@@ -64,6 +64,12 @@ export interface OpggUrfChampionOverview extends OpggChampionOverviewBase {
   roles: OpggChampionRole[]
 }
 
+export interface OpggDoomChampionOverview extends OpggChampionOverviewBase {
+  average_stats: OpggWinRateChampionStats | null
+  positions: null
+  roles: OpggChampionRole[]
+}
+
 export interface OpggArenaChampionOverview extends OpggChampionOverviewBase {
   average_stats: OpggArenaChampionStats | null
   positions?: never
@@ -76,6 +82,7 @@ export type OpggChampionOverview =
   | OpggArenaChampionOverview
   | OpggNexusBlitzChampionOverview
   | OpggUrfChampionOverview
+  | OpggDoomChampionOverview
 
 export interface OpggAnalyzedChampionOverviewMeta {
   version: string
@@ -114,12 +121,18 @@ export interface OpggUrfChampionsResponse {
   meta: OpggAnalyzedChampionOverviewMeta
 }
 
+export interface OpggDoomChampionsResponse {
+  data: OpggDoomChampionOverview[]
+  meta: OpggAnalyzedChampionOverviewMeta
+}
+
 export type OpggChampionOverviewResponse =
   | OpggRankedChampionsResponse
   | OpggAramChampionsResponse
   | OpggArenaChampionsResponse
   | OpggNexusBlitzChampionsResponse
   | OpggUrfChampionsResponse
+  | OpggDoomChampionsResponse
 
 export interface OpggChampionVersionsResponse {
   data: string[]

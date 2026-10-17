@@ -55,9 +55,11 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
 
   async onInit() {
     this._mobxUtils.propSync(ExtraAssetsMain.id, 'gtimg', this.gtimg, [
+      'enabled',
       'heroList',
       'kiwiAugments',
-      'classicHeroes'
+      'classicHeroes',
+      'guideCatalogs'
     ])
 
     this._refreshController.start()

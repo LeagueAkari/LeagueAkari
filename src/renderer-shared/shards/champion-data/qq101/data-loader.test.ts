@@ -1,4 +1,4 @@
-import type { Qq101HttpApiAxiosHelper } from '@shared/http-api-axios-helper/qq101'
+import type { Qq101DataSource } from '@shared/data-sources/qq101'
 import type { Qq101ChampionDataPreferences } from '@shared/types/champion-data'
 import { createPinia, setActivePinia } from 'pinia'
 import { describe, expect, it, onTestFinished, vi } from 'vitest'
@@ -10,13 +10,13 @@ import { Qq101ChampionDataLoader } from './data-loader'
 
 const signal = new AbortController().signal
 
-function createLoader(api: Partial<Qq101HttpApiAxiosHelper>) {
+function createLoader(api: Partial<Qq101DataSource>) {
   const logger = { warn: vi.fn() }
 
   return {
     loader: new Qq101ChampionDataLoader(
       logger as unknown as ConstructorParameters<typeof Qq101ChampionDataLoader>[0],
-      api as Qq101HttpApiAxiosHelper
+      api as Qq101DataSource
     ),
     logger
   }
@@ -101,29 +101,26 @@ describe('QQ101 champion data loader', () => {
       getTierStats: vi.fn().mockResolvedValue(null),
       getDurations: vi.fn().mockResolvedValue(null)
     })
-    const result = await loader.loadDetails(
-      { mode: 'ranked', position: 'all', patch: '16.19', tier: 26 },
-      {
-        mode: 'ranked',
-        data: { patch: '16.19', date: '20260925', champions: [] }
-      },
-      103,
-      signal
+    setActivePinia(createPinia())
+    const store = useChampionDataStore()
+    store.qq101.enabled = true
+    store.qq101.loadedPreferences = { mode: 'ranked', position: 'all', patch: '16.19', tier: 26 }
+    const controller = new Qq101ChampionDataController(
+      { logger: { warn: vi.fn() } } as unknown as ChampionDataRendererContext,
+      loader
     )
+    await controller.selectChampion(103)
     expect(getRunes).toHaveBeenCalledWith({ patch: '16.19', tier: 26, position: 'MIDDLE' }, 103, {
-      signal
+      signal: expect.any(AbortSignal)
     })
-    expect(result).toMatchObject({
+    expect(store.qq101.detailView).toMatchObject({
       mode: 'ranked',
-      data: {
-        champion: null,
-        championId: 103,
-        position: 'MIDDLE',
-        build: null,
-        runes: { pages: [] },
-        errors: { build: expect.stringContaining('build failed') }
-      }
+      championId: 103,
+      position: 'MIDDLE',
+      sections: { build: { status: 'error' }, runes: { status: 'empty' } }
     })
+    controller.dispose()
+    setActivePinia(undefined)
   })
 
   it('does not overwrite each source snapshot date with the hero snapshot date', async () => {
@@ -144,9 +141,9 @@ describe('QQ101 champion data loader', () => {
       synergyDate: '20260925'
     })
   })
-  it.each([true, false])(
-    'loads when enabled and cancels when disabled (enabled at startup: %s)',
-    async (enabledAtStartup) => {
+  it.each(['remote', 'local'] as const)(
+    'loads when enabled and cancels when the %s switch is disabled',
+    async (switchKind) => {
       setActivePinia(createPinia())
 
       const store = useChampionDataStore()
@@ -173,13 +170,22 @@ describe('QQ101 champion data loader', () => {
         setActivePinia(undefined)
       })
 
-      store.qq101.enabled = enabledAtStartup
+      const setEnabled = (enabled: boolean) => {
+        if (switchKind === 'remote') {
+          store.qq101.enabled = enabled
+        } else {
+          store.settings.sourcePreferences = {
+            enabled: { opgg: true, qq101: enabled },
+            defaultSource: 'opgg'
+          }
+        }
+      }
+      store.qq101.enabled = true
+      setEnabled(false)
       controller.start()
 
-      if (!enabledAtStartup) {
-        expect(getTierList).not.toHaveBeenCalled()
-        store.qq101.enabled = true
-      }
+      expect(getTierList).not.toHaveBeenCalled()
+      setEnabled(true)
 
       await vi.waitFor(() => expect(store.qq101.isLoading).toBe(false))
       expect(store.qq101.overview).toEqual({ mode: 'ranked', data })
@@ -190,7 +196,7 @@ describe('QQ101 champion data loader', () => {
 
       await vi.waitFor(() => expect(getTierList).toHaveBeenCalledTimes(2))
       const signal = getTierList.mock.calls[1][1].signal as AbortSignal
-      store.qq101.enabled = false
+      setEnabled(false)
 
       expect(signal.aborted).toBe(true)
       expect(store.qq101.isLoading).toBe(false)

@@ -28,6 +28,8 @@
 </template>
 
 <script setup lang="ts">
+defineOptions({ inheritAttrs: false })
+
 import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
@@ -45,6 +47,7 @@ const {
 }>()
 
 const resources = useAkariResourceProvider()
+
 const perkDisplay = computed(() => {
   if (!perkId) {
     return null

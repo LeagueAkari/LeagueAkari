@@ -1,25 +1,50 @@
 import { describe, expect, it } from 'vitest'
 
-import { type TabBarTab, getTabReorder, validateTabOrder } from './tab-order'
+import { type TabBarItems, type TabBarTab, getReorderedTabIds, resolveTabOrder } from './tab-order'
 
-const tab = (id: string, fixedPosition?: number): TabBarTab => ({
-  id,
-  name: id,
-  fixedPosition
-})
+function tab(id: string, fixedPosition?: number): TabBarTab {
+  return { id, name: id, fixedPosition }
+}
+
+function createItems(...tabs: TabBarTab[]): TabBarItems {
+  return Object.fromEntries(tabs.map(({ id, ...item }) => [id, item]))
+}
 
 describe('tab bar ordering', () => {
+  it('uses the order model rather than metadata insertion order', () => {
+    const items = createItems(tab('garen'), tab('tier', 0), tab('ahri'))
+    const { tabs, fixedCount } = resolveTabOrder(items, ['tier', 'ahri', 'garen'])
+
+    expect(tabs.map((tab) => tab.id)).toEqual(['tier', 'ahri', 'garen'])
+    expect(tabs[1]).toMatchObject({ id: 'ahri', name: 'ahri' })
+    expect(fixedCount).toBe(1)
+  })
+
   it('allows a contiguous fixed prefix and independently non-closable flexible tabs', () => {
-    const tabs = [
+    const items = createItems(
       tab('tier', 0),
       tab('overview', 1),
       { ...tab('ahri'), closable: false },
       tab('garen')
-    ]
-    expect(validateTabOrder(tabs)).toBe(2)
-    expect(getTabReorder(tabs, 'ahri', 1)).toEqual({ id: 'ahri', fromIndex: 2, toIndex: 3 })
-    expect(getTabReorder(tabs, 'overview', 2)).toBeNull()
-    expect(getTabReorder(tabs, 'garen', -1)).toEqual({ id: 'garen', fromIndex: 3, toIndex: 2 })
+    )
+    const order = ['tier', 'overview', 'ahri', 'garen']
+
+    expect(resolveTabOrder(items, order).fixedCount).toBe(2)
+    expect(getReorderedTabIds(items, order, 'ahri', 1)).toEqual([
+      'tier',
+      'overview',
+      'garen',
+      'ahri'
+    ])
+    expect(getReorderedTabIds(items, order, 'overview', 2)).toBeNull()
+    expect(getReorderedTabIds(items, order, 'garen', -1)).toEqual([
+      'tier',
+      'overview',
+      'garen',
+      'ahri'
+    ])
+    expect(order).toEqual(['tier', 'overview', 'ahri', 'garen'])
+    expect(Object.keys(items)).toEqual(order)
   })
 
   it.each([
@@ -31,17 +56,28 @@ describe('tab bar ordering', () => {
     [tab('a', -1)],
     [tab('a', 0.5)]
   ])('rejects invalid fixed positions: %j', (...tabs) => {
-    expect(() => validateTabOrder(tabs)).toThrow('ordered prefix')
+    expect(() =>
+      resolveTabOrder(
+        createItems(...tabs),
+        tabs.map((tab) => tab.id)
+      )
+    ).toThrow('ordered prefix')
   })
 
-  it('rejects duplicate IDs and preserves a purely flexible list', () => {
-    expect(() => validateTabOrder([tab('a'), tab('a')])).toThrow('unique')
-    expect(validateTabOrder([])).toBe(0)
-    expect(getTabReorder([tab('a'), tab('b')], 'a', 1)).toEqual({
-      id: 'a',
-      fromIndex: 0,
-      toIndex: 1
-    })
-    expect(getTabReorder([tab('a')], 'a', 0)).toBeNull()
+  it.each([['a'], ['a', 'a'], ['a', 'missing'], ['', 'b']])(
+    'rejects incomplete, duplicate or unknown order IDs: %j',
+    (...order) => {
+      expect(() => resolveTabOrder(createItems(tab('a'), tab('b')), order)).toThrow('TabBar:')
+    }
+  )
+
+  it('preserves empty, unchanged and purely flexible orders', () => {
+    expect(resolveTabOrder({}, [])).toEqual({ tabs: [], fixedCount: 0 })
+    const items = createItems(tab('a'), tab('b'))
+
+    expect(getReorderedTabIds(items, ['a', 'b'], 'a', 1)).toEqual(['b', 'a'])
+    expect(getReorderedTabIds(items, ['a', 'b'], 'a', 0)).toBeNull()
+    expect(getReorderedTabIds(items, ['a', 'b'], 'missing', 0)).toBeNull()
+    expect(getReorderedTabIds(items, ['a', 'b'], 'a', Number.NaN)).toBeNull()
   })
 })

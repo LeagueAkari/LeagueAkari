@@ -24,7 +24,8 @@ opgg:
       opgg: OP.GG
       qq101: 101
     modes:
-      ranked: Ranked
+      ranked: Ranked Solo/Duo
+      flex: Ranked Flex
       classic: Classic
       aram: ARAM
       aram_mayhem: 'ARAM: Mayhem'
@@ -86,6 +87,10 @@ opgg:
       bestChampions: Best Champions
       combination: Combination
   sources:
+    disabled: Disabled
+    noneEnabled: No data sources enabled
+    enableDescription: Enable OP.GG or 101 to view champion data.
+    openSettings: Open settings
     qq101Placeholder: The independent 101 data view is still being designed and is not shown yet
     unavailable: No champion data source is currently available
     updateRequired: Update to version {{version}} or later
@@ -135,6 +140,13 @@ opgg:
     dataUnavailable: The selected source does not support this mode or is unavailable
     settings:
       title: Champion Data Settings
+      sources:
+        label: Data Sources
+        description: Enable sources independently, or turn both off. The default source opens whenever the window is shown.
+        default: Default
+        defaultLabel: Set {{source}} as the default source
+        enableLabel: Enable {{source}}
+        saveFailed: Failed to save data source settings. Please try again.
       temporarilyUnavailable: Temporarily unavailable
       flashPosition:
         label: Flash Position Preference
@@ -162,6 +174,17 @@ opgg:
     runesSet: '[$t(common:appName)] {{action}} rune build: {{name}}'
     sessionChampions:
       title: Session Champions
+  itemProgression:
+    title: Build order
+    kind: Build statistics type
+    single: Items
+    combined: Builds
+    singleStage: Item {{order}}
+    combinedStage: '{{order}} items'
+    build: Build
+    help: About build statistics
+    description: Items are grouped by purchase order. Builds show the full sequence from the first item.
+    note: Samples differ by build stage. Compare win rates alongside game counts.
   champion:
     boots: Boots
     adorableRabi: Kawaii Bunny
@@ -173,7 +196,7 @@ opgg:
     banRate: Ban Rate
     matchups: Matchups
     counter: Unfavorable matchups
-    allCounters: All matchups
+    advantage: Favorable matchups
     empty: No Data Available
     times: '{{times}} Games'
     expand: Expand
@@ -182,13 +205,15 @@ opgg:
     apply: Apply
     runes: Rune Builds
     abilityBuild: Ability Leveling
+    skillEvolution: 'Level {{level}}: level R and evolve {{skill}}'
     runesFooter: Applying a build creates or replaces a rune page in the client.
     starterItemText: Starting Items
     prismItemText: Prism Tier Items
     coreItemText: Core Items
     itemText: Items
-    applyRunes: Import Current Item Build
-    applyRunesText: Build Applied
+    importItemSet: Import
+    addItemSet: Import the full item set
+    connectToAddItemSet: Connect to the League client to add the full item set
     augments: Augments
     augmentAll: All
     augmentGold: Gold

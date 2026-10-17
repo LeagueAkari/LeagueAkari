@@ -36,7 +36,7 @@
     <!-- for gtimg source -->
     <template v-if="augmentDisplay.tooltipHtml">
       <div class="my-2 h-px bg-black/10 dark:bg-white/10" />
-      <div class="max-w-100" v-html="augmentDisplay.tooltipHtml" />
+      <div class="max-w-[min(400px,calc(100vw_-_48px))]" v-html="augmentDisplay.tooltipHtml" />
     </template>
   </NPopover>
   <div
@@ -48,6 +48,8 @@
 </template>
 
 <script setup lang="ts">
+defineOptions({ inheritAttrs: false })
+
 import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
@@ -61,6 +63,7 @@ const { augmentId, size = 20 } = defineProps<{
 }>()
 
 const resources = useAkariResourceProvider()
+
 const augmentDisplay = computed(() => {
   if (!augmentId) {
     return null

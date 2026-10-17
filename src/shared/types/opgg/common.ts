@@ -1,5 +1,6 @@
 export const OPGG_CHAMPION_DATA_MODES = [
   'ranked',
+  'flex',
   'aram',
   'aram_mayhem',
   'arena',
@@ -7,7 +8,15 @@ export const OPGG_CHAMPION_DATA_MODES = [
   'urf'
 ] as const
 
-export const OPGG_CHAMPION_API_MODES = ['ranked', 'aram', 'arena', 'nexus_blitz', 'urf'] as const
+export const OPGG_CHAMPION_API_MODES = [
+  'ranked',
+  'flex',
+  'aram',
+  'arena',
+  'nexus_blitz',
+  'urf',
+  'doom'
+] as const
 
 export const OPGG_RANKED_POSITIONS = ['top', 'jungle', 'mid', 'adc', 'support'] as const
 

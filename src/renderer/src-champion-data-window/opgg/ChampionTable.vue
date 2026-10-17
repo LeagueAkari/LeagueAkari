@@ -6,7 +6,7 @@
       :data="data"
       :loading="isLoading"
       :columns="combinedColumns"
-      :row-key="(item) => item.id"
+      :row-key="(item) => item.championId"
       virtual-scroll
       :row-props="rowProps"
       size="small"
@@ -75,6 +75,7 @@ const columns: DataTableColumns<OpggChampionDataRow> = [
     get filterOptionValue() {
       return filterText.value || null
     },
+
     renderFilterMenu: () => (
       <div
         class="w-52 p-2"
@@ -94,17 +95,20 @@ const columns: DataTableColumns<OpggChampionDataRow> = [
     align: 'center',
     className: statisticCellClass,
     sorter: (a, b) => {
-      return resources.champions.name(a.id).localeCompare(resources.champions.name(b.id))
+      return resources.champions
+        .name(a.championId)
+        .localeCompare(resources.champions.name(b.championId))
     },
+
     render: (row) => {
       return (
         <div class="flex items-center justify-center overflow-hidden">
           <LcuImage
             class="size-8 shrink-0"
-            src={resources.champions.icon(row.id)?.iconPath ?? ''}
+            src={resources.champions.icon(row.championId)?.iconPath ?? ''}
           />
           <div class="ml-2 w-25 truncate text-left text-[13px] text-black/80 dark:text-white/80">
-            {resources.champions.name(row.id)}
+            {resources.champions.name(row.championId)}
           </div>
         </div>
       )
@@ -126,6 +130,7 @@ const columns: DataTableColumns<OpggChampionDataRow> = [
     width: 76,
     className: statisticCellClass,
     sorter: (a, b) => (a.winRate ?? 0) - (b.winRate ?? 0),
+
     render: (row) => {
       if (row.winRate === null) {
         return '-'
@@ -179,7 +184,7 @@ const countersColumn: DataTableColumn<OpggChampionDataRow> = {
         {row.counters.slice(0, 3).map((counter) => (
           <LcuImage
             class="size-4.5"
-            src={resources.champions.icon(counter.champion_id)?.iconPath ?? ''}
+            src={resources.champions.icon(counter.championId)?.iconPath ?? ''}
           />
         ))}
       </div>
@@ -226,12 +231,14 @@ const combinedColumns = computed(() => {
 
 const data = computed(() =>
   (champions.value ?? []).filter(
-    (row) => !filterText.value || match(filterText.value, resources.champions.name(row.id), row.id)
+    (row) =>
+      !filterText.value ||
+      match(filterText.value, resources.champions.name(row.championId), row.championId)
   )
 )
 
 const rowProps: DataTableCreateRowProps<OpggChampionDataRow> = (row) => ({
-  onClick: () => setTab('champion', row.id),
+  onClick: () => setTab('champion', row.championId),
   class: 'cursor-pointer'
 })
 </script>

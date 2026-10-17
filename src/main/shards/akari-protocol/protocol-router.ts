@@ -1,4 +1,5 @@
 import { session } from 'electron'
+import { TransformStream } from 'node:stream/web'
 
 import { AKARI_PROXY_PROTOCOL, type AkariProtocolDomainHandler } from './context'
 import { AkariProtocolProxyRequestCancellation } from './proxy-request-cancellation'
@@ -59,17 +60,7 @@ export class AkariProtocolRouter {
 
       const handler = this._domainRegistry.get(domain)
       if (handler) {
-        const registration = this._proxyRequestCancellation.register(req)
-        try {
-          return await handler(uri, req, {
-            requestId: registration?.requestId,
-            signal: registration?.signal
-          })
-        } finally {
-          if (registration) {
-            this._proxyRequestCancellation.dispose(registration)
-          }
-        }
+        return this._handleRequest(handler, uri, req)
       }
 
       return new Response(`No handler for ${req.url}`, {
@@ -78,5 +69,54 @@ export class AkariProtocolRouter {
         status: 404
       })
     })
+  }
+
+  private async _handleRequest(handler: AkariProtocolDomainHandler, uri: string, request: Request) {
+    const registration = this._proxyRequestCancellation.register(request)
+    const controller = new AbortController()
+    const signals = [request.signal, controller.signal]
+    if (registration) {
+      signals.push(registration.signal)
+    }
+
+    const signal = AbortSignal.any(signals)
+    const cleanup = () => {
+      if (registration) {
+        this._proxyRequestCancellation.dispose(registration)
+      }
+    }
+
+    try {
+      signal.throwIfAborted()
+
+      const response = await handler(uri, request, {
+        requestId: registration?.requestId,
+        signal
+      })
+
+      if (!response.body) {
+        cleanup()
+        return response
+      }
+
+      const stream = new TransformStream({
+        // Abort before pipeTo waits for the source's asynchronous cancellation.
+        cancel: (reason) => controller.abort(reason)
+      })
+      const proxiedResponse = new Response(stream.readable, response)
+
+      // Keep cancellation alive for the body, not just the headers. The pipe preserves
+      // backpressure and cancels its source when the downstream reader stops.
+      void response.body.pipeTo(stream.writable, { signal }).then(cleanup, (error) => {
+        controller.abort(error)
+        cleanup()
+      })
+
+      return proxiedResponse
+    } catch (error) {
+      controller.abort(error)
+      cleanup()
+      throw error
+    }
   }
 }

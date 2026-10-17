@@ -1,4 +1,6 @@
 qq101:
+  sampleCount_one: '{{formatted}} game'
+  sampleCount_other: '{{formatted}} games'
   title: Champion rankings
   source: Statistics by League of Legends 101
   mode: Game mode
@@ -76,3 +78,77 @@ qq101:
     '27': Diamond+
     '28': Master+
     '88': Super server
+  details:
+    loadingSection: 'Loading…'
+    loadingHero: 'Loading champion data'
+    positionsFailed: 'Could not load champion positions'
+    noPositions: 'No position data for this champion at the selected patch and tier'
+    tryPatch: 'View {{patch}}'
+    navigation: 'On this page'
+    back: 'Back to rankings'
+    sectionFailed: 'This section failed; other data remains available'
+    waitingPosition: 'Waiting for a valid lane; check or retry Positions'
+    heroStatsNote: 'These are champion-specific recommendations. Ratings and pick rates differ from global augment win rates.'
+    recommendations: 'Mayhem champion guide'
+    positions: 'Positions'
+    runes: 'Rune pages'
+    summonerSpells: 'Summoner spells'
+    skillOrder: 'Skill order'
+    build: 'Item builds'
+    matchups: 'Matchups'
+    synergies: 'Partners'
+    trend: 'Historical win rate'
+    tierStats: 'Tier statistics'
+    durations: 'Game duration'
+    jungle: 'Jungle routes'
+    augments: 'Champion augments'
+    starting: 'Starting items'
+    boots: 'Boots'
+    core: 'Core items'
+    fourth: 'Fourth item'
+    fifth: 'Fifth item'
+    sixth: 'Sixth item'
+    items: 'Items'
+    builds: 'Full builds'
+    favorable: 'Favorable matchups'
+    unfavorable: 'Unfavorable matchups'
+    champion: 'Champion'
+    augment: 'Augment'
+    grade: 'Rating'
+    pickRate: 'Pick rate'
+    winRate: 'Win rate'
+    banRate: 'Ban rate'
+    share: 'Lane share'
+    position: 'Position'
+    rank: 'Rank'
+    primaryRunes: 'Primary runes'
+    secondaryRunes: 'Secondary runes'
+    statShards: 'Stat shards'
+    games: 'Games'
+    spells: 'Spells'
+    priority: 'Priority'
+    levelOrder: 'Level order'
+    matchupRate: 'Matchup advantage'
+    patch: 'Patch'
+    tier: 'Tier'
+    duration: 'Duration'
+    route: 'Route'
+    team100: 'Blue side'
+    team200: 'Red side'
+  hot: Trending
+  counter: Counter
+  pairFirstRole: First champion role
+  pairSecondRole: Second champion role
+  classicLanesFailed: Classic lane information failed to load. Refresh to retry; rankings remain available.
+  camps:
+    BLUEGOLEM: Blue buff
+    GROMP: Gromp
+    WOLF: Wolves
+    RAPTOR: Raptors
+    REDLIZARD: Red buff
+    KRUG: Krugs
+  tabs:
+    label: 101 pages
+    close: Close page
+    closeOthers: Close other pages
+  openPairQuery: Open partner query

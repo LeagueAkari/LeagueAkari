@@ -1,8 +1,5 @@
 import type { GtimgHeroListJs } from '@shared/data-sources/gtimg'
-import {
-  EXTRA_ASSETS_GTIMG_HERO_LIST_FEATURE_GATE,
-  EXTRA_ASSETS_GTIMG_KIWI_AUGMENTS_FEATURE_GATE
-} from '@shared/shards/feature-gating/keys'
+import { EXTRA_ASSETS_GTIMG_FEATURE_GATE } from '@shared/shards/feature-gating/keys'
 import { observable, reaction, runInAction } from 'mobx'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -21,8 +18,7 @@ const controllers: ExtraAssetsRefreshController[] = []
 
 function createRefresh(enabled?: boolean) {
   const gates = observable.map<string, boolean | undefined>([
-    [EXTRA_ASSETS_GTIMG_HERO_LIST_FEATURE_GATE, enabled],
-    [EXTRA_ASSETS_GTIMG_KIWI_AUGMENTS_FEATURE_GATE, enabled]
+    [EXTRA_ASSETS_GTIMG_FEATURE_GATE, enabled]
   ])
   const gtimg = new ExtraAssetsStateGtimg()
   const gtimgApi = {
@@ -30,14 +26,18 @@ function createRefresh(enabled?: boolean) {
       .fn<(signal?: AbortSignal) => Promise<GtimgHeroListJs>>()
       .mockResolvedValue(heroList),
     getKiwiAugments: vi.fn().mockResolvedValue([]),
-    getClassicHeroes: vi.fn().mockResolvedValue([])
+    getClassicHeroes: vi.fn().mockResolvedValue({ heroes: [] }),
+    getGuideCatalog: vi.fn().mockResolvedValue({ data: { items: [], rune: {}, summonerskill: {} } })
   }
-  const isEnabled = vi.fn((key: string, fallback: boolean) => gates.get(key) ?? fallback)
+  const getEvaluation = vi.fn((key: string) => ({
+    configured: gates.get(key) !== undefined,
+    enabled: gates.get(key) ?? false
+  }))
   const controller = new ExtraAssetsRefreshController({
     namespace: 'extra-assets-main',
     gtimg,
     gtimgApi,
-    featureGating: { isEnabled },
+    featureGating: { getEvaluation },
     mobxUtils: { reaction },
     logger: { info: vi.fn(), warn: vi.fn() }
   } as unknown as ExtraAssetsMainContext)
@@ -47,21 +47,32 @@ function createRefresh(enabled?: boolean) {
     controller,
     gtimg,
     gtimgApi,
-    isEnabled,
+    getEvaluation,
     setEnabled: (key: string, value: boolean) => {
       runInAction(() => {
         gates.set(key, value)
       })
     },
+
     setAllEnabled: (value: boolean) =>
       runInAction(() => {
-        gates.set(EXTRA_ASSETS_GTIMG_HERO_LIST_FEATURE_GATE, value)
-        gates.set(EXTRA_ASSETS_GTIMG_KIWI_AUGMENTS_FEATURE_GATE, value)
+        gates.set(EXTRA_ASSETS_GTIMG_FEATURE_GATE, value)
       })
   }
 }
 
 describe('GTIMG feature gate', () => {
+  it('degrades a malformed resource without losing independently usable catalogs', async () => {
+    const refresh = createRefresh(true)
+    refresh.gtimgApi.getHeroList.mockResolvedValueOnce(null as unknown as GtimgHeroListJs)
+    refresh.controller.start()
+    await vi.advanceTimersByTimeAsync(0)
+    expect(refresh.gtimg.heroList).toBeNull()
+    expect(refresh.gtimg.classicHeroes).toEqual([])
+    expect(refresh.gtimg.kiwiAugments).toEqual([])
+    expect(refresh.gtimg.enabled).toBe(true)
+  })
+
   it('publishes ordinary heroes while the classic catalog is still pending', async () => {
     const refresh = createRefresh(true)
     const pending = Promise.withResolvers<never[]>()
@@ -96,6 +107,9 @@ describe('GTIMG feature gate', () => {
 
     await vi.advanceTimersByTimeAsync(GTIMG_HERO_LIST_UPDATE_INTERVAL)
 
+    expect(refresh.gtimg.enabled).toBe(false)
+    expect(refresh.gtimg.classicHeroes).toBeNull()
+    expect(refresh.gtimg.guideCatalogs).toEqual({ items: {}, perks: {}, spells: {} })
     expect(refresh.gtimg.heroList).toBeNull()
     expect(refresh.gtimg.kiwiAugments).toBeNull()
     expect(refresh.gtimgApi.getHeroList).not.toHaveBeenCalled()
@@ -107,15 +121,14 @@ describe('GTIMG feature gate', () => {
     refresh.controller.start()
     await vi.advanceTimersByTimeAsync(0)
 
-    expect(refresh.isEnabled).toHaveBeenCalledWith(EXTRA_ASSETS_GTIMG_HERO_LIST_FEATURE_GATE, true)
-    expect(refresh.isEnabled).toHaveBeenCalledWith(
-      EXTRA_ASSETS_GTIMG_KIWI_AUGMENTS_FEATURE_GATE,
-      true
-    )
+    expect(refresh.getEvaluation).toHaveBeenCalledWith(EXTRA_ASSETS_GTIMG_FEATURE_GATE, true)
     expect(refresh.gtimg.heroList).toEqual(heroList)
     expect(refresh.gtimg.kiwiAugments).toEqual([])
 
     refresh.setAllEnabled(false)
+    expect(refresh.gtimg.enabled).toBe(false)
+    expect(refresh.gtimg.classicHeroes).toBeNull()
+    expect(refresh.gtimg.guideCatalogs).toEqual({ items: {}, perks: {}, spells: {} })
     expect(refresh.gtimg.heroList).toBeNull()
     expect(refresh.gtimg.kiwiAugments).toBeNull()
     await vi.advanceTimersByTimeAsync(GTIMG_HERO_LIST_UPDATE_INTERVAL)
@@ -128,49 +141,6 @@ describe('GTIMG feature gate', () => {
     expect(refresh.gtimgApi.getKiwiAugments).toHaveBeenCalledTimes(2)
     expect(refresh.gtimg.heroList).toEqual(heroList)
   })
-
-  it.each([
-    {
-      key: EXTRA_ASSETS_GTIMG_HERO_LIST_FEATURE_GATE,
-      state: 'heroList',
-      method: 'getHeroList',
-      otherState: 'kiwiAugments',
-      otherMethod: 'getKiwiAugments'
-    },
-    {
-      key: EXTRA_ASSETS_GTIMG_KIWI_AUGMENTS_FEATURE_GATE,
-      state: 'kiwiAugments',
-      method: 'getKiwiAugments',
-      otherState: 'heroList',
-      otherMethod: 'getHeroList'
-    }
-  ] as const)(
-    'disables $state without interrupting the other resource',
-    async ({ key, state, method, otherState, otherMethod }) => {
-      const refresh = createRefresh()
-      refresh.controller.start()
-      await vi.advanceTimersByTimeAsync(0)
-      const signal = refresh.gtimgApi[method].mock.calls[0][0] as AbortSignal
-      const otherSignal = refresh.gtimgApi[otherMethod].mock.calls[0][0] as AbortSignal
-      const otherData = refresh.gtimg[otherState]
-
-      refresh.setEnabled(key, false)
-      expect(signal.aborted).toBe(true)
-      expect(otherSignal.aborted).toBe(false)
-      expect(refresh.gtimg[state]).toBeNull()
-      expect(refresh.gtimg[otherState]).toEqual(otherData)
-
-      await vi.advanceTimersByTimeAsync(GTIMG_HERO_LIST_UPDATE_INTERVAL)
-      expect(refresh.gtimgApi[method]).toHaveBeenCalledTimes(1)
-      expect(refresh.gtimgApi[otherMethod]).toHaveBeenCalledTimes(2)
-
-      refresh.setEnabled(key, true)
-      await vi.advanceTimersByTimeAsync(0)
-      expect(refresh.gtimgApi[method]).toHaveBeenCalledTimes(2)
-      expect(refresh.gtimgApi[otherMethod]).toHaveBeenCalledTimes(2)
-      expect(refresh.gtimg[state]).not.toBeNull()
-    }
-  )
 
   it('aborts in-flight requests and rejects late results even after re-enabling', async () => {
     const refresh = createRefresh(true)

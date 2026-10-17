@@ -24,7 +24,8 @@ opgg:
       opgg: OP.GG
       qq101: 101
     modes:
-      ranked: 排位
+      ranked: 单双排
+      flex: 灵活排位
       classic: 经典模式
       aram: 极地大乱斗
       aram_mayhem: 海克斯大乱斗
@@ -86,6 +87,10 @@ opgg:
       bestChampions: 适配英雄
       combination: 英雄组合
   sources:
+    disabled: 已禁用
+    noneEnabled: 尚未启用数据源
+    enableDescription: 启用 OP.GG 或 101，开始查看英雄数据。
+    openSettings: 打开设置
     qq101Placeholder: 101 数据源界面正在独立设计，当前版本暂不展示数据
     unavailable: 当前没有可用的英雄数据源
     updateRequired: 请更新至 {{version}} 或更高版本
@@ -135,6 +140,13 @@ opgg:
     dataUnavailable: 当前数据源不支持此模式或暂不可用
     settings:
       title: 英雄数据设置
+      sources:
+        label: 数据来源
+        description: 可分别启用或关闭。每次打开窗口时显示默认来源，也可以全部关闭。
+        default: 默认
+        defaultLabel: 将 {{source}} 设为默认来源
+        enableLabel: 启用 {{source}}
+        saveFailed: 保存数据源设置失败，请重试
       temporarilyUnavailable: 暂不可用
       flashPosition:
         label: 闪现位置偏好
@@ -162,6 +174,17 @@ opgg:
     runesSet: '[$t(common:appName)] 已{{action}}符文配法: {{name}}'
     sessionChampions:
       title: 本局英雄
+  itemProgression:
+    title: 按顺序出装
+    kind: 出装统计类型
+    single: 单件装备
+    combined: 装备组合
+    singleStage: 第 {{order}} 件
+    combinedStage: '{{order}} 件套'
+    build: 出装
+    help: 出装统计说明
+    description: 单件按购买顺序统计；组合展示从第一件开始的完整出装顺序。
+    note: 不同出装阶段的样本不同，请结合场次比较胜率。
   champion:
     boots: 鞋子
     adorableRabi: 兔兔好可爱
@@ -173,7 +196,7 @@ opgg:
     banRate: 禁用率
     matchups: 对位数据
     counter: 劣势对位
-    allCounters: 所有对位
+    advantage: 优势对位
     empty: 暂无数据
     times: '{{times}} 场'
     expand: 展开
@@ -182,13 +205,15 @@ opgg:
     apply: 应用
     runes: 符文配法
     abilityBuild: 技能点法
+    skillEvolution: '{{level}} 级：升级 R，进化 {{skill}}'
     runesFooter: 应用时会创建或替换客户端符文页。
     starterItemText: 初始装备
     prismItemText: 棱彩阶装备
     coreItemText: 核心装备
     itemText: 装备
-    applyRunes: 导入当前装备方案
-    applyRunesText: 方案应用
+    importItemSet: 导入
+    addItemSet: 导入整套装备方案
+    connectToAddItemSet: 连接客户端后可添加整套装备方案
     augments: 强化符文
     augmentAll: 全部
     augmentGold: 黄金阶

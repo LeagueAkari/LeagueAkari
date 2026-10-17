@@ -42,7 +42,10 @@ const formatter = new Intl.NumberFormat('en-US', {
 })
 
 const balanceItems = computed(() =>
-  (champion.value?.balance ?? []).map((adjustment) => ({
+  (champion.value && champion.value.kind !== 'arena' && champion.value.kind !== 'aram_mayhem'
+    ? champion.value.balance
+    : []
+  ).map((adjustment) => ({
     ...adjustment,
     relativeValueText:
       formatter.format(adjustment.relativeValue) + (adjustment.display === 'percentage' ? '%' : '')

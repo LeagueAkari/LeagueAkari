@@ -1,15 +1,6 @@
 import type { OpggChampionDataPreferences } from '.'
 import type { OpggAramBalanceAdjustment } from '../../data-adapter/opgg-aram-balance'
-import type {
-  OpggAramMayhemChampionAugment,
-  OpggArenaAugment,
-  OpggArenaSynergy,
-  OpggChampionCounter,
-  OpggItemBuild,
-  OpggRuneBuild,
-  OpggSkillMastery,
-  OpggSummonerSpellBuild
-} from '../opgg'
+import type { OpggSkillCode } from '../opgg'
 
 export interface OpggChampionDataQuery extends OpggChampionDataPreferences {
   championId: number | null
@@ -21,13 +12,16 @@ export type OpggChampionDataQueryUpdate = Partial<OpggChampionDataQuery>
 
 export type OpggFlashPosition = 'auto' | 'd' | 'f'
 
-export interface OpggChampionDataCounter extends OpggChampionCounter {
+export interface OpggChampionDataCounter {
+  championId: number
+  play: number
+  win: number | null
   winRate: number | null
-  loss: number
+  loss: number | null
 }
 
 export interface OpggChampionDataRow {
-  id: number
+  championId: number
   rank: number | null
   tier: number | null
   winRate: number | null
@@ -39,22 +33,63 @@ export interface OpggChampionDataRow {
   counters: OpggChampionDataCounter[]
 }
 
-export interface OpggChampionDataSummary extends Omit<OpggChampionDataRow, 'counters'> {
+export type OpggChampionDataSummary = Omit<OpggChampionDataRow, 'counters'> &
+  (
+    | { kind: 'win-rate' }
+    | { kind: 'placement'; averagePlace: number | null; firstPlaceRate: number | null }
+  )
+
+export interface OpggRecommendationStats {
+  recommendationId: string
+  play: number
+  win: number | null
+  pickRate: number
+  winRate: number | null
+  loss: number | null
+}
+
+export type OpggRecommendation<T> = T & OpggRecommendationStats
+
+export type OpggPlacementRecommendation<T> = OpggRecommendation<T> & {
   averagePlace: number | null
   firstPlaceRate: number | null
 }
 
-export type OpggRecommendation<T> = T & {
-  recommendationId: string
-  winRate: number | null
-  loss: number
-  averagePlace: number | null
-  firstPlaceRate: number | null
+export interface OpggItemBuild {
+  itemIds: number[]
+}
+
+export interface OpggItemBuildStage {
+  order: number
+  builds: OpggRecommendation<OpggItemBuild>[]
+}
+
+export interface OpggSummonerSpellBuild {
+  spellIds: [number, number]
+}
+
+export interface OpggSkillMastery {
+  skills: OpggSkillCode[]
+  orders: OpggSkillCode[][]
+}
+
+export interface OpggRuneBuild {
+  primaryStyleId: number
+  secondaryStyleId: number
+  primaryRuneIds: number[]
+  secondaryRuneIds: number[]
+  statShardIds: number[]
 }
 
 export type OpggAugmentSort = 'default' | 'performance' | 'popular'
+
 export type OpggKiwiAugmentRarity = 'all' | 'kSilver' | 'kGold' | 'kPrismatic'
-export interface OpggChampionDataKiwiAugment extends OpggAramMayhemChampionAugment {
+
+export interface OpggChampionDataKiwiAugment {
+  augmentId: number
+  tier: number | null
+  performance: number
+  popular: number
   rarity: Exclude<OpggKiwiAugmentRarity, 'all'> | null
   sortRanks: Record<OpggAugmentSort, number>
 }
@@ -66,42 +101,60 @@ export interface OpggItemSetGroup {
   items: number[]
 }
 
-export interface OpggChampionDataDetails {
+interface OpggDetailsBase {
   summary: OpggChampionDataSummary
-  summonerSpells: OpggRecommendation<OpggSummonerSpellBuild>[]
-  runes: OpggRecommendation<OpggRuneBuild>[]
+  hasContent: boolean
+}
+
+interface OpggBuildDetails extends OpggDetailsBase {
   skillMasteries: OpggRecommendation<OpggSkillMastery>[]
   starterItems: OpggRecommendation<OpggItemBuild>[]
   boots: OpggRecommendation<OpggItemBuild>[]
-  prismItems: OpggRecommendation<OpggItemBuild>[]
   coreItems: OpggRecommendation<OpggItemBuild>[]
   lastItems: OpggRecommendation<OpggItemBuild>[]
+  itemSet: { recommendationId: string; groups: OpggItemSetGroup[] } | null
+}
+
+export interface OpggStandardDetails extends OpggBuildDetails {
+  kind: 'ranked' | 'flex' | 'aram' | 'nexus_blitz' | 'urf'
+  itemBuildsByOrder: { single: OpggItemBuildStage[]; combined: OpggItemBuildStage[] }
+  summonerSpells: OpggRecommendation<OpggSummonerSpellBuild>[]
+  runes: OpggRecommendation<OpggRuneBuild>[]
   counters: { recommended: OpggChampionDataCounter[]; all: OpggChampionDataCounter[] }
-  synergies: OpggRecommendation<OpggArenaSynergy>[]
+  balance: (OpggAramBalanceAdjustment & { relativeValue: number })[]
+}
+
+export interface OpggArenaDetails extends OpggBuildDetails {
+  kind: 'arena'
+  prismItems: OpggRecommendation<OpggItemBuild>[]
+  synergies: OpggPlacementRecommendation<{ championId: number }>[]
   augmentGroups: Partial<
     Record<
       1 | 4 | 8,
       {
         rarity: 1 | 4 | 8
-        augments: OpggRecommendation<OpggArenaAugment>[]
+        augments: OpggRecommendation<{ augmentId: number }>[]
       }
     >
   >
+}
+
+export interface OpggMayhemDetails extends OpggDetailsBase {
+  kind: 'aram_mayhem'
   kiwiAugmentGroups: {
     rarity: OpggKiwiAugmentRarity
     augments: OpggChampionDataKiwiAugment[]
   }[]
-  balance: (OpggAramBalanceAdjustment & { relativeValue: number })[]
-  itemSet: { recommendationId: string; groups: OpggItemSetGroup[] } | null
-  hasContent: boolean
 }
+
+export type OpggChampionDataDetails = OpggStandardDetails | OpggArenaDetails | OpggMayhemDetails
 
 export interface OpggChampionDataSnapshot {
   generation: number
   activePage: number | null
-  openedChampions: number[]
+  openedPages: number[]
   pages: Record<number, OpggChampionPage>
-  overviewState: OpggPageState
+  overviewState: OpggQueryPageState
   followSelectionId: number
   query: OpggChampionDataQuery
   version: string | null
@@ -119,14 +172,25 @@ export interface OpggPageState {
   stale: boolean
 }
 
-export interface OpggChampionPage extends OpggPageState {
+export interface OpggQueryPageState extends OpggPageState {
+  query: OpggChampionDataQuery
+  version: string | null
+  versions: string[]
+}
+
+export interface OpggChampionPage extends OpggQueryPageState {
   champion: OpggChampionDataDetails | null
 }
 
-export interface OpggApplyRecommendation {
+export interface OpggChampionBalance {
   championId: number
-  generation: number
-  revision: number
-  recommendationId: string
-  kind: 'runes' | 'spells' | 'items'
+  attackSpeed: number
+  damageDealt: number
+  damageTaken: number
+  abilityHaste: number
+  healing: number
+  tenacity: number
+  shieldAmount: number
+  energyRegen: number
+  areaOfEffectDamage: number
 }

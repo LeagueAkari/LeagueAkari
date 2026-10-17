@@ -12,9 +12,17 @@ export function createOpggSnapshot(
   return {
     generation: 0,
     activePage: null,
-    openedChampions: [],
+    openedPages: [],
     pages: {},
-    overviewState: { status: 'idle', error: null, revision: 0, stale: true },
+    overviewState: {
+      status: 'idle',
+      error: null,
+      revision: 0,
+      stale: true,
+      query: { ...preferences, championId: null, version: null },
+      version: null,
+      versions: []
+    },
     followSelectionId: 0,
     query: { ...preferences, championId: null, version: null },
     version: null,

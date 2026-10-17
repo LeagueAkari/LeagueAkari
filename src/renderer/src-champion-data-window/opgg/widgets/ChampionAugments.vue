@@ -27,77 +27,41 @@
     </template>
 
     <div class="p-3">
-      <div
-        class="mb-1 flex items-center gap-1 last:mb-0"
+      <RecommendationRow
         v-for="(a, i) of selectedAugments.slice(0, isAugmentsExpanded ? Infinity : 4)"
-        :key="a.id"
+        :key="a.augmentId"
+        :rank="i + 1"
       >
-        <div class="min-w-6 shrink-0 text-[10px] text-[#666666] dark:text-[#b2b2b2]">
-          #{{ i + 1 }}
-        </div>
-        <div class="flex min-w-0 items-center gap-1">
-          <AugmentDisplay :size="24" :augment-id="a.id" class="mr-1 shrink-0" />
-          <span class="name truncate text-xs">{{ resources.augments.name(a.id) }}</span>
-        </div>
-        <div class="desc ml-auto flex shrink-0 items-center">
-          <StatisticPopover
-            metric="pickRate"
-            :value="(a.pick_rate * 100).toFixed(2) + '%'"
-            :play="a.play"
-          >
-            <div class="pick flex min-w-19 flex-col items-center">
-              <span class="pick-rate text-xs font-bold text-[#1a1a1a] dark:text-[#ebebeb]"
-                >{{ (a.pick_rate * 100).toFixed(2) }}%</span
-              >
+        <AugmentLabel :augment-id="a.augmentId" />
 
-              <span class="pick-play text-center text-xs text-[#666666] dark:text-[#bebebe]">
-                {{
-                  t('opgg.champion.times', {
-                    times: a.play.toLocaleString()
-                  })
-                }}</span
-              >
-            </div>
-          </StatisticPopover>
-          <StatisticPopover
-            metric="winRate"
-            :value="formatWinRate(a.winRate)"
-            :play="a.play"
-            :record="a"
-          >
-            <div
-              class="win-rate min-w-19 text-center text-xs font-bold"
-              :style="{ color: getWinRateColor(a.winRate) }"
-            >
-              {{ formatWinRate(a.winRate) }}
-            </div>
-          </StatisticPopover>
-        </div>
-      </div>
+        <template #metrics>
+          <RecommendationStats :record="a" />
+        </template>
+      </RecommendationRow>
     </div>
   </SettingsSection>
 </template>
 
 <script setup lang="ts">
+import AugmentLabel from '@champion-data-window/components/champion-statistics/AugmentLabel.vue'
+import RecommendationRow from '@champion-data-window/components/champion-statistics/RecommendationRow.vue'
 import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
-import AugmentDisplay from '@renderer-shared/components/widgets/AugmentDisplay.vue'
-import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { useTranslation } from 'i18next-vue'
 import { NFlex, NRadio, NRadioGroup } from 'naive-ui'
 import { computed, ref, watchEffect } from 'vue'
 
 import { useOpgg } from '../context'
-import { useWinRateTheme } from '@champion-data-window/components/champion-statistics/theme'
-import ExpandButton from './ExpandButton.vue'
-import StatisticPopover from './StatisticPopover.vue'
+import ExpandButton from '@champion-data-window/components/champion-statistics/ExpandButton.vue'
+import RecommendationStats from './RecommendationStats.vue'
 
 const { champion } = useOpgg()
 const { t } = useTranslation()
-const { getWinRateColor, formatWinRate } = useWinRateTheme()
-const resources = useAkariResourceProvider()
 
 const augmentRarity = ref<1 | 4 | 8>()
-const augments = computed(() => champion.value?.augmentGroups ?? null)
+
+const augments = computed(() =>
+  champion.value?.kind === 'arena' ? champion.value.augmentGroups : null
+)
 
 const selectedAugments = computed(() => {
   const groups = augments.value

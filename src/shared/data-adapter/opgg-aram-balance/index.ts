@@ -1,6 +1,15 @@
-import type { OpggAramBalanceItem } from '@shared/types/opgg'
+import type { OpggChampionBalance } from '@shared/types/champion-data/opgg'
 
-type OpggAramBalanceField = Exclude<keyof OpggAramBalanceItem, 'champion_id' | 'default'>
+type OpggAramBalanceField =
+  | 'damage_dealt'
+  | 'damage_taken'
+  | 'attack_speed'
+  | 'cooldown_reduction'
+  | 'healing'
+  | 'tenacity'
+  | 'shield_amount'
+  | 'energy_regen'
+  | 'area_of_effect_damage'
 
 export type OpggAramBalanceAdjustmentType =
   | 'damage-dealt'
@@ -26,68 +35,78 @@ export interface OpggAramBalanceAdjustment {
 const BALANCE_DEFINITIONS = [
   {
     field: 'damage_dealt',
+    valueKey: 'damageDealt',
     type: 'damage-dealt',
     display: 'percentage',
     effectType: 'buff'
   },
   {
     field: 'damage_taken',
+    valueKey: 'damageTaken',
     type: 'damage-taken',
     display: 'percentage',
     effectType: 'nerf'
   },
   {
     field: 'attack_speed',
+    valueKey: 'attackSpeed',
     type: 'attack-speed',
     display: 'percentage',
     effectType: 'buff'
   },
   {
     field: 'cooldown_reduction',
+    valueKey: 'abilityHaste',
     type: 'ability-haste',
     display: 'literal',
     effectType: 'buff'
   },
   {
     field: 'healing',
+    valueKey: 'healing',
     type: 'healing',
     display: 'percentage',
     effectType: 'buff'
   },
   {
     field: 'tenacity',
+    valueKey: 'tenacity',
     type: 'tenacity',
     display: 'literal',
     effectType: 'buff'
   },
   {
     field: 'shield_amount',
+    valueKey: 'shieldAmount',
     type: 'shielding',
     display: 'percentage',
     effectType: 'buff'
   },
   {
     field: 'energy_regen',
+    valueKey: 'energyRegen',
     type: 'energy-regen',
     display: 'percentage',
     effectType: 'buff'
   },
   {
     field: 'area_of_effect_damage',
+    valueKey: 'areaOfEffectDamage',
     type: 'area-of-effect-damage',
     display: 'percentage',
     effectType: 'buff'
   }
 ] as const satisfies readonly {
+  valueKey: Exclude<keyof OpggChampionBalance, 'championId'>
   field: OpggAramBalanceField
   type: OpggAramBalanceAdjustmentType
   display: OpggAramBalanceAdjustment['display']
   effectType: OpggAramBalanceAdjustment['effectType']
 }[]
 
-export function getOpggAramBalanceAdjustments(balance: OpggAramBalanceItem) {
+export function getOpggAramBalanceAdjustments(balance: OpggChampionBalance) {
   return BALANCE_DEFINITIONS.flatMap<OpggAramBalanceAdjustment>((definition, order) => {
-    const value = balance[definition.field]
+    const value = balance[definition.valueKey]
     const baseline = definition.display === 'percentage' ? 100 : 0
 
     if (value === baseline) {
@@ -104,7 +123,17 @@ export function getOpggAramBalanceAdjustments(balance: OpggAramBalanceItem) {
           ? 'nerfed'
           : 'buffed'
 
-    return [{ ...definition, value, effect, order }]
+    return [
+      {
+        field: definition.field,
+        type: definition.type,
+        display: definition.display,
+        effectType: definition.effectType,
+        value,
+        effect,
+        order
+      }
+    ]
   })
 }
 

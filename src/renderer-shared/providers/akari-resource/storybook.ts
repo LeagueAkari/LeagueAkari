@@ -1,6 +1,7 @@
 import braveryIcon from '@renderer-shared/assets/champions/bravery-circle.png?inline'
 import { i18next } from '@renderer-shared/i18n'
 import { championBaseSplashUri } from '@renderer-shared/shards/league-client/game-data-assets'
+import { parseGtimgClassicHeroes } from '@shared/data-adapter/gtimg'
 import type { GtimgClassicHero } from '@shared/data-sources/gtimg'
 import type {
   Augment,
@@ -195,11 +196,11 @@ export function createStorybookAkariResourceProvider(
 ): AkariResourceProviderValue {
   const state = shallowRef(createEmptyState())
   const classicHeroes = shallowRef(new Map<number, GtimgClassicHero>())
-  void fetchJson<{ heroes: GtimgClassicHero[] }>(
-    'https://game.gtimg.cn/images/lol/act/img/jade/js/heroes_index.js'
-  )
+  void fetchJson<unknown>('https://game.gtimg.cn/images/lol/act/img/jade/js/heroes_index.js')
     .then((catalog) => {
-      classicHeroes.value = new Map(catalog.heroes.map((hero) => [hero.heroId, hero]))
+      classicHeroes.value = new Map(
+        (parseGtimgClassicHeroes(catalog).data ?? []).map((hero) => [hero.heroId, hero])
+      )
     })
     .catch(() => {
       // Optional catalog; ordinary Storybook resources load independently.
@@ -240,6 +241,7 @@ export function createStorybookAkariResourceProvider(
       get locale() {
         return toValue(options.locale)
       },
+
       get colorMode() {
         return toValue(options.colorMode)
       }
@@ -255,6 +257,7 @@ export function createStorybookAkariResourceProvider(
       roles(id) {
         return classicHeroes.value.get(id)?.roles ?? state.value.champions.get(id)?.roles ?? []
       },
+
       name(id) {
         if (id >= 60000) {
           return classicHeroes.value.get(id)?.name ?? String(id)
@@ -271,11 +274,13 @@ export function createStorybookAkariResourceProvider(
 
         return state.value.champions.get(id)?.name || id.toString()
       },
+
       icon(id) {
         if (id >= 60000) {
           const hero = classicHeroes.value.get(id)
           return hero ? { id, iconPath: hero.portrait } : null
         }
+
         if (id === -3) {
           return {
             id,
@@ -288,6 +293,7 @@ export function createStorybookAkariResourceProvider(
           iconPath: `/lol-game-data/assets/v1/champion-icons/${id}.png`
         }
       },
+
       baseSplash(id) {
         const champion = state.value.champions.get(id)
 
@@ -297,9 +303,11 @@ export function createStorybookAkariResourceProvider(
 
         return championBaseSplashUri(champion.alias)
       },
+
       searchKeywords() {
         return []
       },
+
       aramBalance() {
         return null
       }
@@ -354,6 +362,7 @@ export function createStorybookAkariResourceProvider(
       name(id) {
         return state.value.perks.get(id)?.name || id.toString()
       },
+
       display(id) {
         const perk = state.value.perks.get(id)
 
@@ -392,6 +401,7 @@ export function createStorybookAkariResourceProvider(
       name(id) {
         return state.value.summonerSpells.get(id)?.name || id.toString()
       },
+
       display(id) {
         const spell = state.value.summonerSpells.get(id)
 
@@ -414,6 +424,7 @@ export function createStorybookAkariResourceProvider(
       name(id) {
         return state.value.augments.get(id)?.nameTRA || id.toString()
       },
+
       display(id): AugmentDisplayResource | null {
         const augment = state.value.augments.get(id)
 

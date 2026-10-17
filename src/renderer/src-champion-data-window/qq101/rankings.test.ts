@@ -23,12 +23,12 @@ describe('QQ101 rankings projection', () => {
     const data = parseQq101TierList(
       response(17960, { datadetails: '1_103_T1_MIDDLE_52_10_1__0#2_103_T3_TOP_48_1_1__-1' }),
       '16.19'
-    )
+    ).data
     const rows = projectRankings({ mode: 'ranked', data }, 'champions', 'all', resources)
     expect(new Set(rows.map((row) => row.key)).size).toBe(2)
     const classic = parseQq101ClassicTierList(
       response(18009, { tierscore_top_hero_list: '1|60103|52|10|1|T1|0' })
-    )
+    ).data
     expect(
       projectRankings({ mode: 'classic', data: classic }, 'champions', 'all', resources)[0].ids
     ).toEqual([60103])
@@ -43,7 +43,7 @@ describe('QQ101 rankings projection', () => {
         ).join('#')
       }),
       '20260926'
-    )
+    ).data
     const overview = {
       mode: 'aram_mayhem' as const,
       data: {
@@ -74,7 +74,7 @@ describe('QQ101 rankings projection', () => {
   it('retains missing augment resources and both ranking metrics', () => {
     const { augments } = parseQq101MayhemAugments(
       response(15381, { augmentlist: '1379_255_0.12_2_-3_0.55_1_2_' })
-    )
+    ).data
     const rows = projectRankings(
       {
         mode: 'aram_mayhem',

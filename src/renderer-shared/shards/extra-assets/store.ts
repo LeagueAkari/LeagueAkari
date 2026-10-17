@@ -1,3 +1,4 @@
+import type { GtimgGuideCatalogs } from '@shared/data-adapter/gtimg/guide-resources'
 import {
   GtimgClassicHero,
   GtimgHeroListJs,
@@ -9,13 +10,19 @@ import { computed, shallowReactive } from 'vue'
 
 export const useExtraAssetsStore = defineStore('shard:extra-assets-renderer', () => {
   const gtimg = shallowReactive({
+    enabled: true,
+    guideCatalogs: { items: {}, perks: {}, spells: {} } as GtimgGuideCatalogs,
     heroList: null as GtimgHeroListJs | null,
     classicHeroes: null as GtimgClassicHero[] | null,
     kiwiAugments: null as GtimgKiwiAugments[] | null
   })
 
+  const guideCatalogs = computed<GtimgGuideCatalogs>(() =>
+    gtimg.enabled ? gtimg.guideCatalogs : { items: {}, perks: {}, spells: {} }
+  )
+
   const kiwiAugmentsMap = computed(() => {
-    if (!gtimg.kiwiAugments) return {}
+    if (!gtimg.enabled || !gtimg.kiwiAugments) return {}
 
     try {
       return gtimg.kiwiAugments.reduce(
@@ -31,7 +38,7 @@ export const useExtraAssetsStore = defineStore('shard:extra-assets-renderer', ()
   })
 
   const heroListMap = computed(() => {
-    if (!gtimg.heroList) return {}
+    if (!gtimg.enabled || !gtimg.heroList) return {}
 
     try {
       return gtimg.heroList.hero.reduce(
@@ -47,13 +54,16 @@ export const useExtraAssetsStore = defineStore('shard:extra-assets-renderer', ()
   })
 
   const classicHeroesMap = computed(() =>
-    Object.fromEntries((gtimg.classicHeroes ?? []).map((hero) => [hero.heroId, hero]))
+    Object.fromEntries(
+      (gtimg.enabled ? (gtimg.classicHeroes ?? []) : []).map((hero) => [hero.heroId, hero])
+    )
   )
 
   return {
     gtimg,
 
     // computed
+    guideCatalogs,
     heroListMap,
     classicHeroesMap,
     kiwiAugmentsMap

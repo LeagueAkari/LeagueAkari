@@ -46,54 +46,50 @@
 
     <div class="p-3">
       <div
-        class="grid gap-x-6 gap-y-1"
+        class="grid gap-x-6"
         :class="{
           'grid-cols-1 @min-[600px]:grid-cols-2': showAdvancedStats,
           'grid-cols-2': !showAdvancedStats
         }"
       >
-        <div
-          class="flex h-8 min-w-0 items-center gap-1"
+        <RecommendationRow
           v-for="(a, i) of selectedAugments.slice(0, isAugmentsExpanded ? Infinity : 16)"
-          :key="a.id"
+          :key="a.augmentId"
+          :rank="i + 1"
         >
-          <!-- name -->
-          <div class="min-w-6 shrink-0 text-[10px] text-[#666666] dark:text-[#b2b2b2]">
-            #{{ i + 1 }}
-          </div>
-
-          <!-- tier -->
-          <div
-            v-if="a.tier !== null"
-            class="mr-1 flex size-4 shrink-0 items-center justify-center rounded text-[11px]"
-            :class="TIER_COLOR[a.tier]"
-          >
-            {{ TIER_NAME[a.tier] }}
-          </div>
-
           <div class="flex min-w-0 items-center gap-1">
-            <AugmentDisplay :size="24" :augment-id="a.id" class="mr-1" />
-            <span class="name truncate text-xs">{{ resources.augments.name(a.id) }}</span>
+            <div
+              v-if="a.tier !== null"
+              class="mr-1 flex size-4 shrink-0 items-center justify-center rounded text-[11px]"
+              :class="TIER_COLOR[a.tier]"
+            >
+              {{ TIER_NAME[a.tier] }}
+            </div>
+            <AugmentLabel :augment-id="a.augmentId" />
           </div>
 
-          <StatisticPopover v-if="showAdvancedStats" metric="performance" :value="a.performance">
-            <div
-              class="ml-auto flex h-4 shrink-0 items-center justify-center rounded bg-black/10 px-1 text-[11px] text-black dark:bg-white/10 dark:text-white"
-            >
-              {{ t('opgg.champion.augmentPerformance') }}
-              <span class="ml-1 font-bold">{{ a.performance }}</span>
-            </div>
-          </StatisticPopover>
+          <template v-if="showAdvancedStats" #metrics>
+            <div class="flex items-center gap-1">
+              <StatisticPopover metric="performance" :value="a.performance">
+                <div
+                  class="flex h-4 shrink-0 items-center justify-center rounded bg-black/10 px-1 text-[11px] text-black dark:bg-white/10 dark:text-white"
+                >
+                  {{ t('opgg.champion.augmentPerformance') }}
+                  <span class="ml-1 font-bold">{{ a.performance }}</span>
+                </div>
+              </StatisticPopover>
 
-          <StatisticPopover v-if="showAdvancedStats" metric="popular" :value="a.popular">
-            <div
-              class="flex h-4 shrink-0 items-center justify-center rounded bg-black/10 px-1 text-[11px] text-black dark:bg-white/10 dark:text-white"
-            >
-              {{ t('opgg.champion.augmentPopular') }}
-              <span class="ml-1 font-bold">{{ a.popular }}</span>
+              <StatisticPopover metric="popular" :value="a.popular">
+                <div
+                  class="flex h-4 shrink-0 items-center justify-center rounded bg-black/10 px-1 text-[11px] text-black dark:bg-white/10 dark:text-white"
+                >
+                  {{ t('opgg.champion.augmentPopular') }}
+                  <span class="ml-1 font-bold">{{ a.popular }}</span>
+                </div>
+              </StatisticPopover>
             </div>
-          </StatisticPopover>
-        </div>
+          </template>
+        </RecommendationRow>
       </div>
     </div>
   </SettingsSection>
@@ -101,8 +97,8 @@
 
 <script setup lang="tsx">
 import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
-import AugmentDisplay from '@renderer-shared/components/widgets/AugmentDisplay.vue'
-import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
+import AugmentLabel from '@champion-data-window/components/champion-statistics/AugmentLabel.vue'
+import RecommendationRow from '@champion-data-window/components/champion-statistics/RecommendationRow.vue'
 import type { OpggKiwiAugmentRarity } from '@shared/types/champion-data/opgg'
 import { ArrowSort16Filled } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
@@ -110,12 +106,11 @@ import { NCheckbox, NFlex, NIcon, NRadio, NRadioGroup, NSelect, SelectOption } f
 import { computed, ref, watch, watchEffect } from 'vue'
 
 import { useOpgg } from '../context'
-import ExpandButton from './ExpandButton.vue'
+import ExpandButton from '@champion-data-window/components/champion-statistics/ExpandButton.vue'
 import StatisticPopover from './StatisticPopover.vue'
 
 const { champion } = useOpgg()
 const { t } = useTranslation()
-const resources = useAkariResourceProvider()
 
 const augmentRarity = ref<OpggKiwiAugmentRarity>()
 const augmentSort = ref<AugmentSort>('default')
@@ -141,6 +136,7 @@ const TIER_COLOR = {
 }
 
 type AugmentSort = 'default' | 'performance' | 'popular'
+
 const augmentSortOptions = computed(() => [
   { label: t('opgg.champion.augmentSort.default'), value: 'default' },
   { label: t('opgg.champion.augmentSort.performance'), value: 'performance' },
@@ -167,15 +163,18 @@ const rarityLabels = {
   kGold: 'augmentGold',
   kPrismatic: 'augmentPrism'
 } as const
+
 const augments = computed(
   () =>
-    champion.value?.kiwiAugmentGroups.map((group) => ({
-      rarity: group.rarity,
-      rarityName: t(`opgg.champion.${rarityLabels[group.rarity]}`),
-      augments: group.augments.toSorted(
-        (a, b) => a.sortRanks[augmentSort.value] - b.sortRanks[augmentSort.value]
-      )
-    })) ?? []
+    (champion.value?.kind === 'aram_mayhem' ? champion.value.kiwiAugmentGroups : []).map(
+      (group) => ({
+        rarity: group.rarity,
+        rarityName: t(`opgg.champion.${rarityLabels[group.rarity]}`),
+        augments: group.augments.toSorted(
+          (a, b) => a.sortRanks[augmentSort.value] - b.sortRanks[augmentSort.value]
+        )
+      })
+    ) ?? []
 )
 
 const selectedAugments = computed(() => {

@@ -1,6 +1,7 @@
 import type {
   OpggAramChampionOverview,
   OpggArenaChampionOverview,
+  OpggDoomChampionOverview,
   OpggNexusBlitzChampionOverview,
   OpggRankedChampionOverview,
   OpggUrfChampionOverview
@@ -15,6 +16,11 @@ interface OpggPickStats {
 
 export interface OpggItemBuild extends OpggPickStats {
   ids: number[]
+}
+
+export interface OpggItemBuildGroup {
+  depth: number
+  items: OpggItemBuild[]
 }
 
 export interface OpggArenaItemBuild extends OpggItemBuild {
@@ -133,6 +139,9 @@ interface OpggWinRateChampionDetailsFields {
 
 export interface OpggRankedChampionDetails extends OpggWinRateChampionDetailsFields {
   summary: OpggRankedChampionOverview
+  // Returned with is_more; omitted by the default detail request.
+  single_items?: OpggItemBuildGroup[]
+  combination_items?: OpggItemBuildGroup[]
 }
 
 export interface OpggAramChampionDetails extends OpggWinRateChampionDetailsFields {
@@ -145,6 +154,10 @@ export interface OpggNexusBlitzChampionDetails extends OpggWinRateChampionDetail
 
 export interface OpggUrfChampionDetails extends OpggWinRateChampionDetailsFields {
   summary: OpggUrfChampionOverview
+}
+
+export interface OpggDoomChampionDetails extends OpggWinRateChampionDetailsFields {
+  summary: OpggDoomChampionOverview
 }
 
 export interface OpggArenaChampionDetails {
@@ -178,6 +191,11 @@ export interface OpggRankedChampionDetailsResponse {
   meta: OpggChampionDetailsMeta
 }
 
+export interface OpggRankedChampionCountersResponse {
+  data: OpggChampionCounter[]
+  meta: OpggChampionDetailsMeta
+}
+
 export interface OpggAramChampionDetailsResponse {
   data: OpggAramChampionDetails
   meta: OpggChampionDetailsMeta
@@ -198,9 +216,15 @@ export interface OpggUrfChampionDetailsResponse {
   meta: OpggChampionDetailsMeta
 }
 
+export interface OpggDoomChampionDetailsResponse {
+  data: OpggDoomChampionDetails
+  meta: OpggChampionDetailsMeta
+}
+
 export type OpggChampionDetailsResponse =
   | OpggRankedChampionDetailsResponse
   | OpggAramChampionDetailsResponse
   | OpggArenaChampionDetailsResponse
   | OpggNexusBlitzChampionDetailsResponse
   | OpggUrfChampionDetailsResponse
+  | OpggDoomChampionDetailsResponse

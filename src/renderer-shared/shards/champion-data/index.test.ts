@@ -11,6 +11,8 @@ import {
 } from './context'
 import { useChampionDataStore } from './store'
 
+vi.mock('@renderer-shared/i18n', () => ({ i18next: { t: (key: string) => key } }))
+
 const api = vi.hoisted(() => ({
   getPatches: vi.fn(),
   getTierList: vi.fn()
@@ -32,8 +34,15 @@ describe('shared champion-data initialization', () => {
       setActivePinia(createPinia())
       const store = useChampionDataStore()
       const overview = { date: '20260916', patch: '16.18', champions: [] }
-      api.getPatches.mockResolvedValue([{ id: 18, name: '16.18' }])
-      api.getTierList.mockResolvedValue(overview)
+      api.getPatches.mockResolvedValue({ data: { code: 0, data: [{ id: '18', name: '16.18' }] } })
+      api.getTierList.mockResolvedValue({
+        data: {
+          code: 0,
+          data: {
+            _fieldValues: { R17960: JSON.stringify({ dtstatdate: '20260916', datadetails: '' }) }
+          }
+        }
+      })
 
       const sync = vi.fn(async (namespace: string, stateId: string) => {
         if (namespace === CHAMPION_DATA_OPGG_NAMESPACE && stateId === 'resources') {
@@ -49,6 +58,7 @@ describe('shared champion-data initialization', () => {
         { sync } as unknown as ConstructorParameters<typeof ChampionDataRenderer>[1],
         {} as ConstructorParameters<typeof ChampionDataRenderer>[2],
         { warn: vi.fn() } as unknown as ConstructorParameters<typeof ChampionDataRenderer>[3],
+        {} as ConstructorParameters<typeof ChampionDataRenderer>[4],
         enableFullData ? { enableFullData: true } : undefined
       )
 

@@ -5,7 +5,7 @@ import { useChampionDataStore } from '@renderer-shared/shards/champion-data/stor
 import { useExtraAssetsStore } from '@renderer-shared/shards/extra-assets/store'
 import { championBaseSplashUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { gtimgUrl } from '@shared/shards/extra-assets'
+import { gtimgUrl, isGtimgUrl } from '@shared/shards/extra-assets'
 import { lcuUrl } from '@shared/shards/league-client'
 
 import type {
@@ -34,6 +34,8 @@ export function createAkariResourceProvider(): AkariResourceProviderValue {
   const assets = {
     resolve(source: string) {
       const normalizedSource = source.trim()
+
+      if (!extra.gtimg.enabled && isGtimgUrl(normalizedSource)) return null
 
       if (!normalizedSource) {
         return null
@@ -73,7 +75,10 @@ export function createAkariResourceProvider(): AkariResourceProviderValue {
     const item = leagueClient.gameData.items[id]
 
     if (!item?.name || !item.iconPath) {
-      return null
+      const fallback = extra.guideCatalogs.items[id]
+      return fallback?.name && fallback.iconPath
+        ? { id, name: fallback.name, iconPath: fallback.iconPath }
+        : null
     }
 
     return {
@@ -96,6 +101,7 @@ export function createAkariResourceProvider(): AkariResourceProviderValue {
       get locale() {
         return app.settings.locale
       },
+
       get colorMode() {
         return app.colorTheme
       }
@@ -138,6 +144,7 @@ export function createAkariResourceProvider(): AkariResourceProviderValue {
           const hero = extra.classicHeroesMap[id]
           return hero ? { id, iconPath: hero.portrait } : null
         }
+
         if (id === -3) {
           return {
             id,
@@ -164,7 +171,9 @@ export function createAkariResourceProvider(): AkariResourceProviderValue {
         const champion = leagueClient.gameData.champions[id]
 
         if (!champion) {
-          return null
+          return extra.heroListMap[id]
+            ? `https://game.gtimg.cn/images/lol/act/img/skin/big${id}000.jpg`
+            : null
         }
 
         return championBaseSplashUri(champion.alias)
@@ -175,6 +184,7 @@ export function createAkariResourceProvider(): AkariResourceProviderValue {
         if (classic) {
           return [classic.name, classic.title, classic.alias, classic.baseAlias]
         }
+
         return extra.heroListMap[id]?.keywords.split(',') ?? []
       },
 
@@ -212,7 +222,19 @@ export function createAkariResourceProvider(): AkariResourceProviderValue {
         const item = leagueClient.gameData.items[id]
 
         if (!item?.name || !item.iconPath || typeof item.description !== 'string') {
-          return null
+          const fallback = extra.guideCatalogs.items[id]
+          return fallback?.name && fallback.iconPath
+            ? {
+                id,
+                name: fallback.name,
+                iconPath: fallback.iconPath,
+                descriptionHtml: fallback.description,
+                price: fallback.price,
+                totalPrice: fallback.totalPrice,
+                from: fallback.from.map(itemInline).filter((v) => v !== null),
+                to: fallback.to.map(itemInline).filter((v) => v !== null)
+              }
+            : null
         }
 
         return {
@@ -230,13 +252,27 @@ export function createAkariResourceProvider(): AkariResourceProviderValue {
 
     perks: {
       name(id: number) {
-        return leagueClient.gameData.perks[id]?.name || id.toString()
+        return (
+          leagueClient.gameData.perks[id]?.name ||
+          extra.guideCatalogs.perks[id]?.name ||
+          id.toString()
+        )
       },
+
       display(id: number) {
         const perk = leagueClient.gameData.perks[id]
 
         if (!perk?.name || !perk.iconPath || typeof perk.longDesc !== 'string') {
-          return null
+          const fallback = extra.guideCatalogs.perks[id]
+          return fallback?.name && fallback.iconPath
+            ? {
+                id,
+                name: fallback.name,
+                iconPath: fallback.iconPath,
+                longDescriptionHtml: fallback.description,
+                endOfGameStatDescriptions: []
+              }
+            : null
         }
 
         return {
@@ -254,7 +290,15 @@ export function createAkariResourceProvider(): AkariResourceProviderValue {
         const style = leagueClient.gameData.perkstyles.styles[id]
 
         if (!style?.name || !style.iconPath || typeof style.tooltip !== 'string') {
-          return null
+          const fallback = extra.guideCatalogs.perks[id]
+          return fallback?.name && fallback.iconPath
+            ? {
+                id,
+                name: fallback.name,
+                iconPath: fallback.iconPath,
+                tooltip: fallback.description
+              }
+            : null
         }
 
         return {
@@ -268,13 +312,19 @@ export function createAkariResourceProvider(): AkariResourceProviderValue {
 
     summonerSpells: {
       name(id: number) {
-        return leagueClient.gameData.summonerSpells[id]?.name || id.toString()
+        return (
+          leagueClient.gameData.summonerSpells[id]?.name ||
+          extra.guideCatalogs.spells[id]?.name ||
+          id.toString()
+        )
       },
+
       display(id: number) {
         const spell = leagueClient.gameData.summonerSpells[id]
 
         if (!spell?.name || !spell.iconPath || typeof spell.description !== 'string') {
-          return null
+          const fallback = extra.guideCatalogs.spells[id]
+          return fallback?.name && fallback.iconPath ? { ...fallback } : null
         }
 
         return {
@@ -298,6 +348,7 @@ export function createAkariResourceProvider(): AkariResourceProviderValue {
           id.toString()
         )
       },
+
       display(id: number): AugmentDisplayResource | null {
         const augment = leagueClient.gameData.augments[id]
         const gtimgAugment = extra.kiwiAugmentsMap[id]

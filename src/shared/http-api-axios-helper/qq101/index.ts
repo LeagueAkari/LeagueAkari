@@ -1,27 +1,6 @@
-import {
-  type Qq101ClassicPosition,
-  parseQq101AramChampions,
-  parseQq101Build,
-  parseQq101ClassicLanes,
-  parseQq101ClassicTierList,
-  parseQq101Durations,
-  parseQq101JungleRoutes,
-  parseQq101Matchups,
-  parseQq101MayhemAugments,
-  parseQq101MayhemChampions,
-  parseQq101MayhemDetails,
-  parseQq101MayhemPairSynergies,
-  parseQq101Patches,
-  parseQq101Positions,
-  parseQq101Runes,
-  parseQq101SkillOrder,
-  parseQq101SummonerSpells,
-  parseQq101Synergies,
-  parseQq101TierList,
-  parseQq101TierStats,
-  parseQq101Trend
-} from '@shared/data-adapter/qq101/protocol'
 import type { AxiosInstance } from 'axios'
+
+export type Qq101ClassicPosition = 'all' | 'top' | 'jungle' | 'middle' | 'bottom' | 'support'
 
 export interface Qq101RiftQuery {
   patch: string
@@ -31,6 +10,14 @@ export interface Qq101RiftQuery {
 
 export interface Qq101RequestOptions {
   signal?: AbortSignal
+}
+
+export type Qq101Role = 'all' | 'tank' | 'fighter' | 'assassin' | 'mage' | 'marksman' | 'support'
+
+export interface Qq101PairQuery {
+  championId: number | null
+  firstRole: Qq101Role
+  secondRole: Qq101Role
 }
 
 const RIFT_API_PATH = '/go/battle_info/odp_proxy/lol_101strategy'
@@ -51,9 +38,7 @@ export class Qq101HttpApiAxiosHelper {
     params: Record<string, string | number>,
     options: Qq101RequestOptions
   ) {
-    const response = await this._http.get<unknown>(path, { params, signal: options.signal })
-
-    return response.data
+    return this._http.get<unknown>(path, { params, signal: options.signal })
   }
 
   private _riftParams(query: Qq101RiftQuery, championId?: number) {
@@ -66,25 +51,11 @@ export class Qq101HttpApiAxiosHelper {
   }
 
   async getPatches(options: Qq101RequestOptions = {}) {
-    const data = await this._get('/go/database/versionlist', { zone: 'lol', from: 'h5' }, options)
-
-    return parseQq101Patches(data)
-  }
-
-  async getLatestPatch(options: Qq101RequestOptions = {}) {
-    const patches = await this.getPatches(options)
-
-    if (!patches[0]) {
-      throw new Error('QQ101 patch list is empty')
-    }
-
-    return patches[0].name
+    return this._get('/go/database/versionlist', { zone: 'lol', from: 'h5' }, options)
   }
 
   async getClassicLanes(options: Qq101RequestOptions = {}) {
-    return parseQq101ClassicLanes(
-      await this._get(`${MAYHEM_API_PATH}/jade_hero_lane`, { itype: 255 }, options)
-    )
+    return this._get(`${MAYHEM_API_PATH}/jade_hero_lane`, { itype: 255 }, options)
   }
 
   async getJungleRoutes(
@@ -92,71 +63,43 @@ export class Qq101HttpApiAxiosHelper {
     championId: number,
     options: Qq101RequestOptions = {}
   ) {
-    return parseQq101JungleRoutes(
-      await this._get(
-        `${RIFT_API_PATH}_jungle`,
-        {
-          itier: query.tier,
-          version_id: query.patch,
-          championid: championId
-        },
-        options
-      ),
-      championId
+    return this._get(
+      `${RIFT_API_PATH}_jungle`,
+      {
+        itier: query.tier,
+        version_id: query.patch,
+        championid: championId
+      },
+      options
     )
   }
 
   async getMayhemDetails(championId: number, options: Qq101RequestOptions = {}) {
-    return parseQq101MayhemDetails(
-      await this._get(`${MAYHEM_API_PATH}/fuwen_hero_rank`, { championid: championId }, options),
-      championId
-    )
+    return this._get(`${MAYHEM_API_PATH}/fuwen_hero_rank`, { championid: championId }, options)
   }
 
   async getTierList(query: Qq101RiftQuery, options: Qq101RequestOptions = {}) {
-    const data = await this._get(
+    return this._get(
       RIFT_API_PATH,
       { ...this._riftParams(query), sort_metric: 1, sort_order: 2 },
       options
     )
-
-    return parseQq101TierList(data, query.patch)
   }
 
   async getClassicTierList(position: Qq101ClassicPosition, options: Qq101RequestOptions = {}) {
-    const data = await this._get(CLASSIC_API_PATH, { lane: position, itier: 255 }, options)
-
-    return parseQq101ClassicTierList(data, position)
+    return this._get(CLASSIC_API_PATH, { lane: position, itier: 255 }, options)
   }
 
   async getTrend(query: Qq101RiftQuery, championId: number, options: Qq101RequestOptions = {}) {
-    const data = await this._get(
-      `${RIFT_API_PATH}_trend`,
-      this._riftParams(query, championId),
-      options
-    )
-
-    return parseQq101Trend(data, championId)
+    return this._get(`${RIFT_API_PATH}_trend`, this._riftParams(query, championId), options)
   }
 
   async getMatchups(query: Qq101RiftQuery, championId: number, options: Qq101RequestOptions = {}) {
-    const data = await this._get(
-      `${RIFT_API_PATH}_confront`,
-      this._riftParams(query, championId),
-      options
-    )
-
-    return parseQq101Matchups(data, championId)
+    return this._get(`${RIFT_API_PATH}_confront`, this._riftParams(query, championId), options)
   }
 
   async getSynergies(query: Qq101RiftQuery, championId: number, options: Qq101RequestOptions = {}) {
-    const data = await this._get(
-      `${RIFT_API_PATH}_partner`,
-      this._riftParams(query, championId),
-      options
-    )
-
-    return parseQq101Synergies(data, championId)
+    return this._get(`${RIFT_API_PATH}_partner`, this._riftParams(query, championId), options)
   }
 
   async getSummonerSpells(
@@ -164,13 +107,7 @@ export class Qq101HttpApiAxiosHelper {
     championId: number,
     options: Qq101RequestOptions = {}
   ) {
-    const data = await this._get(
-      `${RIFT_API_PATH}_skill`,
-      this._riftParams(query, championId),
-      options
-    )
-
-    return parseQq101SummonerSpells(data, championId)
+    return this._get(`${RIFT_API_PATH}_skill`, this._riftParams(query, championId), options)
   }
 
   async getSkillOrder(
@@ -178,47 +115,27 @@ export class Qq101HttpApiAxiosHelper {
     championId: number,
     options: Qq101RequestOptions = {}
   ) {
-    const data = await this._get(
-      `${RIFT_API_PATH}_skill_point`,
-      this._riftParams(query, championId),
-      options
-    )
-
-    return parseQq101SkillOrder(data, championId)
+    return this._get(`${RIFT_API_PATH}_skill_point`, this._riftParams(query, championId), options)
   }
 
   async getTierStats(query: Qq101RiftQuery, championId: number, options: Qq101RequestOptions = {}) {
-    const data = await this._get(
+    return this._get(
       `${RIFT_API_PATH}_segment`,
       { ...this._riftParams(query, championId), itier: 255 },
       options
     )
-
-    return parseQq101TierStats(data, championId)
   }
 
   async getBuild(query: Qq101RiftQuery, championId: number, options: Qq101RequestOptions = {}) {
-    const data = await this._get(
-      `${RIFT_API_PATH}_build`,
-      this._riftParams(query, championId),
-      options
-    )
-
-    return parseQq101Build(data, championId)
+    return this._get(`${RIFT_API_PATH}_build`, this._riftParams(query, championId), options)
   }
 
   async getRunes(query: Qq101RiftQuery, championId: number, options: Qq101RequestOptions = {}) {
-    const data = await this._get(
-      `${RIFT_API_PATH}_runeinfo`,
-      this._riftParams(query, championId),
-      options
-    )
-
-    return parseQq101Runes(data, championId)
+    return this._get(`${RIFT_API_PATH}_runeinfo`, this._riftParams(query, championId), options)
   }
 
   async getPositions(query: Qq101RiftQuery, championId: number, options: Qq101RequestOptions = {}) {
-    const data = await this._get(
+    return this._get(
       `${RIFT_API_PATH}_newlane`,
       {
         itier: query.tier,
@@ -227,57 +144,34 @@ export class Qq101HttpApiAxiosHelper {
       },
       options
     )
-
-    return parseQq101Positions(data, championId)
   }
 
   async getDurations(query: Qq101RiftQuery, championId: number, options: Qq101RequestOptions = {}) {
-    const data = await this._get(
-      `${RIFT_API_PATH}_duration`,
-      this._riftParams(query, championId),
-      options
-    )
-
-    return parseQq101Durations(data, championId)
+    return this._get(`${RIFT_API_PATH}_duration`, this._riftParams(query, championId), options)
   }
 
   async getMayhemChampions(date: string, options: Qq101RequestOptions = {}) {
-    const data = await this._get(
-      `${MAYHEM_API_PATH}/fuwen_aram_hero_rank_v2`,
-      { dtstatdate: date },
-      options
-    )
-
-    return parseQq101MayhemChampions(data, date)
+    return this._get(`${MAYHEM_API_PATH}/fuwen_aram_hero_rank_v2`, { dtstatdate: date }, options)
   }
 
   async getAramChampions(date: string, options: Qq101RequestOptions = {}) {
-    const data = await this._get(
-      `${MAYHEM_API_PATH}/aram_hero_overview`,
-      { dtstatdate: date },
-      options
-    )
-
-    return parseQq101AramChampions(data, date)
+    return this._get(`${MAYHEM_API_PATH}/aram_hero_overview`, { dtstatdate: date }, options)
   }
 
   async getMayhemAugments(options: Qq101RequestOptions = {}) {
-    const data = await this._get(
+    return this._get(
       `${MAYHEM_API_PATH}/fuwen_aram_rune_rank_v2`,
       { augmentid_level: 255 },
       options
     )
-
-    return parseQq101MayhemAugments(data)
   }
 
-  async getMayhemPairSynergies(championId = 255, options: Qq101RequestOptions = {}) {
-    const data = await this._get(
-      `${MAYHEM_API_PATH}/fuwen_aram_hero_parttner`,
-      { role1: 255, role2: 255, championid: championId },
-      options
-    )
-
-    return parseQq101MayhemPairSynergies(data)
+  async getMayhemPairSynergies(query: Qq101PairQuery, options: Qq101RequestOptions = {}) {
+    const params = {
+      role1: query.firstRole === 'all' ? 255 : query.firstRole,
+      role2: query.secondRole === 'all' ? 255 : query.secondRole,
+      championid: query.championId ?? 255
+    }
+    return this._get(`${MAYHEM_API_PATH}/fuwen_aram_hero_parttner`, params, options)
   }
 }

@@ -1,4 +1,5 @@
 qq101:
+  sampleCount: '{{formatted}} 场'
   title: 英雄榜单
   source: 数据来自英雄联盟 101
   mode: 游戏模式
@@ -75,3 +76,77 @@ qq101:
     '27': 钻石及以上
     '28': 大师及以上
     '88': 峡谷之巅
+  details:
+    loadingSection: '正在加载…'
+    loadingHero: '正在加载英雄数据'
+    positionsFailed: '英雄分路数据加载失败'
+    noPositions: '当前版本和段位下，暂无该英雄的分路数据'
+    tryPatch: '查看 {{patch}}'
+    navigation: '章节导航'
+    back: '返回榜单'
+    sectionFailed: '此分区加载失败，其他数据仍可查看'
+    waitingPosition: '等待有效分路；请检查分路分区或重试'
+    heroStatsNote: '此处为英雄专属推荐；强化评级、选取率与全局强化胜率含义不同。'
+    recommendations: '海克斯英雄攻略'
+    positions: '分路表现'
+    runes: '符文方案'
+    summonerSpells: '召唤师技能'
+    skillOrder: '技能加点'
+    build: '装备构筑'
+    matchups: '对线数据'
+    synergies: '最佳搭档'
+    trend: '历史强度趋势'
+    tierStats: '分段位统计'
+    durations: '对局时长统计'
+    jungle: '打野路线'
+    augments: '英雄专属强化'
+    starting: '出门装'
+    boots: '鞋子'
+    core: '核心装'
+    fourth: '第四件装备'
+    fifth: '第五件装备'
+    sixth: '第六件装备'
+    items: '装备'
+    builds: '完整出装方案'
+    favorable: '优势对线'
+    unfavorable: '劣势对线'
+    champion: '英雄'
+    augment: '强化'
+    grade: '评级'
+    pickRate: '选取率'
+    winRate: '胜率'
+    banRate: '禁用率'
+    share: '分路占比'
+    position: '位置'
+    rank: '排名'
+    primaryRunes: '主系符文'
+    secondaryRunes: '副系符文'
+    statShards: '属性碎片'
+    games: '样本量'
+    spells: '技能组合'
+    priority: '优先级'
+    levelOrder: '逐级顺序'
+    matchupRate: '对线收益率'
+    patch: '版本'
+    tier: '段位'
+    duration: '时长'
+    route: '路线'
+    team100: '蓝色方'
+    team200: '红色方'
+  hot: 热度飙升
+  counter: 反制
+  pairFirstRole: 第一位英雄职业
+  pairSecondRole: 第二位英雄职业
+  classicLanesFailed: 经典分路信息加载失败，可刷新重试；榜单仍可查看。
+  camps:
+    BLUEGOLEM: 蓝 Buff
+    GROMP: 魔沼蛙
+    WOLF: 三狼
+    RAPTOR: 锋喙鸟
+    REDLIZARD: 红 Buff
+    KRUG: 石甲虫
+  tabs:
+    label: 101 页面
+    close: 关闭页面
+    closeOthers: 关闭其他页面
+  openPairQuery: 打开拍档查询

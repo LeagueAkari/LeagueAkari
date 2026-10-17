@@ -1,20 +1,19 @@
-import type { OpggAramBalanceItem } from '@shared/types/opgg'
+import type { OpggChampionBalance } from '@shared/types/champion-data/opgg'
 import { describe, expect, it } from 'vitest'
 
 import { getOpggAramBalanceAdjustments, getOpggAramBalanceOverallEffect } from '.'
 
-const defaultBalance: OpggAramBalanceItem = {
-  champion_id: 1,
-  attack_speed: 100,
-  damage_dealt: 100,
-  damage_taken: 100,
-  cooldown_reduction: 0,
+const defaultBalance: OpggChampionBalance = {
+  championId: 1,
+  attackSpeed: 100,
+  damageDealt: 100,
+  damageTaken: 100,
+  abilityHaste: 0,
   healing: 100,
   tenacity: 0,
-  shield_amount: 100,
-  energy_regen: 100,
-  area_of_effect_damage: 100,
-  default: true
+  shieldAmount: 100,
+  energyRegen: 100,
+  areaOfEffectDamage: 100
 }
 
 describe('OP.GG ARAM balance adapter', () => {
@@ -25,9 +24,9 @@ describe('OP.GG ARAM balance adapter', () => {
   it('classifies positive and negative effects from their field semantics', () => {
     const adjustments = getOpggAramBalanceAdjustments({
       ...defaultBalance,
-      damage_dealt: 105,
-      damage_taken: 105,
-      cooldown_reduction: -10
+      damageDealt: 105,
+      damageTaken: 105,
+      abilityHaste: -10
     })
 
     expect(adjustments).toMatchObject([

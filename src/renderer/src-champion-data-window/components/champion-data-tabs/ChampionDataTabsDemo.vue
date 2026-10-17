@@ -33,7 +33,7 @@
         <span class="text-xs font-semibold text-sky-600 dark:text-sky-300">OP.GG</span>
         <span class="text-xs text-black/40 dark:text-white/40">召唤师峡谷 · 翡翠及以上</span>
       </div>
-      <TabBar v-model:active-id="activeId" :tabs="displayTabs" @reorder="reorder">
+      <TabBar v-model:active-id="activeId" v-model:order="tabOrder" :items="displayItems">
         <template #icon="{ tab }">
           <ChampionIcon
             v-if="championIdFor(tab.id) !== undefined"
@@ -68,7 +68,7 @@ import Podium from '@vicons/ionicons5/es/PodiumOutline'
 import StatsChart from '@vicons/ionicons5/es/StatsChart'
 import { computed, markRaw, onBeforeUnmount, ref } from 'vue'
 
-import { TabBar, type TabBarTab, type TabBarTabReorder } from '@renderer-shared/components/tab-bar'
+import { TabBar, type TabBarItems, type TabBarTab } from '@renderer-shared/components/tab-bar'
 
 const props = withDefaults(
   defineProps<{
@@ -93,35 +93,49 @@ const tabs = ref<TabBarTab[]>([])
 const activeId = ref('tier')
 const lastAction = ref('梯队页固定在左侧，不参与排序。')
 const loadingIds = ref(new Set<string>())
-const displayTabs = computed(() =>
-  tabs.value.map((tab) => ({
-    ...tab,
-    actions: [
+const displayItems = computed<TabBarItems>(() =>
+  Object.fromEntries(
+    tabs.value.map(({ id, ...tab }) => [
+      id,
       {
-        id: 'refresh',
-        icon: markRaw(Refresh),
-        label: `刷新${tab.name}`,
-        loading: loadingIds.value.has(tab.id),
-        onClick: () => refresh(tab.id)
-      },
-      {
-        id: 'close',
-        kind: 'close' as const,
-        icon: markRaw(Close),
-        label: `关闭${tab.name}`,
-        onClick: () => close(tab.id)
+        ...tab,
+        actions: [
+          {
+            id: 'refresh',
+            icon: markRaw(Refresh),
+            label: `刷新${tab.name}`,
+            loading: loadingIds.value.has(id),
+            onClick: () => refresh(id)
+          },
+          {
+            id: 'close',
+            kind: 'close' as const,
+            icon: markRaw(Close),
+            label: `关闭${tab.name}`,
+            onClick: () => close(id)
+          }
+        ]
       }
-    ]
-  }))
+    ])
+  )
 )
+
+const tabOrder = computed({
+  get: () => tabs.value.map((tab) => tab.id),
+  set: (ids: string[]) => {
+    const byId = new Map(tabs.value.map((tab) => [tab.id, tab]))
+    tabs.value = ids.map((id) => byId.get(id)!)
+    lastAction.value = `英雄顺序：${tabs.value.map((item) => item.name).join(' → ')}`
+  }
+})
 const timers = new Set<ReturnType<typeof setTimeout>>()
 const activeName = computed(() => tabs.value.find((tab) => tab.id === activeId.value)?.name)
 
-function championIdFor(id: string) {
+const championIdFor = (id: string) => {
   return examples.find((tab) => tab.id === id)?.championId
 }
 
-function reset() {
+const reset = () => {
   timers.forEach(clearTimeout)
   timers.clear()
   loadingIds.value.clear()
@@ -145,14 +159,14 @@ function reset() {
   lastAction.value = '梯队页固定在左侧，不参与排序。'
 }
 
-function addChampion() {
+const addChampion = () => {
   const next = examples.find((example) => !tabs.value.some((tab) => tab.id === example.id))
   if (!next) return
   tabs.value.push({ ...next })
   activeId.value = next.id
 }
 
-function close(id: string) {
+const close = (id: string) => {
   const index = tabs.value.findIndex((tab) => tab.id === id)
   if (index < 0 || tabs.value[index].closable === false) return
   const [removed] = tabs.value.splice(index, 1)
@@ -164,7 +178,7 @@ function close(id: string) {
   lastAction.value = `已关闭 ${removed.name}`
 }
 
-function refresh(id: string) {
+const refresh = (id: string) => {
   const tab = tabs.value.find((tab) => tab.id === id)
   if (!tab) return
   loadingIds.value.add(id)
@@ -174,14 +188,6 @@ function refresh(id: string) {
     timers.delete(timer)
   }, 1100)
   timers.add(timer)
-}
-
-function reorder({ fromIndex, toIndex }: TabBarTabReorder) {
-  const next = [...tabs.value]
-  const [tab] = next.splice(fromIndex, 1)
-  next.splice(toIndex, 0, tab)
-  tabs.value = next
-  lastAction.value = `英雄顺序：${next.map((item) => item.name).join(' → ')}`
 }
 
 reset()

@@ -18,16 +18,18 @@ function setup() {
         signal: AbortSignal
       ) => Promise<Qq101OverviewLoadResult>
     >()
-  const loadDetails = vi.fn()
   const call = vi.fn(async (_namespace, _method, preferences) => {
     store.settings.qq101Preferences = preferences
   })
+  const loadClassicLanes = vi.fn<Qq101ChampionDataLoader['loadClassicLanes']>()
   const controller = new Qq101ChampionDataController(
     { ipc: { call }, logger: { warn: vi.fn() } } as unknown as ChampionDataRendererContext,
-    { loadOverview, loadDetails } as unknown as Qq101ChampionDataLoader
+    { loadOverview, loadClassicLanes } as unknown as Qq101ChampionDataLoader
   )
-  return { store, loadOverview, loadDetails, call, controller }
+
+  return { store, loadOverview, loadClassicLanes, call, controller }
 }
+
 const result: Qq101OverviewLoadResult = {
   patch: '16.19',
   patches: ['16.19'],
@@ -36,6 +38,33 @@ const result: Qq101OverviewLoadResult = {
 afterEach(() => setActivePinia(undefined))
 
 describe('QQ101 ranking requests', () => {
+  it('keeps classic lane labels visible while refreshing and replaces them on success', async () => {
+    const { store, controller, loadOverview, loadClassicLanes } = setup()
+    const previous: Awaited<ReturnType<Qq101ChampionDataLoader['loadClassicLanes']>> = {
+      date: '20261006',
+      champions: [{ classicChampionId: 1, positions: ['top'] }]
+    }
+    const updated: Awaited<ReturnType<Qq101ChampionDataLoader['loadClassicLanes']>> = {
+      date: '20261007',
+      champions: [{ classicChampionId: 1, positions: ['middle'] }]
+    }
+    store.qq101.classicLanes = { status: 'ready', data: previous }
+    loadOverview.mockResolvedValue({
+      patch: null,
+      patches: [],
+      overview: { mode: 'classic', data: { date: '20261007', champions: [] } }
+    })
+    const pending = Promise.withResolvers<typeof updated>()
+    loadClassicLanes.mockReturnValue(pending.promise)
+    const refreshing = controller.changePreferences({ mode: 'classic' })
+    await vi.waitFor(() => expect(loadClassicLanes).toHaveBeenCalledOnce())
+    expect(store.qq101.isLoading).toBe(true)
+    expect(store.qq101.classicLanes).toEqual({ status: 'ready', data: previous })
+    pending.resolve(updated)
+    await refreshing
+    expect(store.qq101.classicLanes).toEqual({ status: 'ready', data: updated })
+  })
+
   it('orders preference writes when a previous IPC save is still in flight', async () => {
     const { controller, store, loadOverview, call } = setup()
     const pending = Promise.withResolvers<void>()
@@ -72,15 +101,6 @@ describe('QQ101 ranking requests', () => {
       patch: '16.19'
     })
     expect(call).toHaveBeenCalledTimes(1)
-  })
-
-  it('refreshes rankings without loading a previously selected champion', async () => {
-    const { controller, store, loadOverview, loadDetails } = setup()
-    store.qq101.selectedChampionId = 103
-    loadOverview.mockResolvedValue(result)
-    await controller.refresh()
-    expect(loadDetails).not.toHaveBeenCalled()
-    expect(store.qq101.details).toBeNull()
   })
 
   it('retains the previous result and failed query so retry targets the same filters', async () => {

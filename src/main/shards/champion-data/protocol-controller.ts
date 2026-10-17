@@ -68,6 +68,7 @@ export class ChampionDataProtocolController {
       if (request.method !== 'GET' && request.method !== 'HEAD') {
         return new Response('Method not allowed', { status: 405 })
       }
+
       const headers = Object.fromEntries(request.headers.entries())
       delete headers[AKARI_PROXY_REQUEST_ID_HEADER]
       // Source-specific headers belong to the upstream client, not the renderer origin.
@@ -82,9 +83,7 @@ export class ChampionDataProtocolController {
           allowAbsoluteUrls: false,
           headers,
           signal: context.signal,
-          // These endpoints return JSON. Keep the protocol request registered until
-          // the complete payload arrives so renderer cancellation reaches upstream.
-          responseType: 'arraybuffer'
+          responseType: 'stream'
         })
       } catch (error) {
         // HTTP status errors stay HTTP status errors across akari://.
@@ -92,8 +91,10 @@ export class ChampionDataProtocolController {
           this._context.logger.warn(`Failed to proxy ${domain} request`, String(error))
           return new Response('Upstream request failed', { status: 502 })
         }
+
         response = error.response
       }
+
       return new Response(
         request.method === 'HEAD' || [204, 205, 304].includes(response.status)
           ? null

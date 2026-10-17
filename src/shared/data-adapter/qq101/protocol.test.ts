@@ -6,12 +6,14 @@ import {
   parseQq101ClassicLanes,
   parseQq101ClassicTierList,
   parseQq101JungleRoutes,
+  parseQq101Matchups,
   parseQq101MayhemAugments,
   parseQq101MayhemChampions,
   parseQq101MayhemDetails,
   parseQq101MayhemPairSynergies,
   parseQq101Positions,
   parseQq101Runes,
+  parseQq101SkillOrder,
   parseQq101TierList
 } from './protocol'
 
@@ -23,13 +25,28 @@ function envelope(fieldId: string, payload: object) {
 }
 
 describe('QQ101 protocol adapter', () => {
+  it('keeps win rate separate from signed matchup advantage, including minus one', () => {
+    const result = parseQq101Matchups(
+      envelope('17968', {
+        low_op_details: '1_142_43.92_-1',
+        high_op_details: '1_901_64.16_6.56281204'
+      }),
+      103
+    ).data
+    expect(result.unfavorable[0]).toMatchObject({
+      championId: 142,
+      winRate: 0.4392,
+      advantage: -0.01
+    })
+    expect(result.favorable[0]).toMatchObject({ winRate: 0.6416, advantage: 0.06562812 })
+  })
   it('accepts official legacy position formats without confusing rank and lane share', () => {
     const result = parseQq101Positions(
       envelope('18122', {
         data_details: 'mid_10_52_3_T1_0_12_95#上单：2_48_3_T4_30_5'
       }),
       103
-    )
+    ).data
     expect(result.positions).toMatchObject([
       { position: 'MIDDLE', rank: 12, share: 0.95 },
       { position: 'TOP', rank: 30, share: 0.05 }
@@ -44,7 +61,7 @@ describe('QQ101 protocol adapter', () => {
           '1_112_T1_BOTTOM_54.47_3.69_23.11_115,101,42_0_0_0#1_112_T1_MIDDLE_52.15_9.57_23.19_38,142,69_-1_0_0'
       }),
       '16.19'
-    )
+    ).data
 
     expect(result.champions).toHaveLength(2)
     expect(result.champions.map((row) => [row.championId, row.position])).toEqual([
@@ -60,7 +77,7 @@ describe('QQ101 protocol adapter', () => {
       augmentlist: '1004_255_0.2774_45_-1_0.5767_20_-1_13,4,41,901,223,81'
     })
     response.data._fieldValues.R15332 = JSON.stringify({ augmentlist: '' })
-    const result = parseQq101MayhemAugments(response, '20260926')
+    const result = parseQq101MayhemAugments(response, '20260926').data
 
     expect(result.date).toBe('20260925')
     expect(result.augments).toEqual([
@@ -84,7 +101,7 @@ describe('QQ101 protocol adapter', () => {
     const result = parseQq101MayhemAugments(
       envelope('15332', { augmentlist: '1001_255_0.1474_110_0_0.4765_189_1_223,36' }),
       '20260925'
-    )
+    ).data
 
     expect(result.augments).toHaveLength(1)
     expect(result.date).toBe('')
@@ -97,7 +114,7 @@ describe('QQ101 protocol adapter', () => {
           '22_1_未变化_0.5487_0.1413_25,0.0539,0.6097,1&11,0.0436,0.6119,2_231.0217_0.6673_0.2096_0.1639'
       }),
       '20260925'
-    )
+    ).data
 
     expect(result.date).toBe('20260925')
     expect(result.champions).toHaveLength(1)
@@ -126,7 +143,7 @@ describe('QQ101 protocol adapter', () => {
           '157_1_下降1_0.5723_0.1073_17,0.0588,0.6166,1_298.6129_0.6094_0.2049_0.1873_1077,1336,1058'
       }),
       '20260925'
-    )
+    ).data
 
     expect(result.champions[0]).toMatchObject({
       championId: 157,
@@ -136,19 +153,26 @@ describe('QQ101 protocol adapter', () => {
     })
   })
 
-  it('distinguishes an empty ranking from a changed or ambiguous response schema', () => {
-    expect(
-      parseQq101AramChampions(envelope('6993', { listcollect: '' }), '20260925').champions
-    ).toEqual([])
-    expect(() => parseQq101AramChampions(envelope('6993', { renamed: '' }), '20260925')).toThrow(
-      'record string'
+  it('recovers a changed envelope or record schema and reports the failure without losing control', () => {
+    const healthy = parseQq101AramChampions(envelope('6993', { listcollect: '' }), '20260925')
+    expect(healthy.data.champions).toEqual([])
+    expect(healthy.issues).toEqual([])
+
+    const changed = parseQq101AramChampions(envelope('6993', { renamed: '' }), '20260925')
+    expect(changed.data.champions).toEqual([])
+    expect(changed.issues).toEqual(
+      expect.arrayContaining([expect.objectContaining({ path: 'rows' })])
     )
-    const response = { code: 0, data: { _fieldValues: { R1: '{}', R2: '{}' } } }
-    expect(() => parseQq101AramChampions(response, '20260925')).toThrow('unambiguous field')
-    expect(() => parseQq101AramChampions({ code: 1 }, '20260925')).toThrow('upstream')
-    expect(() => parseQq101AramChampions({ code: 0, data: 'not-json' }, '20260925')).toThrow(
-      'embedded JSON'
-    )
+
+    for (const response of [
+      { code: 0, data: { _fieldValues: { R1: '{}', R2: '{}' } } },
+      { code: 1 },
+      { code: 0, data: 'not-json' }
+    ]) {
+      const result = parseQq101AramChampions(response, '20260925')
+      expect(result.data.champions).toEqual([])
+      expect(result.issues.length).toBeGreaterThan(0)
+    }
   })
 
   it('parses the live ranked record shape into ratios and numeric IDs', () => {
@@ -158,7 +182,7 @@ describe('QQ101 protocol adapter', () => {
         datadetails: '1_75_T0_TOP_53.53_6.68_7.15_223,14,897_14_1'
       }),
       '16.16'
-    )
+    ).data
 
     expect(result).toEqual({
       date: '20260820',
@@ -188,7 +212,7 @@ describe('QQ101 protocol adapter', () => {
         dtstatdate: '20260820',
         championid_data: '103;64|mage;fighter|0.58|0.1|1'
       })
-    )
+    ).data
 
     expect(result).toEqual({
       date: '20260820',
@@ -210,7 +234,7 @@ describe('QQ101 protocol adapter', () => {
         tierscore_top_hero_list: '1|60081|52.77|57.98|3.35|T0|-1'
       }),
       'bottom'
-    )
+    ).data
 
     expect(result).toEqual({
       date: '20260823',
@@ -231,15 +255,25 @@ describe('QQ101 protocol adapter', () => {
     })
   })
 
-  it('accepts successful unpublished snapshots but rejects truncated records and renamed fields', () => {
+  it('accepts unpublished snapshots and retains available fields in truncated records', () => {
     const response = { code: 0, data: { _fieldValues: { R17960: '' } } }
-    expect(parseQq101TierList(response, '16.19').champions).toEqual([])
-    expect(() => parseQq101TierList(envelope('17960', { datadetails: '1_103' }), '16.19')).toThrow(
-      'truncated'
-    )
-    expect(() => parseQq101Build(envelope('18087', { renamed_details: '' }), 103)).toThrow(
-      'record string'
-    )
+    expect(parseQq101TierList(response, '16.19').data.champions).toEqual([])
+    expect(
+      parseQq101TierList(envelope('17960', { datadetails: '1_103' }), '16.19').data.champions
+    ).toEqual([
+      expect.objectContaining({ championId: 103, rank: 1, winRate: null, pickRate: null })
+    ])
+    expect(
+      parseQq101Build(envelope('18087', { renamed_details: '', core_details: '3078_1_20_53' }), 103)
+        .data.slots
+    ).toEqual({
+      starting: [],
+      boots: [],
+      core: [{ itemIds: [3078], rank: 1, pickRate: 0.2, winRate: 0.53 }],
+      fourth: [],
+      fifth: [],
+      sixth: []
+    })
   })
 
   it('sorts rune pages and resolves catalog keystones outside numeric style ranges', () => {
@@ -249,7 +283,7 @@ describe('QQ101 protocol adapter', () => {
           '10_9923_ws_9923,8139,8140,8106,8210,8226,5008,5008,5001_1.08_54.34_219#2_8992_zj_8992,8226,8210,8237,8106,8139,5005,5008,5001_5.61_49.74_1134'
       }),
       103
-    )
+    ).data
     expect(
       result.pages.map((page) => [page.rank, page.primaryStyleId, page.secondaryStyleId])
     ).toEqual([
@@ -260,7 +294,7 @@ describe('QQ101 protocol adapter', () => {
 
   it('preserves classic source identity and jungle route ordering', () => {
     expect(
-      parseQq101ClassicLanes(envelope('18037', { hero_lane_list: '60117_support;jungle' }))
+      parseQq101ClassicLanes(envelope('18037', { hero_lane_list: '60117_support;jungle' })).data
         .champions
     ).toEqual([{ classicChampionId: 60117, positions: ['support', 'jungle'] }])
     const routes = parseQq101JungleRoutes(
@@ -268,7 +302,7 @@ describe('QQ101 protocol adapter', () => {
         data_details: '255*100:[10_BLUEGOLEM,GROMP_10_1.5_50#2_RAPTOR,REDLIZARD_20_3_60]'
       }),
       64
-    )
+    ).data
     expect(routes.groups[0]).toMatchObject({ startingCamp: null, teamId: 100 })
     expect(routes.groups[0].routes.map((route) => [route.rank, route.winRate])).toEqual([
       [2, 0.6],
@@ -285,7 +319,7 @@ describe('QQ101 protocol adapter', () => {
         itemout: '1056,2003,2003$0.4$0.52'
       }),
       103
-    )!
+    ).data!
     expect(result.augments[0]).toMatchObject({
       augmentId: 2132,
       pickRate: 0.1658,
@@ -294,5 +328,78 @@ describe('QQ101 protocol adapter', () => {
     })
     expect(result.items[0]).toMatchObject({ itemIds: [228002], winRate: 0.5186, pickRate: 0.775 })
     expect(result.starting[0].itemIds).toEqual([1056, 2003, 2003])
+  })
+})
+
+describe('QQ101 tolerant response contracts', () => {
+  it('recovers unexpected record containers without trying to stringify their entries', () => {
+    const result = parseQq101SkillOrder(
+      envelope('18070', {
+        detaildetails: [{ toString: 1, valueOf: 2 }]
+      }),
+      103
+    ).data
+    expect(result).toMatchObject({ championId: 103, priorities: [], options: [], levelOrder: [] })
+  })
+  it('retains the live 2026-10-07 KogMaw row with NC statistics and reports both fallbacks', () => {
+    const { data: result, issues } = parseQq101TierList(
+      envelope('17960', {
+        dtstatdate: '20261006',
+        datadetails: '25_96_T3_BOTTOM_52.16_0.57_0.08_29,51,895_NC_NC_0',
+        unused: { secret: 'must not escape' }
+      }),
+      '16.19'
+    )
+    expect(result.champions[0]).toMatchObject({
+      championId: 96,
+      position: 'BOTTOM',
+      winRate: 0.5216,
+      rankChange: null,
+      dailyAverageSurge: null
+    })
+    expect(result).not.toHaveProperty('unused')
+    expect(issues.map((issue) => issue.path)).toEqual(['rows.0.rank_change', 'rows.0.daily_surge'])
+    expect(JSON.stringify(issues)).not.toContain('must not escape')
+  })
+
+  it('keeps valid Mayhem sections when optional nested JSON and individual IDs are damaged', () => {
+    const { data: result, issues } = parseQq101MayhemDetails(
+      envelope('15318', {
+        itemone_json: '{broken',
+        itemcore_json: JSON.stringify({
+          '1': { itemcore: '3078&3053', winrate: 5300, showrate: 2000, unused: 'drop' },
+          '2': null
+        }),
+        augment_json_irank: '255:1|103|2132|255|0.16|S#2|oops|2133|255|0.2|S',
+        skill_json: JSON.stringify({
+          '1': { qwe: '1&3&2', sks: { '1': null }, qwe_s: 2000, qwe_w: 5000 }
+        })
+      }),
+      103
+    )!
+    expect(result.items).toEqual([])
+    expect(result.core).toEqual([{ rank: 1, itemIds: [3078, 3053], winRate: 0.53, pickRate: 0.2 }])
+    expect(result.augments).toHaveLength(1)
+    expect(result.augments[0].augmentId).toBe(2132)
+    expect(issues.length).toBeGreaterThan(0)
+    expect(JSON.stringify(result)).not.toContain('unused')
+  })
+
+  it('drops invalid identities while recovering invalid ratios in otherwise usable records', () => {
+    const result = parseQq101TierList(
+      envelope('17960', {
+        datadetails:
+          '1_103_T1_MIDDLE_Infinity_130_3__0_0_0#2_bad_T2_MIDDLE_50_10_1__0_0_0#3_22_T2_BOTTOM_51_5_1__0_0_0'
+      }),
+      '16.19'
+    ).data
+    expect(result.champions).toHaveLength(2)
+    expect(result.champions[0]).toMatchObject({
+      championId: 103,
+      winRate: null,
+      pickRate: null,
+      banRate: 0.03
+    })
+    expect(result.champions[1]).toMatchObject({ championId: 22, winRate: 0.51 })
   })
 })

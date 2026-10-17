@@ -6,6 +6,7 @@
 import Champion from './Champion.vue'
 import { provideOpggChampion } from './context'
 
-const props = defineProps<{ championId: number }>()
-provideOpggChampion(() => props.championId)
+const props = defineProps<{ pageId: number }>()
+
+provideOpggChampion(() => props.pageId)
 </script>

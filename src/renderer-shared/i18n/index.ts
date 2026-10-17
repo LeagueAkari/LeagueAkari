@@ -13,6 +13,7 @@ import qq101En from '@shared/i18n/en/renderer/qq101.yaml'
 import rankedEn from '@shared/i18n/en/renderer/ranked.yaml'
 import settingsEn from '@shared/i18n/en/renderer/settings.yaml'
 import shellEn from '@shared/i18n/en/renderer/shell.yaml'
+import tabBarEn from '@shared/i18n/en/renderer/tab-bar.yaml'
 import toolkitEn from '@shared/i18n/en/renderer/toolkit.yaml'
 import commonZhCN from '@shared/i18n/zh-CN/common.yaml'
 import automationZhCN from '@shared/i18n/zh-CN/renderer/automation.yaml'
@@ -29,6 +30,7 @@ import qq101ZhCN from '@shared/i18n/zh-CN/renderer/qq101.yaml'
 import rankedZhCN from '@shared/i18n/zh-CN/renderer/ranked.yaml'
 import settingsZhCN from '@shared/i18n/zh-CN/renderer/settings.yaml'
 import shellZhCN from '@shared/i18n/zh-CN/renderer/shell.yaml'
+import tabBarZhCN from '@shared/i18n/zh-CN/renderer/tab-bar.yaml'
 import toolkitZhCN from '@shared/i18n/zh-CN/renderer/toolkit.yaml'
 import i18next from 'i18next'
 
@@ -49,6 +51,7 @@ function mergeRendererResources(...resources: Record<string, unknown>[]) {
 }
 
 const rendererEn = mergeRendererResources(
+  tabBarEn,
   shellEn,
   settingsEn,
   automationEn,
@@ -67,6 +70,7 @@ const rendererEn = mergeRendererResources(
 )
 
 const rendererZhCN = mergeRendererResources(
+  tabBarZhCN,
   shellZhCN,
   settingsZhCN,
   automationZhCN,

@@ -8,7 +8,14 @@ import type {
 export const CHAMPION_DATA_OPGG_FEATURE_GATE = 'champion-data.opgg'
 export const CHAMPION_DATA_QQ101_FEATURE_GATE = 'champion-data.qq101'
 
-export type ChampionDataSourceId = 'opgg' | 'qq101'
+export const CHAMPION_DATA_SOURCE_ORDER = ['opgg', 'qq101'] as const
+
+export type ChampionDataSourceId = (typeof CHAMPION_DATA_SOURCE_ORDER)[number]
+
+export interface ChampionDataSourcePreferences {
+  enabled: Record<ChampionDataSourceId, boolean>
+  defaultSource: ChampionDataSourceId | null
+}
 
 export interface OpggChampionDataPreferences {
   mode: OpggChampionDataMode

@@ -1,24 +1,82 @@
-import type { Qq101HttpApiAxiosHelper } from '@shared/http-api-axios-helper/qq101'
+import type { Qq101AkariData } from '@shared/data-adapter/qq101/akari-adapter'
+import type { Qq101PairQuery } from '@shared/http-api-axios-helper/qq101'
 
-export type Qq101PatchList = Awaited<ReturnType<Qq101HttpApiAxiosHelper['getPatches']>>
-export type Qq101RankedOverviewData = Awaited<ReturnType<Qq101HttpApiAxiosHelper['getTierList']>>
-export type Qq101ClassicOverviewData = Awaited<
-  ReturnType<Qq101HttpApiAxiosHelper['getClassicTierList']>
->
-export type Qq101MayhemChampionData = Awaited<
-  ReturnType<Qq101HttpApiAxiosHelper['getMayhemChampions']>
->
-export type Qq101MayhemAugmentData = Awaited<
-  ReturnType<Qq101HttpApiAxiosHelper['getMayhemAugments']>
->
-export type Qq101MayhemSynergyData = Awaited<
-  ReturnType<Qq101HttpApiAxiosHelper['getMayhemPairSynergies']>
->
+export type Qq101HeroQuery =
+  { mode: 'ranked'; patch: string; tier: number; position: string | null } | { mode: 'aram_mayhem' }
+
+export type Qq101Page =
+  | {
+      kind: 'champion'
+      id: string
+      championId: number
+      query: Qq101HeroQuery
+      view: Qq101DetailView | null
+      modeChange: { status: 'idle' | 'loading' } | { status: 'error'; message: string }
+    }
+  | {
+      kind: 'pairs'
+      id: string
+      query: Qq101PairQuery
+      state: Qq101Section<Qq101AkariData<'pairs'>>
+    }
+
+export type Qq101PatchList = Qq101AkariData<'patches'>
+
+export type Qq101RankedOverviewData = Qq101AkariData<'ranked'>
+
+export type Qq101ClassicOverviewData = Qq101AkariData<'classic'>
+
+export type Qq101MayhemChampionData = Qq101AkariData<'mayhem'>
+
+export type Qq101MayhemAugmentData = Qq101AkariData<'augments'>
+
+export type Qq101MayhemSynergyData = Qq101AkariData<'pairs'>
+
+export type Qq101Section<T> =
+  | { status: 'idle' }
+  | { status: 'loading' }
+  | { status: 'ready'; data: T }
+  | { status: 'empty' }
+  | { status: 'error'; message: string }
+
+export interface Qq101RiftSections {
+  positions: Qq101AkariData<'positions'>
+  matchups: Qq101AkariData<'matchups'>
+  synergies: Qq101AkariData<'synergies'>
+  summonerSpells: Qq101AkariData<'spells'>
+  skillOrder: Qq101AkariData<'skills'>
+  build: Qq101AkariData<'build'>
+  runes: Qq101AkariData<'runes'>
+  trend: Qq101AkariData<'trend'>
+  tierStats: Qq101AkariData<'tiers'>
+  durations: Qq101AkariData<'durations'>
+  jungle: Qq101AkariData<'jungle'>
+}
+
+export type Qq101RiftSectionKey = keyof Qq101RiftSections
+
+export type Qq101DetailSectionKey = Qq101RiftSectionKey | 'recommendations' | 'summary'
+
+export type Qq101DetailView =
+  | {
+      mode: 'ranked'
+      championId: number
+      position: string | null
+      patch: string
+      tier: number
+      sections: { [K in Qq101RiftSectionKey]: Qq101Section<Qq101RiftSections[K]> }
+    }
+  | {
+      mode: 'aram_mayhem'
+      championId: number
+      summary: Qq101Section<Qq101AkariData<'mayhem'>>
+      recommendations: Qq101Section<Qq101AkariData<'mayhemDetails'>>
+    }
 
 export type Qq101ChampionDataOverview =
   | { mode: 'ranked'; data: Qq101RankedOverviewData }
   | { mode: 'classic'; data: Qq101ClassicOverviewData }
-  | { mode: 'aram'; data: Awaited<ReturnType<Qq101HttpApiAxiosHelper['getAramChampions']>> }
+  | { mode: 'aram'; data: Qq101AkariData<'aram'> }
   | {
       mode: 'aram_mayhem'
       data: {
@@ -29,38 +87,5 @@ export type Qq101ChampionDataOverview =
         augments: Qq101MayhemAugmentData['augments'] | null
         synergies: Qq101MayhemSynergyData['synergies'] | null
         errors: Partial<Record<'champions' | 'augments' | 'synergies', string>>
-      }
-    }
-
-export interface Qq101RankedDetailsData {
-  championId: number
-  position: string
-  champion: Qq101RankedOverviewData['champions'][number] | null
-  errors: Record<string, string>
-  matchups: Awaited<ReturnType<Qq101HttpApiAxiosHelper['getMatchups']>> | null
-  synergies: Awaited<ReturnType<Qq101HttpApiAxiosHelper['getSynergies']>> | null
-  summonerSpells: Awaited<ReturnType<Qq101HttpApiAxiosHelper['getSummonerSpells']>> | null
-  skillOrder: Awaited<ReturnType<Qq101HttpApiAxiosHelper['getSkillOrder']>> | null
-  build: Awaited<ReturnType<Qq101HttpApiAxiosHelper['getBuild']>> | null
-  runes: Awaited<ReturnType<Qq101HttpApiAxiosHelper['getRunes']>> | null
-  positions: Awaited<ReturnType<Qq101HttpApiAxiosHelper['getPositions']>> | null
-  trend: Awaited<ReturnType<Qq101HttpApiAxiosHelper['getTrend']>> | null
-  tierStats: Awaited<ReturnType<Qq101HttpApiAxiosHelper['getTierStats']>> | null
-  durations: Awaited<ReturnType<Qq101HttpApiAxiosHelper['getDurations']>> | null
-}
-
-export type Qq101ChampionDataDetails =
-  | { mode: 'ranked'; data: Qq101RankedDetailsData }
-  | {
-      mode: 'aram'
-      data: Awaited<ReturnType<Qq101HttpApiAxiosHelper['getAramChampions']>>['champions'][number]
-    }
-  | {
-      mode: 'aram_mayhem'
-      data: {
-        champion: Qq101MayhemChampionData['champions'][number]
-        augments: Qq101MayhemAugmentData['augments'] | null
-        recommendations: Awaited<ReturnType<Qq101HttpApiAxiosHelper['getMayhemDetails']>>
-        error: string | null
       }
     }

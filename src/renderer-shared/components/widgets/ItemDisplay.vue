@@ -3,6 +3,7 @@
     <template #trigger>
       <LcuImage
         :src="itemDisplay.iconPath"
+        v-bind="$attrs"
         :style="{ width: `${size}px`, height: `${size}px` }"
         class="item"
         :class="{ trinket: isTrinket, item: !isTrinket }"
@@ -67,6 +68,8 @@
 </template>
 
 <script setup lang="ts">
+defineOptions({ inheritAttrs: false })
+
 import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
@@ -89,6 +92,7 @@ const {
 const { t } = useTranslation()
 
 const resources = useAkariResourceProvider()
+
 const itemDisplay = computed(() => {
   if (!itemId) {
     return null
@@ -132,11 +136,17 @@ const itemDisplay = computed(() => {
 
   .from,
   .to {
-    @apply flex max-w-[460px] flex-wrap items-center gap-0.5 before:mr-1 before:text-xs before:text-black/50 before:italic before:dark:text-white/50;
+    @apply flex max-w-[460px] flex-wrap items-center gap-0.5 before:mr-1 before:text-xs before:italic;
 
     .image {
       @apply size-5 rounded-xs;
     }
+  }
+
+  .from::before,
+  .to::before {
+    color: var(--la-color-text-primary);
+    opacity: 0.65;
   }
 
   .item-display-popover,

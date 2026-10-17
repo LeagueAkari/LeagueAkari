@@ -41,6 +41,8 @@
 </template>
 
 <script setup lang="ts">
+defineOptions({ inheritAttrs: false })
+
 import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
@@ -63,6 +65,7 @@ const {
 const { t } = useTranslation()
 
 const resources = useAkariResourceProvider()
+
 const spellDisplay = computed(() => {
   if (!spellId) {
     return null
