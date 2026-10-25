@@ -144,6 +144,7 @@ const meta = {
     items: { home: { name: 'Home', fixedPosition: 0, closable: false } },
     order: ['home'],
     addLabel: 'Add tab',
+    resizeIdleMs: 1000,
     addOptions: [{ id: 'page', label: 'New page', icon: markRaw(Add) }]
   }
 } satisfies Meta<typeof TabBar>

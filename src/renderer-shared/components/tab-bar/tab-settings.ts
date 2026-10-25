@@ -5,6 +5,7 @@ export const DEFAULT_TAB_WIDTH = {
 
 export const TAB_MOTION = {
   presenceMs: 220,
+  resizeIdleMs: 1000,
   enterEase: 'cubic-bezier(0.16, 1, 0.3, 1)',
   leaveEase: 'cubic-bezier(0.4, 0, 0.2, 1)',
   sortMs: 180,

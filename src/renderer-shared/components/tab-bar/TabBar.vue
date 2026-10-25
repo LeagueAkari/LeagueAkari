@@ -133,7 +133,8 @@ const {
   addOptions = [],
   addLabel,
   minTabWidth = DEFAULT_TAB_WIDTH.min,
-  maxTabWidth = DEFAULT_TAB_WIDTH.max
+  maxTabWidth = DEFAULT_TAB_WIDTH.max,
+  resizeIdleMs = TAB_MOTION.resizeIdleMs
 } = defineProps<{
   items: TabBarItems
   ariaLabel?: string
@@ -143,6 +144,8 @@ const {
   minTabWidth?: number
   /** Maximum item width when space is available, in CSS pixels. */
   maxTabWidth?: number
+  /** Time tabs must remain still after closing before widths are redistributed, in milliseconds. */
+  resizeIdleMs?: number
 }>()
 
 const activeId = defineModel<string>('activeId', { required: true })
@@ -192,9 +195,10 @@ const strip = useTabStrip({
   dragging,
   reducedMotion,
   leaving: computed(() => leavingCount.value > 0),
-  count: () => order.value.length,
+  order: () => order.value,
   minWidth: () => minTabWidth,
   maxWidth: () => maxTabWidth,
+  resizeIdleMs: () => resizeIdleMs,
   activeElement: () => tabRefs.get(activeId.value)?.getElement(),
   elements: () => [...tabRefs.values()].map((item) => item.getElement()).filter((el) => el !== null)
 })

@@ -51,6 +51,15 @@ This applies especially when the work was authored or reviewed with AI assistanc
 
 ---
 
+## Code Style
+
+Before writing or reviewing Vue/TypeScript code, read the relevant sections of
+[Coding Style](docs/coding-style.md). This is the authoritative source for function syntax and
+logical whitespace, with good/bad examples. Domain skills cover architecture and UI concerns;
+reference this guide instead of duplicating its general coding rules in skills.
+
+---
+
 ## Repository Layout
 
 ```

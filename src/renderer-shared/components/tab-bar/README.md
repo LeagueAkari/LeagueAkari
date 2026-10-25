@@ -9,6 +9,7 @@ TabBar owns navigation, dragging and horizontal scrolling. The caller owns pages
   v-model:order="tabOrder"
   :min-tab-width="120"
   :max-tab-width="180"
+  :resize-idle-ms="1000"
 />
 ```
 
@@ -27,6 +28,10 @@ TabBar owns navigation, dragging and horizontal scrolling. The caller owns pages
   these operations without changing the models internally.
 - Item widths divide the available space, capped by `maxTabWidth`. Horizontal overflow starts only
   when that division would fall below `minTabWidth`. Both defaults are shown above.
+- Opening tabs and the initial layout redistribute widths immediately. After closing tabs, widths
+  stay fixed until all tabs have stopped moving for `resizeIdleMs` (default `1000`), then animate
+  together. Further closures or movement restart the wait. Opening a tab cancels a pending wait and
+  immediately redistributes widths for the new list.
 
 Render page content from a stable page collection, independently of `tabOrder`. Key content by page
 ID and use the active ID to control visibility. Moving an existing content root in the DOM can reset

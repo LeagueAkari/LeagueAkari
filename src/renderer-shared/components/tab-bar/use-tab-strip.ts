@@ -8,9 +8,10 @@ interface TabStripOptions {
   layout: Ref<HTMLElement | null>
   viewport: Ref<HTMLElement | null>
   addControl: Ref<HTMLElement | null>
-  count: () => number
+  order: () => readonly string[]
   minWidth: () => number
   maxWidth: () => number
+  resizeIdleMs: () => number
   activeElement: () => HTMLElement | null | undefined
   elements: () => HTMLElement[]
   dragging: Ref<boolean>
@@ -113,15 +114,78 @@ export function useTabStrip(options: TabStripOptions) {
     measure()
   }
 
-  const resize = () => {
-    const container = layout.value
-    const count = options.count()
+  let widthMeasured = false
+  let pendingWidth = width.value
+  let resizeFrame: number | null = null
+  let stableSince = 0
+  let previousBounds: number[] = []
 
-    if (container?.clientWidth && count) {
-      const gap = Number.parseFloat(getComputedStyle(container).columnGap) || 0
-      const addWidth = addControl.value ? addControl.value.offsetWidth + gap : 0
-      const available = container.clientWidth - addWidth - gap * (count - 1)
-      width.value = Math.max(options.minWidth(), Math.min(options.maxWidth(), available / count))
+  const stopResize = () => {
+    if (resizeFrame !== null) {
+      cancelAnimationFrame(resizeFrame)
+      resizeFrame = null
+    }
+
+    previousBounds = []
+  }
+
+  const resizeWhenSettled = (timestamp: number) => {
+    const bounds = options.elements().flatMap((element) => {
+      const rect = element.getBoundingClientRect()
+      return [rect.left, rect.width]
+    })
+
+    // Include real movement from presence, sorting and scrolling before starting the idle period.
+    const moving =
+      dragging.value ||
+      leaving.value ||
+      bounds.length !== previousBounds.length ||
+      bounds.some((value, index) => Math.abs(value - previousBounds[index]) > 0.01)
+
+    if (moving) {
+      stableSince = timestamp
+    }
+
+    previousBounds = bounds
+
+    if (moving || timestamp - stableSince < options.resizeIdleMs()) {
+      resizeFrame = requestAnimationFrame(resizeWhenSettled)
+      return
+    }
+
+    resizeFrame = null
+    previousBounds = []
+    width.value = pendingWidth
+    revealActive()
+  }
+
+  const resize = (defer = false) => {
+    const container = layout.value
+    const count = options.order().length
+
+    if (!container?.clientWidth || !count) {
+      stopResize()
+      return
+    }
+
+    const gap = Number.parseFloat(getComputedStyle(container).columnGap) || 0
+    const addWidth = addControl.value ? addControl.value.offsetWidth + gap : 0
+    const available = container.clientWidth - addWidth - gap * (count - 1)
+    pendingWidth = Math.max(options.minWidth(), Math.min(options.maxWidth(), available / count))
+
+    // Opening tabs and the initial layout resize immediately. Closing keeps the settled width.
+    if (!widthMeasured || !defer) {
+      stopResize()
+      widthMeasured = true
+      width.value = pendingWidth
+    } else if (pendingWidth === width.value) {
+      stopResize()
+    } else {
+      stableSince = performance.now()
+
+      if (resizeFrame === null) {
+        resizeFrame = requestAnimationFrame(resizeWhenSettled)
+      }
     }
 
     revealActive()
@@ -174,14 +238,26 @@ export function useTabStrip(options: TabStripOptions) {
     wheelScrolling = true
   }
 
-  watch([options.count, options.minWidth, options.maxWidth], resize, { flush: 'post' })
+  watch(
+    () => options.order().slice(),
+    (ids, previousIds) => {
+      const added = ids.some((id) => !previousIds.includes(id))
+      const removed = previousIds.some((id) => !ids.includes(id))
+      resize(!added && (removed || resizeFrame !== null))
+    },
+    { flush: 'post' }
+  )
+  watch([options.minWidth, options.maxWidth], () => resize(), { flush: 'post' })
+  watch(options.resizeIdleMs, () => {
+    if (resizeFrame !== null) resize(true)
+  })
   watch(options.activeElement, () => revealActive('smooth'), { flush: 'post' })
   watch([leaving, dragging], () => revealActive(), { flush: 'post' })
   watch(reducedMotion, stopScroll)
 
   useResizeObserver(
     () => [layout.value, addControl.value].filter((el): el is HTMLElement => !!el),
-    resize
+    () => resize(resizeFrame !== null)
   )
 
   useResizeObserver(viewport, () => revealActive())
@@ -190,6 +266,7 @@ export function useTabStrip(options: TabStripOptions) {
   useResizeObserver(options.elements, () => revealActive())
 
   onBeforeUnmount(() => {
+    stopResize()
     stopScroll()
     stopScrollWatch()
   })
