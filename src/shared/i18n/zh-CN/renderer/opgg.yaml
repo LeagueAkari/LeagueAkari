@@ -1,4 +1,30 @@
 opgg:
+  automation:
+    currentGame: '当前对局'
+    enabled: '自动应用推荐符文'
+    description: '仅在本窗口打开且英雄锁定后应用默认数据源的推荐。已保存的自动符文配置优先。'
+    preferences: '对局自动页查询偏好'
+    preferencesDescription: '模式和分路跟随当前对局，版本始终使用最新。修改后立即更新自动页，不重复覆盖已应用的符文。'
+    retryApply: '重试应用'
+    status:
+      disabled: '自动符文未启用'
+      waitingChampion: '等待选择英雄'
+      waitingLock: '等待锁定英雄'
+      loading: '正在加载推荐'
+      missingPosition: '缺少分路信息，无法自动配置'
+      unsupportedMode: '此模式不支持自动配置符文'
+      sourceUnavailable: '默认数据源不可用，本次不自动应用'
+      preset: '已配置自动符文，本次不应用在线推荐'
+      paused: '窗口已隐藏，自动应用已暂停'
+      disconnected: '客户端已断开，自动应用已暂停'
+      inGame: '游戏已开始，仅展示推荐'
+      applied: '已应用推荐符文'
+      manual: '已手动应用符文，本轮不再自动覆盖'
+      applying: '正在应用符文'
+      loadError: '推荐加载失败，请刷新重试'
+      applyError: '符文应用失败'
+      empty: '此版本暂无可用符文推荐'
+      otherSource: '自动应用使用默认数据源，此来源仅供浏览'
   tabs:
     label: OP.GG 页面
     close: 关闭标签页
@@ -140,22 +166,27 @@ opgg:
     dataUnavailable: 当前数据源不支持此模式或暂不可用
     settings:
       title: 英雄数据设置
+      sections:
+        window: 窗口设置
+        sources: 数据源
+        preferences: 偏好
       sources:
         label: 数据来源
         description: 可分别启用或关闭。每次打开窗口时显示默认来源，也可以全部关闭。
         default: 默认
         defaultLabel: 将 {{source}} 设为默认来源
         enableLabel: 启用 {{source}}
+        enableDescription: 在英雄数据窗口中显示此来源。
+        defaultSource: 默认数据源
+        defaultDescription: 用于默认显示的英雄数据与自动符文推荐。
         saveFailed: 保存数据源设置失败，请重试
       temporarilyUnavailable: 暂不可用
       flashPosition:
         label: 闪现位置偏好
-        description: 在设置召唤师技能时，放置闪现的位置
-        auto: 当前位置
         options:
-          d: 闪现位置默认在 D
-          f: 闪现位置默认在 F
-          auto: 根据当前闪现的位置决定
+          d: D（左侧）
+          f: F（右侧）
+          auto: 自动
       autoApplyRunes:
         label: 自动应用符文
         description: 若英雄数据匹配当前模式，自动应用最高出场率的符文。仅当英雄数据窗口启用且可见时生效

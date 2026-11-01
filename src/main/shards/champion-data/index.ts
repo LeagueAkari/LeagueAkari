@@ -1,4 +1,5 @@
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { championDataAutomationSettingsSchema } from '@shared/shards/champion-data/automation'
 import { championDataSourcePreferencesSchema } from '@shared/shards/champion-data/source-preferences'
 import type {
   OpggChampionDataPreferences,
@@ -75,6 +76,10 @@ export class ChampionDataMain implements IAkariShardInitDispose {
     this._settingService = settingFactory.register(
       ChampionDataMain.id,
       {
+        automation: {
+          default: this.settings.automation,
+          schema: championDataAutomationSettingsSchema
+        },
         sourcePreferences: {
           default: this.settings.sourcePreferences,
           schema: championDataSourcePreferencesSchema
@@ -118,6 +123,7 @@ export class ChampionDataMain implements IAkariShardInitDispose {
     await this._settingService.applyToState()
 
     this._mobxUtils.propSync(ChampionDataMain.id, 'settings', this.settings, [
+      'automation',
       'sourcePreferences',
       'opggFlashPosition',
       'opggPreferences',

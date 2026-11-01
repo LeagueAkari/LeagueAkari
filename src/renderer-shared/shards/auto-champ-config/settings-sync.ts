@@ -5,4 +5,5 @@ export async function syncAutoChampConfigSettings(context: AutoChampConfigRender
   const store = useAutoChampConfigStore()
 
   await context.piniaMobxUtils.sync(AUTO_CHAMP_CONFIG_MAIN_NAMESPACE, 'settings', store.settings)
+  store.isReady = true
 }

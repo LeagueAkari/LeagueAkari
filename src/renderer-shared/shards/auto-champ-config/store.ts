@@ -1,6 +1,6 @@
 import { ChampionRunesConfig, SummonerSpellsConfig } from '@shared/shards/auto-champ-config'
 import { defineStore } from 'pinia'
-import { shallowReactive } from 'vue'
+import { ref, shallowReactive } from 'vue'
 
 interface ChampionRunesV2Preset {
   [key: number]: Record<string, ChampionRunesConfig | null>
@@ -12,6 +12,7 @@ interface SummonerSpellsPreset {
 }
 
 export const useAutoChampConfigStore = defineStore('shard:auto-champ-config-renderer', () => {
+  const isReady = ref(false)
   const settings = shallowReactive({
     enabled: false,
 
@@ -24,6 +25,7 @@ export const useAutoChampConfigStore = defineStore('shard:auto-champ-config-rend
   })
 
   return {
-    settings
+    settings,
+    isReady
   }
 })

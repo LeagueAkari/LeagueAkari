@@ -1,5 +1,6 @@
 import type { Qq101AkariData } from '@shared/data-adapter/qq101/akari-adapter'
 import { createOpggSnapshot } from '@shared/shards/champion-data'
+import { createChampionDataAutomationSettings } from '@shared/shards/champion-data/automation'
 import { createChampionDataSourcePreferences } from '@shared/shards/champion-data/source-preferences'
 import type {
   OpggChampionDataPreferences,
@@ -10,11 +11,20 @@ import type { OpggChampionBalance } from '@shared/types/champion-data/opgg'
 import { defineStore } from 'pinia'
 import { computed, shallowReactive } from 'vue'
 
+import type { RuneAutomationStatus } from './context'
 import type { Qq101ChampionDataOverview, Qq101DetailView } from './qq101/types'
 import type { Qq101Page, Qq101Section } from './qq101/types'
 
 export const useChampionDataStore = defineStore('shard:champion-data-renderer', () => {
+  const currentGame = shallowReactive({
+    active: false,
+    championId: 0,
+    position: '',
+    status: 'disabled' as RuneAutomationStatus,
+    error: null as string | null
+  })
   const settings = shallowReactive({
+    automation: createChampionDataAutomationSettings(),
     sourcePreferences: createChampionDataSourcePreferences(),
     opggFlashPosition: 'auto' as OpggFlashPosition,
     opggPreferences: {
@@ -68,6 +78,7 @@ export const useChampionDataStore = defineStore('shard:champion-data-renderer', 
   })
 
   return {
+    currentGame,
     settings,
     opgg,
     qq101,

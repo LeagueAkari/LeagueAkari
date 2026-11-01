@@ -1,8 +1,10 @@
 import type { Qq101PairQuery } from '@shared/http-api-axios-helper/qq101'
+import type { CurrentGameUnavailableReason } from '@shared/shards/champion-data/automation'
 import { formatError } from '@shared/utils/errors'
 import { isAbortError } from '@shared/utils/queue-keeper'
 
 import type { ChampionDataRendererContext } from '../context'
+import { isValidRunePage } from '../rune-executor'
 import { useChampionDataStore } from '../store'
 import type { Qq101ChampionDataLoader } from './data-loader'
 import { Qq101DetailsController } from './details-controller'
@@ -22,6 +24,11 @@ function samePairQuery(a: Qq101PairQuery, b: Qq101PairQuery) {
 
 export class Qq101PagesController {
   private _sequence = 0
+  private _currentGameQuery: {
+    championId: number
+    query: Qq101HeroQuery
+    reason: CurrentGameUnavailableReason | null
+  } | null = null
   private readonly _details = new Map<string, Qq101DetailsController>()
   private readonly _pairs = new Map<string, AbortController>()
   private readonly _modeChanges = new Map<string, AbortController>()
@@ -37,6 +44,85 @@ export class Qq101PagesController {
 
   private get _enabled() {
     return this._state.enabled && useChampionDataStore().settings.sourcePreferences.enabled.qq101
+  }
+
+  get currentGamePage() {
+    return (
+      this._state.pages.items.find(
+        (p): p is Extract<Qq101Page, { kind: 'champion' }> =>
+          p.kind === 'champion' && Boolean(p.currentGame)
+      ) ?? null
+    )
+  }
+
+  syncCurrentGamePage(
+    championId: number,
+    query: Qq101HeroQuery,
+    reason: CurrentGameUnavailableReason | null
+  ) {
+    if (!this._enabled) return Promise.resolve()
+    const previous = this.currentGamePage
+    const desired = { championId, query, reason }
+    if (previous && JSON.stringify(this._currentGameQuery) === JSON.stringify(desired))
+      return Promise.resolve()
+
+    this._currentGameQuery = desired
+    const id = previous?.id ?? `qq101-${++this._sequence}`
+    this._details.get(id)?.close()
+    this._modeChanges.get(id)?.abort()
+    const page: Extract<Qq101Page, { kind: 'champion' }> = {
+      kind: 'champion',
+      id,
+      championId,
+      query,
+      currentGame: { unavailableReason: reason },
+      view: null,
+      modeChange: { status: 'idle' }
+    }
+    if (previous) this._replace(page)
+    else {
+      this._state.pages.items = [page, ...this._state.pages.items]
+      this.activate(id)
+    }
+    return this._loadCurrentGamePage()
+  }
+
+  private async _loadCurrentGamePage() {
+    const page = this.currentGamePage
+    const target = this._currentGameQuery
+    if (!page || !target || target.reason || !this._enabled) return
+
+    this._details.get(page.id)?.close()
+    this._modeChanges.get(page.id)?.abort()
+    const request = new AbortController()
+    this._modeChanges.set(page.id, request)
+    this._replace({ ...page, view: null, modeChange: { status: 'loading' } })
+    try {
+      let query = target.query
+      if (query.mode === 'ranked') {
+        const patches = await this._loader.loadPatches(request.signal)
+        if (request.signal.aborted) return
+        if (!patches[0]) throw new Error('QQ101 patch list is empty')
+        query = { ...query, patch: patches[0].name }
+      }
+      if (request.signal.aborted) return
+      this._replace({ ...page, query, view: null, modeChange: { status: 'idle' } })
+      await this._createDetails(page.id, query).select(
+        target.championId,
+        query.mode === 'ranked' ? (query.position ?? undefined) : undefined
+      )
+    } catch (error) {
+      if (request.signal.aborted || isAbortError(error)) return
+      const current = this.currentGamePage
+      if (current?.id === page.id)
+        this._replace({ ...current, modeChange: { status: 'error', message: formatError(error) } })
+    }
+  }
+
+  removeCurrentGamePage() {
+    const page = this.currentGamePage
+    if (page) this._removePage(page.id)
+    this._currentGameQuery = null
   }
 
   activate(id: string) {
@@ -72,7 +158,11 @@ export class Qq101PagesController {
     if (!query) return
 
     const existing = this._state.pages.items.find(
-      (p) => p.kind === 'champion' && p.championId === championId && sameHeroQuery(p.query, query)
+      (p) =>
+        p.kind === 'champion' &&
+        !p.currentGame &&
+        p.championId === championId &&
+        sameHeroQuery(p.query, query)
     )
     if (existing) {
       this.activate(existing.id)
@@ -92,6 +182,14 @@ export class Qq101PagesController {
     this._state.pages.items = [...this._state.pages.items, page]
     this.activate(id)
 
+    const controller = this._createDetails(id, query)
+    await controller.select(
+      championId,
+      query.mode === 'ranked' ? (query.position ?? undefined) : undefined
+    )
+  }
+
+  private _createDetails(id: string, query: Qq101HeroQuery) {
     const owner = this
     const controller = new Qq101DetailsController(this._context, this._loader, {
       get enabled() {
@@ -117,13 +215,16 @@ export class Qq101PagesController {
     })
 
     this._details.set(id, controller)
-    await controller.select(
-      championId,
-      query.mode === 'ranked' ? (query.position ?? undefined) : undefined
-    )
+    return controller
   }
 
   async updateHero(id: string, query: Qq101HeroQuery) {
+    if (this._state.pages.items.some((p) => p.id === id && p.kind === 'champion' && p.currentGame))
+      return
+    return this._updateHero(id, query)
+  }
+
+  private async _updateHero(id: string, query: Qq101HeroQuery) {
     const page = this._state.pages.items.find((p) => p.id === id)
     if (page?.kind !== 'champion') return
 
@@ -136,7 +237,7 @@ export class Qq101PagesController {
 
   async changeHeroMode(id: string, mode: 'ranked' | 'aram_mayhem') {
     const page = this._state.pages.items.find((p) => p.id === id)
-    if (page?.kind !== 'champion') return
+    if (page?.kind !== 'champion' || page.currentGame) return
 
     if (mode === 'aram_mayhem') {
       await this.updateHero(id, { mode })
@@ -216,6 +317,33 @@ export class Qq101PagesController {
     }
   }
 
+  getRecommendedRunes() {
+    const page = this.currentGamePage
+    const section = page?.view?.mode === 'ranked' ? page.view.sections.runes : null
+    if (!page || section?.status !== 'ready') return undefined
+
+    return section.data.pages
+      .map((_rune, index) => this.getRuneSelection(page.id, index)!.runes)
+      .find(isValidRunePage)
+  }
+
+  getRuneSelection(id: string, index: number) {
+    if (!this._enabled) return null
+    const page = this._state.pages.items.find((p) => p.id === id)
+    const view = page?.kind === 'champion' ? page.view : null
+    if (view?.mode !== 'ranked' || view.sections.runes.status !== 'ready') return null
+    const rune = view.sections.runes.data.pages[index]
+    if (!rune) return null
+    return {
+      championId: view.championId,
+      runes: {
+        primaryStyleId: rune.primaryStyleId ?? 0,
+        subStyleId: rune.secondaryStyleId ?? 0,
+        selectedPerkIds: [...rune.primaryRuneIds, ...rune.secondaryRuneIds, ...rune.statShardIds]
+      }
+    }
+  }
+
   retry(id: string, key: Qq101DetailSectionKey) {
     return this._details.get(id)?.retry(key)
   }
@@ -223,12 +351,19 @@ export class Qq101PagesController {
   refresh(id = this._state.pages.activeId) {
     const page = this._state.pages.items.find((p) => p.id === id)
     if (page?.kind === 'pairs') return this.updatePairs(id, page.query)
-    if (page?.kind === 'champion') return this.updateHero(id, page.query)
+    if (page?.kind === 'champion')
+      return page.currentGame ? this._loadCurrentGamePage() : this.updateHero(id, page.query)
 
     return Promise.resolve()
   }
 
   close(id: string) {
+    if (this._state.pages.items.some((p) => p.id === id && p.kind === 'champion' && p.currentGame))
+      return
+    this._removePage(id)
+  }
+
+  private _removePage(id: string) {
     const index = this._state.pages.items.findIndex((p) => p.id === id)
     if (index < 0) return
 
@@ -256,12 +391,16 @@ export class Qq101PagesController {
       throw new Error('Invalid QQ101 tab order')
     }
 
-    this._state.pages.items = ids.map((id) => pages.get(id)!)
+    const ordered = ids.map((id) => pages.get(id)!)
+    this._state.pages.items = [
+      ...ordered.filter((p) => p.kind === 'champion' && p.currentGame),
+      ...ordered.filter((p) => p.kind !== 'champion' || !p.currentGame)
+    ]
   }
 
   clear() {
     for (const page of [...this._state.pages.items]) {
-      this.close(page.id)
+      this._removePage(page.id)
     }
 
     this.activate('rankings')

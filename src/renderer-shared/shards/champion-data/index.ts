@@ -1,5 +1,7 @@
+import { i18next } from '@renderer-shared/i18n'
 import { Config, Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { Qq101DataSource } from '@shared/data-sources/qq101'
+import type { ChampionDataAutomationSettings } from '@shared/shards/champion-data/automation'
 import type { ChampionDataSourcePreferences } from '@shared/types/champion-data'
 
 import { AkariProtocolRenderer } from '../akari-protocol'
@@ -15,11 +17,13 @@ import {
   type ChampionDataRendererConfig,
   type ChampionDataRendererContext
 } from './context'
+import { CurrentGameController } from './current-game-controller'
 import { createChampionDataApis } from './http-api'
 import { OpggChampionDataController } from './opgg/data-controller'
 import { OpggChampionDataLoader } from './opgg/data-loader'
 import { Qq101ChampionDataController } from './qq101/data-controller'
 import { Qq101ChampionDataLoader } from './qq101/data-loader'
+import { RuneExecutor } from './rune-executor'
 import { syncChampionDataResources, syncChampionDataState } from './state-sync'
 import { useChampionDataStore } from './store'
 
@@ -27,6 +31,8 @@ import { useChampionDataStore } from './store'
 export class ChampionDataRenderer implements IAkariShardInitDispose {
   static id = CHAMPION_DATA_RENDERER_NAMESPACE
 
+  public readonly currentGame: CurrentGameController
+  private readonly _runes: RuneExecutor
   public readonly api: ReturnType<typeof createChampionDataApis>
   public readonly opgg: OpggChampionDataController
   public readonly qq101: Qq101ChampionDataController
@@ -41,6 +47,7 @@ export class ChampionDataRenderer implements IAkariShardInitDispose {
     @Config() private readonly _config?: ChampionDataRendererConfig
   ) {
     this._context = { ipc, piniaMobxUtils, logger }
+    this._runes = new RuneExecutor(leagueClient)
     this.api = createChampionDataApis(protocol)
     this.opgg = new OpggChampionDataController(
       {
@@ -65,11 +72,18 @@ export class ChampionDataRenderer implements IAkariShardInitDispose {
           return leagueClient
         }
       },
-      new OpggChampionDataLoader(this.api.opgg)
+      new OpggChampionDataLoader(this.api.opgg),
+      this._runes
     )
     this.qq101 = new Qq101ChampionDataController(
       this._context,
       new Qq101ChampionDataLoader(logger, new Qq101DataSource(this.api.qq101))
+    )
+    this.currentGame = new CurrentGameController(
+      this._context,
+      this.opgg,
+      this.qq101.pages,
+      this._runes
     )
   }
 
@@ -80,12 +94,29 @@ export class ChampionDataRenderer implements IAkariShardInitDispose {
       await syncChampionDataState(this._context)
       this.opgg.start()
       this.qq101.start()
+      this.currentGame.start()
     }
   }
 
   async onDispose() {
+    this.currentGame.dispose()
+    this._runes.dispose()
     this.opgg.dispose()
     this.qq101.dispose()
+  }
+
+  setAutomation(settings: ChampionDataAutomationSettings): Promise<void> {
+    return this._context.ipc.call(CHAMPION_DATA_MAIN_NAMESPACE, 'setAutomation', settings)
+  }
+
+  async applyQq101Runes(pageId: string, index: number) {
+    const selection = this.qq101.pages.getRuneSelection(pageId, index)
+    const client = useLeagueClientStore()
+    if (!client.isConnected || !selection) throw new Error('Rune recommendation is not ready')
+    await this._runes.apply(
+      selection.runes,
+      `[${i18next.t('appName', { ns: 'common' })}] ${client.gameData.championName(selection.championId)}`
+    )
   }
 
   setSourcePreferences(preferences: ChampionDataSourcePreferences): Promise<void> {

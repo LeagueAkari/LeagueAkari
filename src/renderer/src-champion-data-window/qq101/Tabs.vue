@@ -78,10 +78,23 @@ const championId = (id: string) => {
 
 const pageById = (id: string) => pages.find((p) => p.id === id)
 
+const managed = (p: Qq101Page | undefined) => p?.kind === 'champion' && Boolean(p.currentGame)
+
 const name = (p: Qq101Page) =>
-  p.kind === 'champion' ? resources.champions.name(p.championId) : t('qq101.boards.synergies')
+  p.kind === 'champion'
+    ? p.championId
+      ? resources.champions.name(p.championId)
+      : t('opgg.automation.currentGame')
+    : t('qq101.boards.synergies')
 
 const queryFields = (page: Qq101Page): QuerySummaryField[] => {
+  if (page.kind === 'champion' && page.currentGame?.unavailableReason)
+    return [
+      {
+        label: t('opgg.automation.currentGame'),
+        value: t(`opgg.automation.status.${page.currentGame.unavailableReason}`)
+      }
+    ]
   if (page.kind === 'pairs') {
     return [
       {
@@ -134,12 +147,14 @@ const queryFields = (page: Qq101Page): QuerySummaryField[] => {
 }
 
 const isLoading = (p: Qq101Page) =>
-  p.kind === 'pairs'
-    ? p.state.status === 'loading'
-    : !p.view ||
-      (p.view.mode === 'ranked'
-        ? Object.values(p.view.sections).some((s) => s.status === 'loading')
-        : p.view.recommendations.status === 'loading')
+  p.kind === 'champion' && (p.currentGame?.unavailableReason || p.modeChange.status === 'error')
+    ? false
+    : p.kind === 'pairs'
+      ? p.state.status === 'loading'
+      : !p.view ||
+        (p.view.mode === 'ranked'
+          ? Object.values(p.view.sections).some((s) => s.status === 'loading')
+          : p.view.recommendations.status === 'loading')
 
 const refreshAction = (id: string, loading: boolean) => ({
   id: 'refresh',
@@ -161,15 +176,21 @@ const tabItems = computed<TabBarItems>(() => ({
       p.id,
       {
         name: name(p),
+        fixedPosition: managed(p) ? 1 : undefined,
+        closable: !managed(p),
         actions: [
           refreshAction(p.id, isLoading(p)),
-          {
-            id: 'close',
-            kind: 'close' as const,
-            icon: markRaw(Close),
-            label: t('qq101.tabs.close'),
-            onClick: () => emit('close', p.id)
-          }
+          ...(managed(p)
+            ? []
+            : [
+                {
+                  id: 'close',
+                  kind: 'close' as const,
+                  icon: markRaw(Close),
+                  label: t('qq101.tabs.close'),
+                  onClick: () => emit('close', p.id)
+                }
+              ])
         ]
       }
     ])
@@ -179,11 +200,15 @@ const tabItems = computed<TabBarItems>(() => ({
 const menu = reactive({ show: false, x: 0, y: 0, id: '' })
 
 const menuOptions = computed(() => [
-  { key: 'close', label: t('qq101.tabs.close'), disabled: menu.id === 'rankings' },
+  {
+    key: 'close',
+    label: t('qq101.tabs.close'),
+    disabled: menu.id === 'rankings' || managed(pageById(menu.id))
+  },
   {
     key: 'others',
     label: t('qq101.tabs.closeOthers'),
-    disabled: !pages.some((p) => p.id !== menu.id)
+    disabled: !pages.some((p) => p.id !== menu.id && !managed(p))
   }
 ])
 
@@ -202,9 +227,9 @@ const selectMenu = (key: string) => {
   menu.show = false
 
   if (key === 'close') {
-    emit('close', menu.id)
+    if (!managed(pageById(menu.id))) emit('close', menu.id)
   } else {
-    pages.filter((p) => p.id !== menu.id).forEach((p) => emit('close', p.id))
+    pages.filter((p) => p.id !== menu.id && !managed(p)).forEach((p) => emit('close', p.id))
   }
 }
 </script>

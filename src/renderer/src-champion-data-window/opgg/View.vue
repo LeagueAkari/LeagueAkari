@@ -2,8 +2,14 @@
   <div class="relative flex flex-col px-2 pt-1 pb-2">
     <TabAndFilters class="mb-1" />
 
+    <CurrentGameStatus v-if="managedPage" source="opgg" />
     <NEmpty
-      v-if="isDataUnavailable"
+      v-if="managedPage?.currentGame?.unavailableReason"
+      class="flex min-h-0 flex-1 items-center justify-center"
+      :description="t(`opgg.automation.status.${managedPage.currentGame.unavailableReason}`)"
+    />
+    <NEmpty
+      v-else-if="isDataUnavailable"
       class="flex min-h-0 flex-1 items-center justify-center"
       :description="t('opgg.view.dataUnavailable')"
     />
@@ -68,6 +74,7 @@
 </template>
 
 <script setup lang="ts">
+import CurrentGameStatus from '@champion-data-window/components/current-game/CurrentGameStatus.vue'
 import { useTranslation } from 'i18next-vue'
 import ChampionPagePlaceholder from '@champion-data-window/components/champion-page/ChampionPagePlaceholder.vue'
 import { NButton, NEmpty, NSpin } from 'naive-ui'
@@ -81,6 +88,7 @@ import SessionChampions from './widgets/SessionChampions.vue'
 
 const { t } = useTranslation()
 const {
+  snapshot,
   currentTab,
   championId,
   champion,
@@ -94,6 +102,14 @@ const {
   cancel,
   refresh
 } = useOpgg()
+
+const managedPage = computed(() =>
+  activePage.value === null
+    ? null
+    : snapshot.value.pages[activePage.value]?.currentGame
+      ? snapshot.value.pages[activePage.value]
+      : null
+)
 
 // Keep mounted content stable: tab sorting must not reinsert page DOM.
 const contentPageIds = computed(() => openedPages.value.toSorted((first, second) => first - second))

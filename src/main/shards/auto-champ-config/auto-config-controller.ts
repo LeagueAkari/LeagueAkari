@@ -1,4 +1,5 @@
 import { i18next } from '@main/i18n'
+import { resolveChampionPresetKey } from '@shared/shards/auto-champ-config/preset'
 import { formatError } from '@shared/utils/errors'
 import { compareShallow } from 'mobx'
 
@@ -44,23 +45,12 @@ export class AutoChampConfigController {
         const queueType = leagueClient.data.gameflow.session.gameData.queue.type
         const selfPosition = self.assignedPosition
 
-        let configKey: string | null
-        // CLASSIC 模式下, 特别区分是否是 RANKED
-        if (gameMode === 'CLASSIC') {
-          // 目前有 RANKED_FLEX_SR, RANKED_SOLO_5x5
-          if (queueType.startsWith('RANKED_')) {
-            const rankedConfigKey = `ranked-${selfPosition}`
-            if (settings.runesV2[championId] && settings.runesV2[championId][rankedConfigKey]) {
-              configKey = rankedConfigKey
-            } else {
-              configKey = 'ranked-default'
-            }
-          } else {
-            configKey = 'normal'
-          }
-        } else {
-          configKey = GAME_MODE_TYPE_MAP[gameMode] || null
-        }
+        const configKey = resolveChampionPresetKey(
+          settings.runesV2[championId],
+          gameMode,
+          queueType,
+          selfPosition
+        )
 
         if (!configKey) {
           return

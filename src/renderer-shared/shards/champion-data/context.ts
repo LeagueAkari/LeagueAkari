@@ -16,3 +16,22 @@ export interface ChampionDataRendererContext {
 export interface ChampionDataRendererConfig {
   enableFullData?: boolean
 }
+
+export type RuneAutomationStatus =
+  | 'disabled'
+  | 'waitingChampion'
+  | 'waitingLock'
+  | 'loading'
+  | 'missingPosition'
+  | 'unsupportedMode'
+  | 'sourceUnavailable'
+  | 'preset'
+  | 'paused'
+  | 'disconnected'
+  | 'inGame'
+  | 'applied'
+  | 'manual'
+  | 'applying'
+  | 'loadError'
+  | 'applyError'
+  | 'empty'

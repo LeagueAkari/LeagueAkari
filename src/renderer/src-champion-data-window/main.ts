@@ -16,6 +16,7 @@ import { createApp } from 'vue'
 
 import NaiveUIProviderApp from './NaiveUIProviderApp.vue'
 import './assets/css/styles.css'
+import { router } from './router'
 import { manager } from './shards'
 
 try {
@@ -26,7 +27,9 @@ try {
     .use(createPinia())
     .use(I18nextVue, { i18next })
     .use(manager)
+    .use(router)
   await manager.setup()
+  await router.isReady()
   app.mount('#app')
 } catch (error) {
   console.error('League Akari 无法正确加载：', error)

@@ -7,14 +7,7 @@ import type { AutoChampConfigSettings } from './state'
 
 export const AUTO_CHAMP_CONFIG_MAIN_NAMESPACE = 'auto-champ-config-main'
 
-export const GAME_MODE_TYPE_MAP: Record<string, string> = {
-  CLASSIC: 'normal',
-  URF: 'urf',
-  ARAM: 'aram',
-  NEXUSBLITZ: 'nexusblitz',
-  ULTBOOK: 'ultbook'
-}
-
+export { GAME_MODE_TYPE_MAP } from '@shared/shards/auto-champ-config/preset'
 export interface ChampionConfigMeta {
   championId: number
   position: string

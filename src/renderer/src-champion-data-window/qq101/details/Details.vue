@@ -2,6 +2,7 @@
   <div class="flex min-h-0 flex-1 flex-col gap-1 px-2 pt-1 pb-2">
     <div class="flex flex-wrap items-center gap-1">
       <QuerySelect
+        :disabled="readOnly"
         class="min-w-32 flex-1"
         :value="view.mode"
         :options="modes"
@@ -11,6 +12,7 @@
       />
       <template v-if="view.mode === 'ranked'">
         <QuerySelect
+          :disabled="readOnly"
           class="min-w-24 flex-1"
           size="small"
           :value="view.patch"
@@ -19,6 +21,7 @@
           @update:value="emit('preferences', { patch: $event })"
         />
         <QuerySelect
+          :disabled="readOnly"
           kind="tier"
           class="min-w-28 flex-1"
           size="small"
@@ -33,7 +36,7 @@
           size="small"
           :value="view.position"
           :options="positions"
-          :disabled="positions.length === 0"
+          :disabled="readOnly || positions.length === 0"
           :loading="view.sections.positions.status === 'loading'"
           :placeholder="t('qq101.position')"
           @update:value="emit('position', $event)"
@@ -104,7 +107,7 @@
         >
           <template v-if="positionGate !== 'loading'" #actions>
             <NButton
-              v-if="positionGate === 'empty' && previousPatch"
+              v-if="positionGate === 'empty' && previousPatch && !readOnly"
               size="tiny"
               secondary
               @click="emit('preferences', { patch: previousPatch })"
@@ -175,6 +178,16 @@
                     layout="runes"
                   >
                     <RunePageDisplay :page="page" />
+                    <template #actions>
+                      <NButton
+                        size="tiny"
+                        type="primary"
+                        secondary
+                        :disabled="applying || !page.primaryStyleId || !page.secondaryStyleId"
+                        @click="emit('applyRunes', index)"
+                        >{{ t('opgg.champion.apply') }}</NButton
+                      >
+                    </template>
 
                     <template #metrics>
                       <StatisticValue
@@ -311,16 +324,25 @@ import StatisticValue from '@champion-data-window/components/champion-statistics
 import RecommendationRow from '@champion-data-window/components/champion-statistics/RecommendationRow.vue'
 import RecommendationSequence from '@champion-data-window/components/champion-statistics/RecommendationSequence.vue'
 import { formatCount } from '../format'
-import { tierIcons } from '../filters'
+import { useTierOptions } from '../filters'
 import { detailPanels, type DetailTable } from './presentation'
 
-const { view, patches, modeChange } = defineProps<{
+const {
+  view,
+  patches,
+  modeChange,
+  readOnly = false,
+  applying = false
+} = defineProps<{
+  readOnly?: boolean
+  applying?: boolean
   view: Qq101DetailView
   patches: string[]
   modeChange: Extract<Qq101Page, { kind: 'champion' }>['modeChange']
 }>()
 
 const emit = defineEmits<{
+  applyRunes: [index: number]
   mode: [mode: 'ranked' | 'aram_mayhem']
   champion: [id: number]
   position: [position: string]
@@ -398,13 +420,7 @@ const modes = computed(() =>
   ['ranked', 'aram_mayhem'].map((value) => ({ value, label: t(`qq101.modes.${value}`) }))
 )
 
-const tiers = computed(() =>
-  [255, 88, 10, 9, 28, 8, 27, 7, 26, 6, 25, 5, 24, 4, 3, 2, 1].map((value) => ({
-    value,
-    label: t(`qq101.tiers.${value}`),
-    rank: tierIcons[value]
-  }))
-)
+const { tierOptions: tiers } = useTierOptions()
 
 const panels = computed(() => detailPanels(view, rarity.value))
 

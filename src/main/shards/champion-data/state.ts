@@ -1,3 +1,4 @@
+import { createChampionDataAutomationSettings } from '@shared/shards/champion-data/automation'
 import { createChampionDataSourcePreferences } from '@shared/shards/champion-data/source-preferences'
 import type {
   OpggChampionDataPreferences,
@@ -23,6 +24,7 @@ export class OpggChampionDataState {
 }
 
 export class ChampionDataSettings {
+  automation = createChampionDataAutomationSettings()
   sourcePreferences = createChampionDataSourcePreferences()
   opggFlashPosition: OpggFlashPosition = 'auto'
   opggPreferences: OpggChampionDataPreferences = {
@@ -40,6 +42,7 @@ export class ChampionDataSettings {
 
   constructor() {
     makeAutoObservable(this, {
+      automation: observableRef,
       sourcePreferences: observableRef,
       opggPreferences: observableRef,
       qq101Preferences: observableRef

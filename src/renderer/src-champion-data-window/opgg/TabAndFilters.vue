@@ -30,8 +30,9 @@
         />
       </template>
     </TabBar>
-    <div class="flex flex-wrap gap-1">
+    <div v-if="!managedPage?.currentGame?.unavailableReason" class="flex flex-wrap gap-1">
       <QuerySelect
+        :disabled="Boolean(managedPage)"
         :render-label="renderLabel"
         size="small"
         :style="filterStyle('mode')"
@@ -42,9 +43,10 @@
         @update:value="changeMode"
       />
       <QuerySelect
+        :disabled="Boolean(managedPage)"
         v-if="mode !== 'aram_mayhem'"
         size="small"
-        :render-label="renderRegionLabel"
+        kind="region"
         :style="filterStyle('region')"
         :placeholder="t('opgg.filters.region')"
         :options="regionOptions"
@@ -53,9 +55,10 @@
         @update:value="changeRegion"
       />
       <QuerySelect
+        :disabled="Boolean(managedPage)"
         v-if="mode !== 'aram_mayhem' && mode !== 'arena'"
         size="small"
-        :render-label="renderTierLabel"
+        kind="tier"
         :style="filterStyle('tier')"
         :placeholder="t('opgg.filters.rankTier')"
         :options="tierOptions"
@@ -64,6 +67,7 @@
         @update:value="changeTier"
       />
       <QuerySelect
+        :disabled="Boolean(managedPage)"
         v-if="mode === 'ranked' || mode === 'flex'"
         size="small"
         :render-label="renderPositionLabel"
@@ -83,7 +87,7 @@
         :value="version"
         :options="versionOptions"
         :consistent-menu-width="false"
-        :disabled="versions.length === 0"
+        :disabled="Boolean(managedPage) || versions.length === 0"
         @update:value="changeVersion"
       />
     </div>
@@ -142,6 +146,14 @@ const {
   changeVersion
 } = useOpgg()
 
+const managedPage = computed(() =>
+  activePage.value === null
+    ? null
+    : snapshot.value.pages[activePage.value]?.currentGame
+      ? snapshot.value.pages[activePage.value]
+      : null
+)
+
 const { modeOptions } = useModeOptions()
 const { regionOptions } = useRegionOptions()
 const { tierOptions } = useTierOptions()
@@ -183,7 +195,11 @@ const tabItems = computed<TabBarItems>(() => ({
     Object.entries(snapshot.value.pages).map(([id, page]) => [
       id,
       {
-        name: resources.champions.name(page.query.championId!),
+        name: page.query.championId
+          ? resources.champions.name(page.query.championId)
+          : t('opgg.automation.currentGame'),
+        fixedPosition: page.currentGame ? 1 : undefined,
+        closable: !page.currentGame,
         actions: [
           {
             id: 'refresh',
@@ -194,15 +210,19 @@ const tabItems = computed<TabBarItems>(() => ({
               void refreshPage(Number(id))
             }
           },
-          {
-            id: 'close',
-            kind: 'close' as const,
-            icon: markRaw(Close),
-            label: t('opgg.tabs.close'),
-            onClick: () => {
-              void closeChampion(Number(id))
-            }
-          }
+          ...(page.currentGame
+            ? []
+            : [
+                {
+                  id: 'close',
+                  kind: 'close' as const,
+                  icon: markRaw(Close),
+                  label: t('opgg.tabs.close'),
+                  onClick: () => {
+                    void closeChampion(Number(id))
+                  }
+                }
+              ])
         ]
       }
     ])
@@ -212,6 +232,8 @@ const tabItems = computed<TabBarItems>(() => ({
 const renderTabTooltip = (tab: TabBarTab) => {
   const page = snapshot.value.pages[Number(tab.id)]
   if (!page) return tab.name
+  if (page.currentGame?.unavailableReason)
+    return t(`opgg.automation.status.${page.currentGame.unavailableReason}`)
 
   const query = page.query
   const fields: QuerySummaryField[] = [
@@ -332,14 +354,6 @@ const versionOptions = computed(() => versions.value.map((value) => ({ label: va
 
 const renderLabel: SelectRenderLabel = (option) => (
   <FilterLabel label={String(option.label ?? '')} />
-)
-
-const renderRegionLabel: SelectRenderLabel = (option) => (
-  <FilterLabel label={String(option.label ?? '')} icon="region" flag={option.flag as string} />
-)
-
-const renderTierLabel: SelectRenderLabel = (option) => (
-  <FilterLabel label={String(option.label ?? '')} icon="tier" rank={option.rank as string} />
 )
 
 const renderPositionLabel: SelectRenderLabel = (option) => (

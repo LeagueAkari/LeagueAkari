@@ -8,6 +8,20 @@
       @close="controller.pages.close($event)"
       @refresh="refreshPage"
     />
+    <CurrentGameStatus v-if="managedPage" source="qq101" class="mx-2" />
+    <NEmpty
+      v-if="managedPage && !managedPage.view"
+      class="flex min-h-0 flex-1 items-center justify-center"
+      :description="
+        t(
+          managedPage.currentGame?.unavailableReason
+            ? `opgg.automation.status.${managedPage.currentGame.unavailableReason}`
+            : managedPage.modeChange.status === 'error'
+              ? 'opgg.automation.status.loadError'
+              : 'opgg.automation.status.loading'
+        )
+      "
+    />
     <Rankings
       v-show="state.pages.activeId === 'rankings'"
       :preferences="preferences"
@@ -27,6 +41,9 @@
         v-if="page.kind === 'champion' && page.view"
         v-show="state.pages.activeId === page.id"
         :view="page.view"
+        :read-only="Boolean(page.currentGame)"
+        :applying="applying"
+        @apply-runes="applyRunes(page.id, $event)"
         :patches="state.patches"
         :mode-change="page.modeChange"
         @mode="controller.pages.changeHeroMode(page.id, $event)"
@@ -47,12 +64,16 @@
   </div>
 </template>
 <script setup lang="ts">
+import CurrentGameStatus from '@champion-data-window/components/current-game/CurrentGameStatus.vue'
+import { NEmpty, useMessage } from 'naive-ui'
+import { useTranslation } from 'i18next-vue'
+
 import { useInstance } from '@renderer-shared/shards'
 import { ChampionDataRenderer } from '@renderer-shared/shards/champion-data'
 import { useChampionDataStore } from '@renderer-shared/shards/champion-data/store'
 import type { Qq101Page } from '@renderer-shared/shards/champion-data/qq101/types'
 import type { Qq101ChampionDataPreferences } from '@shared/types/champion-data'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import Rankings from './Rankings.vue'
 import Details from './details/Details.vue'
 import Pairs from './pairs/Pairs.vue'
@@ -60,7 +81,28 @@ import Tabs from './Tabs.vue'
 
 const store = useChampionDataStore()
 const state = store.qq101
-const controller = useInstance(ChampionDataRenderer).qq101
+const championData = useInstance(ChampionDataRenderer)
+const controller = championData.qq101
+const { t } = useTranslation()
+const message = useMessage()
+const applying = ref(false)
+const managedPage = computed(() =>
+  state.pages.items.find(
+    (p): p is Extract<Qq101Page, { kind: 'champion' }> =>
+      p.kind === 'champion' && Boolean(p.currentGame) && p.id === state.pages.activeId
+  )
+)
+const applyRunes = async (id: string, index: number) => {
+  applying.value = true
+  try {
+    await championData.applyQq101Runes(id, index)
+    message.success(t('opgg.automation.status.applied'))
+  } catch (error) {
+    message.warning(t('opgg.view.setRunesFailedMessage', { reason: String(error) }))
+  } finally {
+    applying.value = false
+  }
+}
 
 const activeId = computed({
   get: () => state.pages.activeId,

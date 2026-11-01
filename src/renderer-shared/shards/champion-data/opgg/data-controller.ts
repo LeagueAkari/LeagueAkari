@@ -5,6 +5,7 @@ import {
 } from '@shared/data-adapter/opgg/projection'
 import type { OpggLoadedChampion, OpggLoadedOverview } from '@shared/data-adapter/opgg/types'
 import { createOpggSnapshot } from '@shared/shards/champion-data'
+import type { CurrentGameUnavailableReason } from '@shared/shards/champion-data/automation'
 import type {
   OpggChampionDataQuery,
   OpggChampionDataQueryUpdate,
@@ -16,6 +17,7 @@ import { formatError } from '@shared/utils/errors'
 import { QueueKeeper, isAbortError } from '@shared/utils/queue-keeper'
 import { type WatchStopHandle, watch } from 'vue'
 
+import { RuneExecutor, isValidRunePage } from '../rune-executor'
 import type { OpggApplySelection, OpggRendererContext } from './context'
 import type { OpggChampionDataLoader } from './data-loader'
 import { OpggLoadoutExecutor } from './loadout-executor'
@@ -30,10 +32,19 @@ export class OpggChampionDataController {
     { champion: OpggLoadedChampion; position: OpggRankedPosition }
   >()
 
+  private readonly _loadout: OpggLoadoutExecutor
+  private _currentGameQuery: {
+    query: OpggChampionDataQuery
+    reason: CurrentGameUnavailableReason | null
+  } | null = null
+
   constructor(
     private readonly _context: OpggRendererContext,
-    private readonly _loader: OpggChampionDataLoader
-  ) {}
+    private readonly _loader: OpggChampionDataLoader,
+    runes = new RuneExecutor(_context.client)
+  ) {
+    this._loadout = new OpggLoadoutExecutor(_context, runes)
+  }
 
   private readonly _watchers: WatchStopHandle[] = []
 
@@ -49,22 +60,9 @@ export class OpggChampionDataController {
             return
           }
 
-          const follow = this._followQuery()
-          void this.updateQuery(follow ?? {}, true, Boolean(follow))
+          void this.updateQuery({}, true)
         },
         { immediate: true, flush: 'sync' }
-      )
-    )
-    this._watchers.push(
-      watch(
-        () => JSON.stringify(this._followQuery()),
-        (serialized) => {
-          const query = JSON.parse(serialized) as OpggChampionDataQueryUpdate | null
-          if (query && this._enabled()) {
-            void this.updateQuery(query, false, true)
-          }
-        },
-        { flush: 'sync' }
       )
     )
     this._watchers.push(
@@ -89,6 +87,87 @@ export class OpggChampionDataController {
     )
   }
 
+  get currentGamePageId() {
+    return (
+      this._context.state.snapshot.openedPages.find(
+        (id) => this._context.state.snapshot.pages[id].currentGame
+      ) ?? null
+    )
+  }
+
+  get currentGamePage() {
+    const id = this.currentGamePageId
+    return id === null ? null : this._context.state.snapshot.pages[id]
+  }
+
+  syncCurrentGamePage(query: OpggChampionDataQuery, reason: CurrentGameUnavailableReason | null) {
+    if (!this._enabled()) return Promise.resolve(false)
+    let id = this.currentGamePageId
+    const desired = { query, reason }
+    if (id !== null && JSON.stringify(this._currentGameQuery) === JSON.stringify(desired)) {
+      return Promise.resolve(true)
+    }
+
+    this._currentGameQuery = desired
+    const snapshot = this._context.state.snapshot
+    const created = id === null
+    if (id === null) id = ++this._pageSequence
+    this._queue.cancelById('page:' + id)
+    this._loaded.delete(id)
+    this._publish({
+      ...snapshot,
+      activePage: created ? id : snapshot.activePage,
+      openedPages: created ? [id, ...snapshot.openedPages] : snapshot.openedPages,
+      pages: {
+        ...snapshot.pages,
+        [id]: {
+          currentGame: { unavailableReason: reason },
+          query,
+          version: null,
+          versions: [],
+          champion: null,
+          status: 'idle',
+          error: null,
+          stale: true,
+          revision: ++this._sequence
+        }
+      }
+    })
+    return reason ? Promise.resolve(false) : this._request(id)
+  }
+
+  getRecommendedRunes() {
+    const page = this.currentGamePage
+    if (
+      !page ||
+      page.stale ||
+      page.status !== 'ready' ||
+      !page.champion ||
+      !('runes' in page.champion)
+    )
+      return undefined
+
+    return page.champion.runes
+      .filter(
+        (rune) =>
+          rune.primaryRuneIds.length === 4 &&
+          rune.secondaryRuneIds.length === 2 &&
+          rune.statShardIds.length === 3
+      )
+      .map((rune) => ({
+        primaryStyleId: rune.primaryStyleId,
+        subStyleId: rune.secondaryStyleId,
+        selectedPerkIds: [...rune.primaryRuneIds, ...rune.secondaryRuneIds, ...rune.statShardIds]
+      }))
+      .find(isValidRunePage)
+  }
+
+  removeCurrentGamePage() {
+    const id = this.currentGamePageId
+    if (id !== null) this._removePage(id)
+    this._currentGameQuery = null
+  }
+
   update(query: OpggChampionDataQueryUpdate, pageId?: number | null) {
     return this.updateQuery(query, false, false, pageId)
   }
@@ -98,7 +177,7 @@ export class OpggChampionDataController {
   }
 
   apply(request: OpggApplySelection) {
-    return new OpggLoadoutExecutor(this._context).apply(request)
+    return this._loadout.apply(request)
   }
 
   cancel(id: number | null) {
@@ -156,9 +235,12 @@ export class OpggChampionDataController {
 
     const query = this._mergeQuery(origin.query, { ...update, championId })
     const snapshot = this._context.state.snapshot
-    const existing = snapshot.openedPages.find((id) => sameQuery(snapshot.pages[id].query, query))
+    const existing = snapshot.openedPages.find(
+      (id) => !snapshot.pages[id].currentGame && sameQuery(snapshot.pages[id].query, query)
+    )
     if (existing !== undefined) return this.activate(existing)
-    if (snapshot.openedPages.length >= 20) return false
+    if (snapshot.openedPages.filter((id) => !snapshot.pages[id].currentGame).length >= 20)
+      return false
 
     const id = ++this._pageSequence
     this._publish({
@@ -194,6 +276,11 @@ export class OpggChampionDataController {
   }
 
   async close(id: number) {
+    if (this._context.state.snapshot.pages[id]?.currentGame) return
+    this._removePage(id)
+  }
+
+  private _removePage(id: number) {
     const snapshot = this._context.state.snapshot
     const index = snapshot.openedPages.indexOf(id)
     if (index < 0) return
@@ -223,7 +310,13 @@ export class OpggChampionDataController {
     )
       throw new Error('Invalid OP.GG tab order')
 
-    this._publish({ ...snapshot, openedPages: [...ids] })
+    this._publish({
+      ...snapshot,
+      openedPages: [
+        ...ids.filter((id) => snapshot.pages[id].currentGame),
+        ...ids.filter((id) => !snapshot.pages[id].currentGame)
+      ]
+    })
   }
 
   cancelAll(clear = false) {
@@ -290,6 +383,8 @@ export class OpggChampionDataController {
     follow = false,
     id: number | null = this._context.state.snapshot.activePage
   ): Promise<boolean> {
+    if (id !== null && this._context.state.snapshot.pages[id]?.currentGame) return false
+
     if (!this._enabled()) return false
 
     if (follow) {
@@ -307,7 +402,7 @@ export class OpggChampionDataController {
     }
 
     const page = this._page(id)
-    if (!page) return false
+    if (!page || (id !== null && this._context.state.snapshot.pages[id]?.currentGame)) return false
 
     const query = this._mergeQuery(page.query, update)
     const changed = !sameQuery(page.query, query)
@@ -335,7 +430,14 @@ export class OpggChampionDataController {
 
     const revision = ++this._sequence
     const generation = this._context.state.snapshot.generation
-    const query = { ...this._page(id).query }
+    const currentGame =
+      id === null ? undefined : this._context.state.snapshot.pages[id]?.currentGame
+    if (currentGame?.unavailableReason) return Promise.resolve(false)
+    const query = {
+      ...(currentGame && this._currentGameQuery
+        ? this._currentGameQuery.query
+        : this._page(id).query)
+    }
     this._setPage(id, { status: 'loading', error: null, stale: true, revision })
 
     const current = () =>
@@ -344,11 +446,15 @@ export class OpggChampionDataController {
 
     const request = this._queue
       .replace('read', 'page:' + id, async ({ signal }) => {
-        const resolved = await this._loader.resolveTarget(query, signal, force && id === null)
+        const resolved = await this._loader.resolveTarget(
+          query,
+          signal,
+          force && (id === null || Boolean(currentGame))
+        )
         signal.throwIfAborted()
         const key = JSON.stringify(resolved.target)
         let overview = this._overviews.get(key)
-        if (!overview || (force && id === null)) {
+        if (!overview || (force && (id === null || Boolean(currentGame)))) {
           overview = await this._loader.loadOverview(resolved.target, signal)
           signal.throwIfAborted()
           if (!current()) return false
@@ -430,64 +536,6 @@ export class OpggChampionDataController {
     }
 
     return projectDetails(champion, position, resources)
-  }
-
-  private _followQuery(): OpggChampionDataQueryUpdate | null {
-    const { leagueClient } = this._context
-    const session = leagueClient.champSelect.session
-    const gameflow = leagueClient.gameflow.session
-    if (!session || !gameflow) {
-      return null
-    }
-
-    const self = session.myTeam.find((item) => item.cellId === session.localPlayerCellId)
-    if (!self) {
-      return null
-    }
-
-    const championId =
-      session.actions
-        .flat()
-        .find(
-          (action) =>
-            action.actorCellId === self.cellId && action.type === 'pick' && action.championId
-        )?.championId ?? self.championId
-    if (
-      !championId ||
-      championId === -3 ||
-      leagueClient.champSelect.disabledChampionIds.has(championId)
-    ) {
-      return null
-    }
-
-    const modes: Record<string, OpggChampionDataQuery['mode']> = {
-      CLASSIC: 'ranked',
-      ARAM: 'aram',
-      KIWI: 'aram_mayhem',
-      CHERRY: 'arena',
-      NEXUSBLITZ: 'nexus_blitz',
-      URF: 'urf',
-      ARURF: 'urf'
-    }
-    const mode =
-      gameflow.gameData.queue.id === 440 ? 'flex' : modes[gameflow.gameData.queue.gameMode]
-    if (!mode) {
-      return null
-    }
-
-    const positions: Record<string, OpggChampionDataQuery['position']> = {
-      top: 'top',
-      jungle: 'jungle',
-      middle: 'mid',
-      bottom: 'adc',
-      utility: 'support'
-    }
-    const position = positions[self.assignedPosition.toLowerCase()]
-    if ((mode === 'ranked' || mode === 'flex') && position) {
-      return { championId, mode, position }
-    }
-
-    return { championId, mode }
   }
 }
 

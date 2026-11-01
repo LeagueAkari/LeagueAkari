@@ -3,64 +3,63 @@
     <SetupInAppScope />
     <ChampionDataSourceBar
       :sources="sources"
-      :active-source="activeSource"
-      @select="selectSource"
-      @settings="settingsShown = true"
+      :active-tab="isSettings ? 'settings' : activeSource"
+      @select="selectTab"
     />
-
-    <div
-      v-if="!activeSource"
-      role="status"
-      class="flex min-h-0 flex-1 items-center justify-center px-6 text-center"
-    >
-      <div class="flex max-w-80 flex-col items-center gap-3">
-        <div class="text-sm font-medium text-black/70 dark:text-white/75">
-          {{ allSourcesDisabled ? t('opgg.sources.noneEnabled') : unavailableDescription }}
-        </div>
-        <div v-if="allSourcesDisabled" class="text-xs text-black/45 dark:text-white/45">
-          {{ t('opgg.sources.enableDescription') }}
-        </div>
-        <NButton v-if="allSourcesDisabled" size="small" secondary @click="settingsShown = true">
-          {{ t('opgg.sources.openSettings') }}
-        </NButton>
-      </div>
-    </div>
-    <KeepAlive>
-      <Qq101View v-if="activeSource === 'qq101'" class="h-0 flex-1" />
-    </KeepAlive>
-    <KeepAlive>
-      <View v-if="activeSource === 'opgg'" class="h-0 flex-1" />
-    </KeepAlive>
-    <NModal v-model:show="settingsShown" transform-origin="center">
-      <div class="w-125 max-w-[90vw]">
-        <SettingsPane @close="settingsShown = false" />
-      </div>
-    </NModal>
+    <RouterView v-slot="{ Component, route: currentRoute }">
+      <KeepAlive>
+        <component
+          :is="Component"
+          :key="currentRoute.name ?? currentRoute.path"
+          v-if="currentRoute.name !== 'settings' || settingsAvailable"
+          v-bind="currentRoute.name === 'sources' ? sourceViewProps : {}"
+          class="h-0 min-h-0 flex-1"
+        />
+      </KeepAlive>
+    </RouterView>
   </div>
 </template>
 
 <script setup lang="ts">
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/setup-in-app-scope-component'
-import { useTranslation } from 'i18next-vue'
-import { NButton, NModal } from 'naive-ui'
-import { computed, ref } from 'vue'
+import type { ChampionDataSourceId } from '@shared/types/champion-data'
+import { computed, watch } from 'vue'
+import { RouterView, useRoute, useRouter } from 'vue-router'
 
-import View from './opgg/View.vue'
 import { provideOpgg } from './opgg/context'
-import SettingsPane from './opgg/widgets/Settings.vue'
 import ChampionDataSourceBar from './sources/ChampionDataSourceBar.vue'
-import Qq101View from './qq101/View.vue'
 import { useChampionDataSources } from './sources/use-champion-data-sources'
 
 provideOpgg()
 
-const { t } = useTranslation()
-const settingsShown = ref(false)
+const router = useRouter()
+const route = useRoute()
 const { sources, allSourcesDisabled, activeSource, minimumUpgradeVersion, selectSource } =
   useChampionDataSources()
-const unavailableDescription = computed(() =>
-  minimumUpgradeVersion.value
-    ? t('opgg.sources.updateRequired', { version: minimumUpgradeVersion.value })
-    : t('opgg.sources.unavailable')
+const settingsAvailable = computed(() => sources.value.some((source) => source.available))
+const isSettings = computed(() => route.name === 'settings')
+const sourceViewProps = computed(() => ({
+  activeSource: activeSource.value,
+  allSourcesDisabled: allSourcesDisabled.value,
+  settingsAvailable: settingsAvailable.value,
+  minimumUpgradeVersion: minimumUpgradeVersion.value
+}))
+
+const selectTab = (tab: ChampionDataSourceId | 'settings') => {
+  if (tab === 'settings') {
+    if (settingsAvailable.value) void router.push('/settings')
+    return
+  }
+
+  selectSource(tab)
+  void router.push('/')
+}
+
+watch(
+  [isSettings, settingsAvailable],
+  ([settings, available]) => {
+    if (settings && !available) void router.replace('/')
+  },
+  { immediate: true }
 )
 </script>

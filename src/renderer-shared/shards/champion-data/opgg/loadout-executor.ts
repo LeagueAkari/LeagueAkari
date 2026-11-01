@@ -10,10 +10,14 @@ import type {
 import { toRaw } from 'vue'
 import { z } from 'zod'
 
+import { RuneExecutor } from '../rune-executor'
 import type { OpggApplySelection, OpggRendererContext } from './context'
 
 export class OpggLoadoutExecutor {
-  constructor(private readonly _context: OpggRendererContext) {}
+  constructor(
+    private readonly _context: OpggRendererContext,
+    private readonly _runes = new RuneExecutor(_context.client)
+  ) {}
 
   async apply(request: OpggApplySelection) {
     const { state, leagueClient, settings } = this._context
@@ -132,43 +136,19 @@ export class OpggLoadoutExecutor {
     snapshot: OpggChampionDataSnapshot,
     runes: OpggStandardDetails['runes'][number]
   ) {
-    const { api } = this._context.client
     const name = this._name(snapshot)
-    const inventory = (await api.perks.getPerkInventory()).data
-    let pageId: number
-
-    if (inventory.canAddCustomPage) {
-      const { data } = await api.perks.postPerkPage({
-        name,
-        isEditable: true,
-        primaryStyleId: runes.primaryStyleId.toString()
-      })
-
-      pageId = data.id
-    } else {
-      const pages = (await api.perks.getPerkPages()).data
-
-      if (!pages.length) {
-        throw new Error('No rune page is available')
-      }
-
-      pageId = pages[0].id
-    }
-
-    await api.perks.putPage({
-      id: pageId,
-      name,
-      isRecommendationOverride: false,
-      isTemporary: false,
-      primaryStyleId: runes.primaryStyleId,
-      subStyleId: runes.secondaryStyleId,
-      selectedPerkIds: [...runes.primaryRuneIds, ...runes.secondaryRuneIds, ...runes.statShardIds]
-    })
-    await api.perks.putCurrentPage(pageId)
+    const created = await this._runes.apply(
+      {
+        primaryStyleId: runes.primaryStyleId,
+        subStyleId: runes.secondaryStyleId,
+        selectedPerkIds: [...runes.primaryRuneIds, ...runes.secondaryRuneIds, ...runes.statShardIds]
+      },
+      name
+    )
     await this._sendChat(
       this._t('view.runesSet', {
         name,
-        action: this._t(inventory.canAddCustomPage ? 'view.create' : 'view.replace')
+        action: this._t(created ? 'view.create' : 'view.replace')
       })
     )
   }

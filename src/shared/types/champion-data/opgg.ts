@@ -1,3 +1,5 @@
+import type { CurrentGamePage } from '@shared/shards/champion-data/automation'
+
 import type { OpggChampionDataPreferences } from '.'
 import type { OpggAramBalanceAdjustment } from '../../data-adapter/opgg-aram-balance'
 import type { OpggSkillCode } from '../opgg'
@@ -179,6 +181,7 @@ export interface OpggQueryPageState extends OpggPageState {
 }
 
 export interface OpggChampionPage extends OpggQueryPageState {
+  currentGame?: CurrentGamePage
   champion: OpggChampionDataDetails | null
 }
 

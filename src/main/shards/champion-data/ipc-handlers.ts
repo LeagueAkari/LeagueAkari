@@ -1,3 +1,4 @@
+import type { ChampionDataAutomationSettings } from '@shared/shards/champion-data/automation'
 import type {
   ChampionDataSourcePreferences,
   OpggChampionDataPreferences,
@@ -15,6 +16,12 @@ export class ChampionDataIpcHandlers {
   ) {}
 
   register() {
+    this._ipc.onCall(
+      this._context.namespace,
+      'setAutomation',
+      (_, value: ChampionDataAutomationSettings) =>
+        this._context.settingService.set('automation', value)
+    )
     this._ipc.onCall(
       this._context.namespace,
       'setSourcePreferences',

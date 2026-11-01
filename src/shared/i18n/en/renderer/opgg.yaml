@@ -1,4 +1,30 @@
 opgg:
+  automation:
+    currentGame: 'Current game'
+    enabled: 'Automatically apply recommended runes'
+    description: 'Apply the default source after locking a champion while this window is open. Saved rune presets take priority.'
+    preferences: 'Current-game query defaults'
+    preferencesDescription: 'Mode and lane follow the game; data uses the latest version. Changes reload these pages without reapplying successful runes.'
+    retryApply: 'Retry application'
+    status:
+      disabled: 'Automatic runes are disabled'
+      waitingChampion: 'Waiting for a champion'
+      waitingLock: 'Waiting for champion lock-in'
+      loading: 'Loading recommendations'
+      missingPosition: 'Lane is unavailable; automatic runes are skipped'
+      unsupportedMode: 'This mode does not support automatic runes'
+      sourceUnavailable: 'The default source is unavailable; automatic runes are skipped'
+      preset: 'A saved rune preset takes priority; online runes will not be applied'
+      paused: 'Window hidden; automatic application paused'
+      disconnected: 'Client disconnected; automatic application paused'
+      inGame: 'Game started; recommendations are for viewing only'
+      applied: 'Recommended runes applied'
+      manual: 'Runes applied manually; automatic overwrite stopped for this selection'
+      applying: 'Applying runes'
+      loadError: 'Recommendations failed to load; refresh to retry'
+      applyError: 'Rune application failed'
+      empty: 'No usable rune recommendation in this version'
+      otherSource: 'Automatic application uses the default source; this source is for browsing'
   tabs:
     label: OP.GG pages
     close: Close tab
@@ -140,22 +166,27 @@ opgg:
     dataUnavailable: The selected source does not support this mode or is unavailable
     settings:
       title: Champion Data Settings
+      sections:
+        window: Window
+        sources: Data Sources
+        preferences: Preferences
       sources:
         label: Data Sources
         description: Enable sources independently, or turn both off. The default source opens whenever the window is shown.
         default: Default
         defaultLabel: Set {{source}} as the default source
         enableLabel: Enable {{source}}
+        enableDescription: Show this source in the Champion Data window.
+        defaultSource: Default Source
+        defaultDescription: Used for the default champion data view and automatic rune recommendations.
         saveFailed: Failed to save data source settings. Please try again.
       temporarilyUnavailable: Temporarily unavailable
       flashPosition:
         label: Flash Position Preference
-        description: The position for Flash when setting summoner spells
-        auto: Current position
         options:
-          d: Default Flash position is D
-          f: Default Flash position is F
-          auto: Decide based on the current Flash position
+          d: D (Left)
+          f: F (Right)
+          auto: Automatic
       autoApplyRunes:
         label: Auto Apply Runes
         description: Automatically apply the highest pick rate runes if the champion data matches the current mode. Only effective when the champion data window is enabled and visible

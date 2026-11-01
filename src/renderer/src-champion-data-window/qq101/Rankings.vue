@@ -27,7 +27,7 @@
         size="small"
         :value="preferences.tier"
         :options="tiers"
-        :render-label="renderTierLabel"
+        kind="tier"
         :style="filterStyle('tier')"
         :aria-label="t('qq101.tier')"
         :consistent-menu-width="false"
@@ -140,7 +140,7 @@ import { useTranslation } from 'i18next-vue'
 import { NButton, NSpin, type SelectRenderLabel } from 'naive-ui'
 import { computed, ref } from 'vue'
 import RankingTable from './RankingTable.vue'
-import { tierIcons } from './filters'
+import { useTierOptions } from './filters'
 import { projectRankings, type RankingBoard } from './rankings'
 
 const {
@@ -218,13 +218,7 @@ const boards = computed(() =>
   }))
 )
 
-const tiers = computed(() =>
-  [255, 88, 10, 9, 28, 8, 27, 7, 26, 6, 25, 5, 24, 4, 3, 2, 1].map((value) => ({
-    value,
-    label: t(`qq101.tiers.${value}`),
-    rank: tierIcons[value]
-  }))
-)
+const { tierOptions: tiers } = useTierOptions()
 
 const positions = computed(() =>
   ['all', 'top', 'jungle', 'middle', 'bottom', 'utility'].map((value) => ({
@@ -256,10 +250,6 @@ const patchOptions = computed(() => [
 
 const renderLabel: SelectRenderLabel = (option) => (
   <FilterLabel label={String(option.label ?? '')} />
-)
-
-const renderTierLabel: SelectRenderLabel = (option) => (
-  <FilterLabel label={String(option.label ?? '')} icon="tier" rank={option.rank as string} />
 )
 
 const renderPositionLabel: SelectRenderLabel = (option) => (

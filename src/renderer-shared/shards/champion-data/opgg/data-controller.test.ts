@@ -189,20 +189,18 @@ describe('OP.GG renderer data flow', () => {
     expect(api.getRankedChampions).toHaveBeenCalledTimes(2)
   })
 
-  it('uses flex data and the assigned lane when following a flex champion selection', async () => {
-    const { context, state, api, enableWindow } = setup()
-    const { champSelect, gameflow } = context.leagueClient
-    gameflow.session = {
-      gameData: { queue: { id: 440, gameMode: 'CLASSIC' } }
-    } as NonNullable<typeof gameflow.session>
-    champSelect.session = {
-      localPlayerCellId: 1,
-      myTeam: [{ cellId: 1, championId: 1, assignedPosition: 'middle' }],
-      actions: []
-    } as unknown as NonNullable<typeof champSelect.session>
-
+  it('loads a separate managed flex page using its explicit query', async () => {
+    const { controller, state, api, enableWindow } = setup()
     await enableWindow()
-    expect(state.snapshot.query).toMatchObject({ championId: 1, mode: 'flex', position: 'mid' })
+    await controller.syncCurrentGamePage(
+      { ...state.snapshot.query, championId: 1, mode: 'flex', position: 'mid' },
+      null
+    )
+    expect(controller.currentGamePage?.query).toMatchObject({
+      championId: 1,
+      mode: 'flex',
+      position: 'mid'
+    })
     expect(api.getRankedChampion).toHaveBeenLastCalledWith(
       'global',
       1,
@@ -630,40 +628,27 @@ describe('OP.GG renderer data flow', () => {
     }
   )
 
-  it('follows selection while hidden, stops when disabled, and follows the current pick on reopen', async () => {
-    const { context, state, api, enableWindow } = setup()
-    const { champSelect, gameflow } = context.leagueClient
-
-    const selectChampion = (championId: number) => {
-      champSelect.session = {
-        localPlayerCellId: 1,
-        myTeam: [{ cellId: 1, championId, assignedPosition: 'middle' }],
-        actions: []
-      } as unknown as NonNullable<typeof champSelect.session>
-    }
-
-    gameflow.session = {
-      gameData: { queue: { gameMode: 'CLASSIC' } }
-    } as NonNullable<typeof gameflow.session>
-
-    selectChampion(1)
-    expect(api.getChampionVersions).not.toHaveBeenCalled()
-
+  it('protects managed pages while allowing identical ordinary queries and ordinary-page operations', async () => {
+    const { controller, state, enableWindow } = setup()
     await enableWindow()
-    expect(state.snapshot.query).toMatchObject({ championId: 1, mode: 'ranked', position: 'mid' })
-
-    selectChampion(2)
-    await vi.waitFor(() => expect(state.snapshot.champion?.summary.championId).toBe(2))
-
-    state.enabled = false
-
-    selectChampion(1)
-    expect(state.snapshot.query.championId).toBe(2)
-    expect(state.snapshot.status).toBe('idle')
-    expect(api.getRankedChampion).toHaveBeenCalledTimes(2)
-
-    await enableWindow()
-    expect(state.snapshot.champion?.summary.championId).toBe(1)
+    await controller.open(1)
+    const ordinary = state.snapshot.activePage!
+    const query = { ...state.snapshot.pages[ordinary].query }
+    await controller.syncCurrentGamePage(query, null)
+    const managed = controller.currentGamePageId!
+    expect(managed).not.toBe(ordinary)
+    await controller.close(managed)
+    await controller.update({ tier: 'gold_plus', championId: 2 }, managed)
+    expect(controller.currentGamePage?.query).toMatchObject(query)
+    await controller.reorder([ordinary, managed])
+    expect(state.snapshot.openedPages).toEqual([managed, ordinary])
+    await controller.open(1, ordinary)
+    expect(state.snapshot.activePage).toBe(ordinary)
+    await controller.syncCurrentGamePage({ ...query, championId: 2 }, null)
+    expect(controller.currentGamePageId).toBe(managed)
+    expect(state.snapshot.activePage).toBe(ordinary)
+    controller.removeCurrentGamePage()
+    expect(state.snapshot.openedPages).toEqual([ordinary])
   })
 })
 
