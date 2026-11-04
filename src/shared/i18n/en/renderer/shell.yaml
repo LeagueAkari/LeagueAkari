@@ -183,6 +183,7 @@ navigation:
   sidebar:
     menu:
       match-history: Match History
+      self-improvement: Self-Improvement
       ongoing-game: Ongoing Game
       automation: Automation
       toolkit: Toolkit

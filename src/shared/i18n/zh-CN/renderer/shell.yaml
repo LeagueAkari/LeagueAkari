@@ -182,6 +182,7 @@ navigation:
   sidebar:
     menu:
       match-history: 战绩
+      self-improvement: 自我提升
       ongoing-game: 对局
       automation: 自动操作
       toolkit: 工具集
