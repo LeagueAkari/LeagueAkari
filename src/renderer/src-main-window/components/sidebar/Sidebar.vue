@@ -55,6 +55,7 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { ToolFilled as ToolFilledIcon } from '@vicons/antd'
+import { ChartLineData as ChartLineDataIcon } from '@vicons/carbon'
 import {
   AnimalRabbit28Filled as AnimalRabbit28FilledIcon,
   Flash20Filled as Flash20FilledIcon,
@@ -175,6 +176,11 @@ const menu = computed(() => {
       key: 'player-tabs',
       icon: renderIcon(AnalyticsRoundIcon),
       name: t('navigation.sidebar.menu.match-history')
+    },
+    {
+      key: 'self-improvement',
+      icon: renderIcon(ChartLineDataIcon),
+      name: t('navigation.sidebar.menu.self-improvement')
     },
     {
       key: 'ongoing-game',
