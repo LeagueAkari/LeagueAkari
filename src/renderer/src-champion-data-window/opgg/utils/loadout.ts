@@ -1,6 +1,7 @@
+import { ChampionDataRenderer } from '@champion-data-window/shards/champion-data'
+import type { OpggApplySelection } from '@champion-data-window/shards/champion-data/opgg/context'
 import { useInstance } from '@renderer-shared/shards'
-import { ChampionDataRenderer } from '@renderer-shared/shards/champion-data'
-import type { OpggApplySelection } from '@renderer-shared/shards/champion-data/opgg/context'
+import { isAbortError } from '@shared/utils/queue-keeper'
 import { useTranslation } from 'i18next-vue'
 import { useMessage } from 'naive-ui'
 
@@ -10,9 +11,13 @@ export function useLoadout() {
   const championData = useInstance(ChampionDataRenderer)
   const message = useMessage()
   const { t } = useTranslation()
-  const { championId, pageId, pageState, isDataStale } = useOpgg()
+  const { championId, pageId, pageState, isDataStale, applying } = useOpgg()
 
   const apply = async (kind: OpggApplySelection['kind'], recommendationId: string) => {
+    if (applying.value[kind]) {
+      return
+    }
+
     try {
       if (
         pageId.value === null ||
@@ -36,6 +41,10 @@ export function useLoadout() {
             })
       )
     } catch (error) {
+      if (isAbortError(error)) {
+        return
+      }
+
       const key =
         kind === 'items'
           ? 'opgg.champion.writeFileFailedMessage'

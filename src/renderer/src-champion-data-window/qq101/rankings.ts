@@ -1,5 +1,5 @@
+import type { Qq101ChampionDataOverview } from '@champion-data-window/shards/champion-data/qq101/types'
 import type { AkariResourceProviderValue } from '@renderer-shared/providers/akari-resource'
-import type { Qq101ChampionDataOverview } from '@renderer-shared/shards/champion-data/qq101/types'
 
 export type RankingBoard = 'champions' | 'augments' | 'synergies'
 
@@ -33,6 +33,7 @@ export type RankingRow = RankingBase &
 // QQ101 derives Mayhem tiers within each profession, before search or sorting.
 function tierAt(index: number, total: number) {
   let boundary = 1
+
   for (const [tier, proportion] of [0.04, 0.15, 0.3, 0.4].entries()) {
     boundary = Math.max(boundary, Math.round(total * proportion))
     if (index < boundary) {
@@ -52,6 +53,7 @@ export function projectRankings(
   if (!overview) {
     return []
   }
+
   if (overview.mode === 'aram_mayhem' && board === 'augments') {
     return (overview.data.augments ?? []).map((row) => ({
       key: String(row.augmentId),
@@ -67,6 +69,7 @@ export function projectRankings(
       rarity: resources.augments.display(row.augmentId)?.rarity
     }))
   }
+
   if (overview.mode === 'aram_mayhem' && board === 'synergies') {
     return (overview.data.synergies ?? []).map((row) => ({
       key: row.champions
@@ -81,6 +84,7 @@ export function projectRankings(
       pickRate: row.pickRate
     }))
   }
+
   if (overview.mode === 'ranked' || overview.mode === 'classic') {
     return overview.data.champions.map((row) => ({
       key: `${row.championId}:${row.position}`,
@@ -104,6 +108,7 @@ export function projectRankings(
     (a, b) => (a.rank ?? Infinity) - (b.rank ?? Infinity)
   )
   const tierByRole = new Map<string, Map<number, number>>()
+
   for (const profession of ['tank', 'fighter', 'assassin', 'mage', 'marksman', 'support']) {
     const members = champions.filter((row) =>
       resources.champions.roles(row.championId).includes(profession)

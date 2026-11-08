@@ -5,10 +5,19 @@ import {
   GtimgKiwiAugments,
   Hero
 } from '@shared/data-sources/gtimg'
+import type { OpggChampionBalance } from '@shared/types/champion-data/opgg'
 import { defineStore } from 'pinia'
 import { computed, shallowReactive } from 'vue'
 
 export const useExtraAssetsStore = defineStore('shard:extra-assets-renderer', () => {
+  const opgg = shallowReactive({
+    aramBalance: null as OpggChampionBalance[] | null
+  })
+
+  const opggAramBalanceMap = computed<Record<number, OpggChampionBalance>>(() =>
+    Object.fromEntries((opgg.aramBalance ?? []).map((balance) => [balance.championId, balance]))
+  )
+
   const gtimg = shallowReactive({
     enabled: true,
     guideCatalogs: { items: {}, perks: {}, spells: {} } as GtimgGuideCatalogs,
@@ -61,11 +70,13 @@ export const useExtraAssetsStore = defineStore('shard:extra-assets-renderer', ()
 
   return {
     gtimg,
+    opgg,
 
     // computed
     guideCatalogs,
     heroListMap,
     classicHeroesMap,
+    opggAramBalanceMap,
     kiwiAugmentsMap
   }
 })

@@ -154,33 +154,49 @@ const reset = () => {
       : []),
     ...(props.empty ? [] : examples.slice(0, props.overflow ? 7 : 3).map((tab) => ({ ...tab })))
   ]
-  if (props.multipleFixed) tabs.value.find((tab) => tab.id === 'ahri')!.closable = false
+  if (props.multipleFixed) {
+    tabs.value.find((tab) => tab.id === 'ahri')!.closable = false
+  }
+
   activeId.value = props.empty ? 'tier' : 'khazix'
   lastAction.value = '梯队页固定在左侧，不参与排序。'
 }
 
 const addChampion = () => {
   const next = examples.find((example) => !tabs.value.some((tab) => tab.id === example.id))
-  if (!next) return
+  if (!next) {
+    return
+  }
+
   tabs.value.push({ ...next })
   activeId.value = next.id
 }
 
 const close = (id: string) => {
   const index = tabs.value.findIndex((tab) => tab.id === id)
-  if (index < 0 || tabs.value[index].closable === false) return
+  if (index < 0 || tabs.value[index].closable === false) {
+    return
+  }
+
   const [removed] = tabs.value.splice(index, 1)
   tabs.value.forEach((tab, index) => {
-    if (tab.fixedPosition !== undefined) tab.fixedPosition = index
+    if (tab.fixedPosition !== undefined) {
+      tab.fixedPosition = index
+    }
   })
-  if (activeId.value === id)
+  if (activeId.value === id) {
     activeId.value = tabs.value[index]?.id ?? tabs.value[index - 1]?.id ?? 'tier'
+  }
+
   lastAction.value = `已关闭 ${removed.name}`
 }
 
 const refresh = (id: string) => {
   const tab = tabs.value.find((tab) => tab.id === id)
-  if (!tab) return
+  if (!tab) {
+    return
+  }
+
   loadingIds.value.add(id)
   lastAction.value = `仅刷新 ${tab.name}`
   const timer = setTimeout(() => {

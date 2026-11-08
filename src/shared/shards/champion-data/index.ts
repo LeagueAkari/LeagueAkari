@@ -23,7 +23,6 @@ export function createOpggSnapshot(
       version: null,
       versions: []
     },
-    followSelectionId: 0,
     query: { ...preferences, championId: null, version: null },
     version: null,
     versions: [],

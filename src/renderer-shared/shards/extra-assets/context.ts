@@ -6,3 +6,7 @@ export const EXTRA_ASSETS_RENDERER_NAMESPACE = 'extra-assets-renderer'
 export interface ExtraAssetsRendererContext {
   piniaMobxUtils: PiniaMobxUtilsRenderer
 }
+
+export interface ExtraAssetsRendererConfig {
+  subscribeAramBalance?: boolean
+}

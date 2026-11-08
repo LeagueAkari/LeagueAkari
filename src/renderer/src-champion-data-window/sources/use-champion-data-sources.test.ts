@@ -1,21 +1,17 @@
-import { useChampionDataStore } from '@renderer-shared/shards/champion-data/store'
+import { useChampionDataStore } from '@champion-data-window/shards/champion-data/store'
 import { useChampionDataWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { createChampionDataSourcePreferences } from '@shared/shards/champion-data/source-preferences'
 import type { FeatureGateEvaluationResult } from '@shared/shards/feature-gating'
+import { CHAMPION_DATA_OPGG_FEATURE_GATE } from '@shared/types/champion-data'
 import { createPinia, setActivePinia } from 'pinia'
 import { describe, expect, it, onTestFinished, vi } from 'vitest'
 import { effectScope } from 'vue'
 
-import {
-  resolveActiveChampionDataSource,
-  resolveChampionDataSourceOptions,
-  resolveEnabledChampionDataSources,
-  resolveMinimumUpgradeVersion,
-  useChampionDataSources
-} from './use-champion-data-sources'
+import { resolveMinimumUpgradeVersion, useChampionDataSources } from './use-champion-data-sources'
 
+const { getEvaluation } = vi.hoisted(() => ({ getEvaluation: vi.fn() }))
 vi.mock('@renderer-shared/shards', () => ({
-  useInstance: () => ({ getEvaluation: () => ({ enabled: true }) })
+  useInstance: () => ({ getEvaluation })
 }))
 
 function evaluation(overrides: Partial<FeatureGateEvaluationResult>): FeatureGateEvaluationResult {
@@ -32,44 +28,38 @@ function evaluation(overrides: Partial<FeatureGateEvaluationResult>): FeatureGat
   }
 }
 
-describe('champion data source selection', () => {
-  it.each([
-    { opgg: true, qq101: true, order: ['opgg', 'qq101'] },
-    { opgg: false, qq101: true, order: ['qq101', 'opgg'] },
-    { opgg: true, qq101: false, order: ['opgg', 'qq101'] },
-    { opgg: false, qq101: false, order: ['opgg', 'qq101'] }
-  ])(
-    'keeps disabled sources last and preserves the fixed order: $opgg / $qq101',
-    ({ opgg, qq101, order }) => {
-      const preferences = { enabled: { opgg, qq101 }, defaultSource: 'qq101' as const }
-      const evaluations = {
-        opgg: evaluation({ enabled: true }),
-        qq101: evaluation({ enabled: true })
-      }
-      const options = resolveChampionDataSourceOptions(evaluations, preferences)
-
-      expect(options.map((source) => source.id)).toEqual(order)
-      expect(options.filter((source) => source.enabled).map((source) => source.id)).toEqual(
-        resolveEnabledChampionDataSources(evaluations, preferences)
-      )
-    }
+function setupSources(
+  preferences = createChampionDataSourcePreferences(),
+  unavailableGate?: string
+) {
+  setActivePinia(createPinia())
+  getEvaluation.mockImplementation((key: string) =>
+    evaluation({ enabled: key !== unavailableGate })
   )
+  const store = useChampionDataStore()
+  store.settings.sourcePreferences = preferences
 
+  const scope = effectScope()
+  onTestFinished(() => {
+    scope.stop()
+    setActivePinia(undefined)
+  })
+
+  return {
+    sources: scope.run(useChampionDataSources)!,
+    store,
+    windowStore: useChampionDataWindowStore()
+  }
+}
+
+describe('champion data source selection', () => {
   it('uses the saved default on startup and each reopen, without saving manual navigation', () => {
-    setActivePinia(createPinia())
-    const store = useChampionDataStore()
-    const windowStore = useChampionDataWindowStore()
-    store.settings.sourcePreferences = {
+    const { sources, store, windowStore } = setupSources({
       enabled: { opgg: true, qq101: true },
       defaultSource: 'qq101'
-    }
-    const scope = effectScope()
-    onTestFinished(() => {
-      scope.stop()
-      setActivePinia(undefined)
     })
-    const sources = scope.run(() => useChampionDataSources())!
 
+    expect(sources.sources.value.map((source) => source.id)).toEqual(['opgg', 'qq101'])
     expect(sources.activeSource.value).toBe('qq101')
     windowStore.show = true
     sources.selectSource('opgg')
@@ -79,6 +69,14 @@ describe('champion data source selection', () => {
     windowStore.show = true
     expect(sources.activeSource.value).toBe('qq101')
 
+    store.settings.sourcePreferences = {
+      enabled: { opgg: false, qq101: true },
+      defaultSource: 'qq101'
+    }
+    expect(sources.sources.value).toEqual([
+      { id: 'qq101', enabled: true, available: true },
+      { id: 'opgg', enabled: false, available: true }
+    ])
     store.settings.sourcePreferences = {
       enabled: { opgg: false, qq101: false },
       defaultSource: null
@@ -92,41 +90,17 @@ describe('champion data source selection', () => {
   })
 
   it('falls back from a remotely unavailable default without rewriting the saved preference', () => {
-    const preferences = createChampionDataSourcePreferences()
-    const evaluations = {
-      opgg: evaluation({ enabled: false }),
-      qq101: evaluation({ enabled: true })
-    }
-    expect(
-      resolveActiveChampionDataSource(
-        'opgg',
-        resolveEnabledChampionDataSources(evaluations, preferences),
-        preferences.defaultSource
-      )
-    ).toBe('qq101')
-    expect(preferences.defaultSource).toBe('opgg')
-  })
-
-  it('shows only sources whose structured evaluation is enabled', () => {
-    expect(
-      resolveEnabledChampionDataSources({
-        opgg: evaluation({ key: 'champion-data.opgg', enabled: true, mismatches: [] }),
-        qq101: evaluation({
-          key: 'champion-data.qq101',
-          enabled: false,
-          origin: 'dev-override',
-          decision: 'force-off',
-          mismatches: []
-        })
-      })
-    ).toEqual(['opgg'])
-  })
-
-  it('keeps a visible selection and otherwise falls back in OP.GG then 101 order', () => {
-    expect(resolveActiveChampionDataSource('qq101', ['opgg', 'qq101'])).toBe('qq101')
-    expect(resolveActiveChampionDataSource('qq101', ['opgg'])).toBe('opgg')
-    expect(resolveActiveChampionDataSource('opgg', ['qq101'])).toBe('qq101')
-    expect(resolveActiveChampionDataSource('opgg', [])).toBeNull()
+    const { sources, store } = setupSources(
+      createChampionDataSourcePreferences(),
+      CHAMPION_DATA_OPGG_FEATURE_GATE
+    )
+    expect(sources.sources.value).toEqual([
+      { id: 'qq101', enabled: true, available: true },
+      { id: 'opgg', enabled: false, available: false }
+    ])
+    expect(sources.activeSource.value).toBe('qq101')
+    expect(sources.allSourcesDisabled.value).toBe(false)
+    expect(store.settings.sourcePreferences.defaultSource).toBe('opgg')
   })
 
   it('shows the lowest update target only when every source has one pure minimum mismatch', () => {

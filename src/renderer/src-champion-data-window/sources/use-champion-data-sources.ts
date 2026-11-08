@@ -1,5 +1,5 @@
+import { useChampionDataStore } from '@champion-data-window/shards/champion-data/store'
 import { useInstance } from '@renderer-shared/shards'
-import { useChampionDataStore } from '@renderer-shared/shards/champion-data/store'
 import { FeatureGatingRenderer } from '@renderer-shared/shards/feature-gating'
 import { useChampionDataWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { createChampionDataSourcePreferences } from '@shared/shards/champion-data/source-preferences'
@@ -80,7 +80,9 @@ export function resolveMinimumUpgradeVersion(
     (source) => preferences.enabled[source]
   ).map((source) => evaluations[source])
 
-  if (!disabledEvaluations.length) return null
+  if (!disabledEvaluations.length) {
+    return null
+  }
 
   if (disabledEvaluations.some((evaluation) => evaluation.enabled)) {
     return null
@@ -109,12 +111,14 @@ export function useChampionDataSources() {
   const featureGating = useInstance(FeatureGatingRenderer)
   const store = useChampionDataStore()
   const windowStore = useChampionDataWindowStore()
+
   const sourceTab = ref<ChampionDataSourceId | null>(store.settings.sourcePreferences.defaultSource)
 
   const evaluations = computed<Record<ChampionDataSourceId, FeatureGateEvaluationResult>>(() => ({
     opgg: featureGating.getEvaluation(CHAMPION_DATA_OPGG_FEATURE_GATE, false),
     qq101: featureGating.getEvaluation(CHAMPION_DATA_QQ101_FEATURE_GATE, false)
   }))
+
   const enabledSources = computed(() =>
     resolveEnabledChampionDataSources(evaluations.value, store.settings.sourcePreferences)
   )
@@ -124,6 +128,7 @@ export function useChampionDataSources() {
   const allSourcesDisabled = computed(() =>
     CHAMPION_DATA_SOURCE_ORDER.every((source) => !store.settings.sourcePreferences.enabled[source])
   )
+
   const activeSource = computed<ChampionDataSourceId | null>(() =>
     resolveActiveChampionDataSource(
       sourceTab.value,
@@ -131,6 +136,7 @@ export function useChampionDataSources() {
       store.settings.sourcePreferences.defaultSource
     )
   )
+
   const minimumUpgradeVersion = computed(() =>
     resolveMinimumUpgradeVersion(evaluations.value, store.settings.sourcePreferences)
   )
@@ -146,13 +152,17 @@ export function useChampionDataSources() {
   watch(
     () => windowStore.show,
     (shown) => {
-      if (shown) sourceTab.value = store.settings.sourcePreferences.defaultSource
+      if (shown) {
+        sourceTab.value = store.settings.sourcePreferences.defaultSource
+      }
     },
     { flush: 'sync' }
   )
 
   const selectSource = (source: ChampionDataSourceId) => {
-    if (enabledSources.value.includes(source)) sourceTab.value = source
+    if (enabledSources.value.includes(source)) {
+      sourceTab.value = source
+    }
   }
 
   return {

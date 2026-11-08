@@ -3,7 +3,20 @@ import type {
   GtimgGuideCatalogs
 } from '@shared/data-adapter/gtimg/guide-resources'
 import { GtimgClassicHero, GtimgHeroListJs, GtimgKiwiAugments } from '@shared/data-sources/gtimg'
+import type { OpggChampionBalance } from '@shared/types/champion-data/opgg'
 import { makeAutoObservable, observableRef } from 'mobx'
+
+export class ExtraAssetsStateOpgg {
+  aramBalance: OpggChampionBalance[] | null = null
+
+  constructor() {
+    makeAutoObservable(this, { aramBalance: observableRef })
+  }
+
+  setAramBalance(aramBalance: OpggChampionBalance[]) {
+    this.aramBalance = aramBalance
+  }
+}
 
 export class ExtraAssetsStateGtimg {
   enabled = true

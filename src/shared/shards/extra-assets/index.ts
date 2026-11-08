@@ -1,3 +1,6 @@
+// Existing resource subscription used by both the bench and the champion data window.
+export const OPGG_ARAM_BALANCE_SYNC_NAMESPACE = 'champion-data-main/opgg'
+
 export const gtimgUrl = {
   championIcon: (alias: string) => `https://game.gtimg.cn/images/lol/act/img/champion/${alias}.png`
 }

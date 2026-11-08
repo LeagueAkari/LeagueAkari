@@ -8,6 +8,7 @@ import type { ExtraAssetsStateGtimg } from './state'
 export const EXTRA_ASSETS_MAIN_NAMESPACE = 'extra-assets-main'
 export const GTIMG_HERO_LIST_UPDATE_INTERVAL = 3 * 60 * 60 * 1000
 export const GTIMG_KIWI_AUGMENTS_UPDATE_INTERVAL = 3 * 60 * 60 * 1000
+export const OPGG_ARAM_BALANCE_UPDATE_INTERVAL = 30 * 60 * 1000
 
 export interface ExtraAssetsMainContext {
   featureGating: FeatureGatingMain

@@ -1,7 +1,7 @@
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import { resolve } from 'path'
-import { defineConfig } from 'vitest/config'
+import { configDefaults, defineConfig } from 'vitest/config'
 
 export default defineConfig({
   plugins: [
@@ -24,6 +24,7 @@ export default defineConfig({
     }
   },
   test: {
+    exclude: [...configDefaults.exclude, '.playwright-mcp/**'],
     globals: true,
     environment: 'node'
   }

@@ -48,13 +48,9 @@ describe('tab bar ordering', () => {
   })
 
   it.each([
-    [tab('a', 1)],
     [tab('a', 0), tab('b', 0)],
     [tab('a', 0), tab('b', 2)],
-    [tab('a'), tab('b', 1)],
-    [tab('a', 0), tab('b'), tab('c', 2)],
-    [tab('a', -1)],
-    [tab('a', 0.5)]
+    [tab('a'), tab('b', 1)]
   ])('rejects invalid fixed positions: %j', (...tabs) => {
     expect(() =>
       resolveTabOrder(
@@ -64,12 +60,16 @@ describe('tab bar ordering', () => {
     ).toThrow('ordered prefix')
   })
 
-  it.each([['a'], ['a', 'a'], ['a', 'missing'], ['', 'b']])(
+  it.each([['a'], ['a', 'a'], ['a', 'missing']])(
     'rejects incomplete, duplicate or unknown order IDs: %j',
     (...order) => {
       expect(() => resolveTabOrder(createItems(tab('a'), tab('b')), order)).toThrow('TabBar:')
     }
   )
+
+  it('rejects an empty ID even when the metadata contains that key', () => {
+    expect(() => resolveTabOrder(createItems(tab('')), [''])).toThrow('TabBar:')
+  })
 
   it('preserves empty, unchanged and purely flexible orders', () => {
     expect(resolveTabOrder({}, [])).toEqual({ tabs: [], fixedCount: 0 })

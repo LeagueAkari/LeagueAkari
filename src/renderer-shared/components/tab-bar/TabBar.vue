@@ -65,6 +65,10 @@
                 @keydown="handleKeydown"
                 @contextmenu="(event) => !dragging && emit('contextmenu', event, tab)"
               >
+                <template v-if="slots.prefix" #prefix="scope">
+                  <slot name="prefix" v-bind="scope" />
+                </template>
+
                 <template v-if="slots.icon" #icon="scope">
                   <slot name="icon" v-bind="scope" />
                 </template>
@@ -153,6 +157,7 @@ const activeId = defineModel<string>('activeId', { required: true })
 const order = defineModel<string[]>('order', { required: true })
 
 const slots = defineSlots<{
+  prefix(props: { tab: TabBarTab; active: boolean }): unknown
   'add-menu'(props: { close: () => void; select: (id: string) => void }): unknown
   icon(props: { tab: TabBarTab; active: boolean }): unknown
   tooltip(props: { tab: TabBarTab; active: boolean }): unknown

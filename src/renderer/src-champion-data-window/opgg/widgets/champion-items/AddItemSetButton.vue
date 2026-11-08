@@ -6,8 +6,8 @@
           size="tiny"
           secondary
           :aria-label="t('opgg.champion.addItemSet')"
-          :disabled="!lcs.isConnected || isApplying || isLoading || isDataStale"
-          :loading="isApplying"
+          :disabled="!lcs.isConnected || applying.items || isLoading || isDataStale"
+          :loading="applying.items"
           @click="writeItemSets(itemSet.recommendationId)"
         >
           <template #icon><NIcon :component="Add" /></template>
@@ -29,7 +29,7 @@ import { computed } from 'vue'
 import { useOpgg } from '../../context'
 import { useLoadout } from '../../utils/loadout'
 
-const { champion, isApplying, isLoading, isDataStale } = useOpgg()
+const { champion, applying, isLoading, isDataStale } = useOpgg()
 const { writeItemSets } = useLoadout()
 const { t } = useTranslation()
 const lcs = useLeagueClientStore()

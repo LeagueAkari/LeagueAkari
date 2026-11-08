@@ -26,6 +26,7 @@
               @click="emit('activate')"
               @keydown="emit('keydown', $event)"
             >
+              <slot name="prefix" :tab="tab" :active="active" />
               <span
                 v-if="tab.icon || slots.icon"
                 class="tab-bar-icon flex size-3.5 shrink-0 items-center justify-center"
@@ -95,6 +96,7 @@ const { tab, index, active, width } = defineProps<{
 }>()
 
 const slots = defineSlots<{
+  prefix(props: { tab: TabBarTab; active: boolean }): unknown
   icon(props: { tab: TabBarTab; active: boolean }): unknown
   tooltip(props: { tab: TabBarTab; active: boolean }): unknown
   text(props: { tab: TabBarTab; active: boolean }): unknown

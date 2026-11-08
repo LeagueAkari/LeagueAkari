@@ -1,10 +1,10 @@
+import { ChampionDataRenderer } from '@champion-data-window/shards/champion-data'
 import { createManager } from '@renderer-shared/shards'
 import { AkariApiRenderer } from '@renderer-shared/shards/akari-api'
 import { AkariProtocolRenderer } from '@renderer-shared/shards/akari-protocol'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { AutoChampConfigRenderer } from '@renderer-shared/shards/auto-champ-config'
 import { AutoSelectRenderer } from '@renderer-shared/shards/auto-select'
-import { ChampionDataRenderer } from '@renderer-shared/shards/champion-data'
 import { ExtraAssetsRenderer } from '@renderer-shared/shards/extra-assets'
 import { FeatureGatingRenderer } from '@renderer-shared/shards/feature-gating'
 import { AkariIpcRenderer } from '@renderer-shared/shards/ipc'
@@ -26,8 +26,8 @@ manager.use(AkariProtocolRenderer)
 manager.use(AppCommonRenderer)
 manager.use(AutoChampConfigRenderer)
 manager.use(AutoSelectRenderer)
-manager.use(ChampionDataRenderer, { enableFullData: true })
-manager.use(ExtraAssetsRenderer)
+manager.use(ExtraAssetsRenderer, { subscribeAramBalance: true })
+manager.use(ChampionDataRenderer)
 manager.use(FeatureGatingRenderer)
 manager.use(LeagueClientRenderer, {
   subscribeState: {

@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-full min-h-(--la-app-min-height) min-w-(--la-app-min-width) flex-col">
     <SetupInAppScope />
-    <ChampionDataSourceBar
+    <ChampionDataWindowTitlebar
       :sources="sources"
       :active-tab="isSettings ? 'settings' : activeSource"
       @select="selectTab"
@@ -27,7 +27,7 @@ import { computed, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
 import { provideOpgg } from './opgg/context'
-import ChampionDataSourceBar from './sources/ChampionDataSourceBar.vue'
+import ChampionDataWindowTitlebar from './components/ChampionDataWindowTitlebar.vue'
 import { useChampionDataSources } from './sources/use-champion-data-sources'
 
 provideOpgg()
@@ -47,7 +47,10 @@ const sourceViewProps = computed(() => ({
 
 const selectTab = (tab: ChampionDataSourceId | 'settings') => {
   if (tab === 'settings') {
-    if (settingsAvailable.value) void router.push('/settings')
+    if (settingsAvailable.value) {
+      void router.push('/settings')
+    }
+
     return
   }
 
@@ -58,7 +61,9 @@ const selectTab = (tab: ChampionDataSourceId | 'settings') => {
 watch(
   [isSettings, settingsAvailable],
   ([settings, available]) => {
-    if (settings && !available) void router.replace('/')
+    if (settings && !available) {
+      void router.replace('/')
+    }
   },
   { immediate: true }
 )

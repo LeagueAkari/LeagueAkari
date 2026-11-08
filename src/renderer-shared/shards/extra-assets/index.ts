@@ -1,7 +1,11 @@
-import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { Config, Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
-import { EXTRA_ASSETS_RENDERER_NAMESPACE, type ExtraAssetsRendererContext } from './context'
+import {
+  EXTRA_ASSETS_RENDERER_NAMESPACE,
+  type ExtraAssetsRendererConfig,
+  type ExtraAssetsRendererContext
+} from './context'
 import { syncExtraAssetsState } from './state-sync'
 
 @Shard(ExtraAssetsRenderer.id)
@@ -10,13 +14,16 @@ export class ExtraAssetsRenderer implements IAkariShardInitDispose {
 
   private readonly _context: ExtraAssetsRendererContext
 
-  constructor(@Dep(PiniaMobxUtilsRenderer) piniaMobxUtils: PiniaMobxUtilsRenderer) {
+  constructor(
+    @Dep(PiniaMobxUtilsRenderer) piniaMobxUtils: PiniaMobxUtilsRenderer,
+    @Config() private readonly _config?: ExtraAssetsRendererConfig
+  ) {
     this._context = {
       piniaMobxUtils
     }
   }
 
   async onInit() {
-    await syncExtraAssetsState(this._context)
+    await syncExtraAssetsState(this._context, this._config)
   }
 }

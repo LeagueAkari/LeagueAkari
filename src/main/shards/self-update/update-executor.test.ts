@@ -167,12 +167,7 @@ describe('SelfUpdateExecutor', () => {
     const context = createContext(httpClient)
     const executor = new SelfUpdateExecutor(context)
 
-    const result = await Promise.race([
-      executor.start(createRelease()),
-      new Promise<'timeout'>((resolve) => setTimeout(() => resolve('timeout'), 50))
-    ])
-
-    expect(result).not.toBe('timeout')
+    await expect(executor.start(createRelease())).resolves.toMatchObject({ result: 'failed' })
     expect(context.state.updateProgressInfo?.phase).toBe('download-failed')
   })
 

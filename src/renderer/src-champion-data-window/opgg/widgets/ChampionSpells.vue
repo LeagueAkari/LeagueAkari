@@ -33,7 +33,8 @@
             size="tiny"
             type="primary"
             secondary
-            :disabled="lcs.gameflow.phase !== 'ChampSelect' || isApplying || isLoading"
+            :disabled="lcs.gameflow.phase !== 'ChampSelect' || applying.spells || isLoading"
+            :loading="applying.spells"
           >
             {{ t('opgg.champion.apply') }}
           </NButton>
@@ -57,7 +58,7 @@ import { useLoadout } from '../utils/loadout'
 import ExpandButton from '@champion-data-window/components/champion-statistics/ExpandButton.vue'
 import RecommendationStats from './RecommendationStats.vue'
 
-const { champion, isApplying, isLoading } = useOpgg()
+const { champion, applying, isLoading } = useOpgg()
 const { setSummonerSpells } = useLoadout()
 const { t } = useTranslation()
 const lcs = useLeagueClientStore()

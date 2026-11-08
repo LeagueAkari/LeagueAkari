@@ -60,7 +60,10 @@ export function useWinRateTheme() {
   // Win rates use the API's 0-1 scale, before percentage formatting.
   const getWinRateColor = (winRate: number | null | undefined) => {
     const colors = palette.value
-    if (winRate == null) return colors.unknown
+    if (winRate == null) {
+      return colors.unknown
+    }
+
     return winRate >= 0.5 ? colors.positive : colors.negative
   }
 

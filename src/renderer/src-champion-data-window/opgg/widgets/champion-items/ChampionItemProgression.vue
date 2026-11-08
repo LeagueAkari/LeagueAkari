@@ -92,7 +92,9 @@ const builds = computed(
 watchEffect(() => {
   if (!stages.value.length) {
     const alternative = kind.value === 'single' ? 'combined' : 'single'
-    if (groups.value[alternative].length) kind.value = alternative
+    if (groups.value[alternative].length) {
+      kind.value = alternative
+    }
   }
 
   if (stages.value.length && !stages.value.some((stage) => stage.order === order.value)) {

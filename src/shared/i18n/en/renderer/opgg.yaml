@@ -11,6 +11,7 @@ opgg:
       waitingChampion: 'Waiting for a champion'
       waitingLock: 'Waiting for champion lock-in'
       loading: 'Loading recommendations'
+      idle: 'Refresh to load recommendations'
       missingPosition: 'Lane is unavailable; automatic runes are skipped'
       unsupportedMode: 'This mode does not support automatic runes'
       sourceUnavailable: 'The default source is unavailable; automatic runes are skipped'

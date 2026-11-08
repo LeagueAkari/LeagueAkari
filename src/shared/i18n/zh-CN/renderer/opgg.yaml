@@ -7,6 +7,7 @@ opgg:
     preferencesDescription: '模式和分路跟随当前对局，版本始终使用最新。修改后立即更新自动页，不重复覆盖已应用的符文。'
     retryApply: '重试应用'
     status:
+      idle: '刷新以加载推荐'
       disabled: '自动符文未启用'
       waitingChampion: '等待选择英雄'
       waitingLock: '等待锁定英雄'

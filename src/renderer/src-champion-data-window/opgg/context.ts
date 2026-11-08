@@ -1,6 +1,6 @@
+import { ChampionDataRenderer } from '@champion-data-window/shards/champion-data'
+import { useChampionDataStore } from '@champion-data-window/shards/champion-data/store'
 import { useInstance } from '@renderer-shared/shards'
-import { ChampionDataRenderer } from '@renderer-shared/shards/champion-data'
-import { useChampionDataStore } from '@renderer-shared/shards/champion-data/store'
 import type { OpggChampionDataQuery, OpggFlashPosition } from '@shared/types/champion-data/opgg'
 import { useMessage } from 'naive-ui'
 import { type InjectionKey, computed, inject, provide } from 'vue'
@@ -13,6 +13,7 @@ function createOpggContext(fixedPageId?: () => number) {
   const championData = useInstance(ChampionDataRenderer)
   const store = useChampionDataStore()
   const message = useMessage()
+
   const snapshot = computed(() => store.opgg.snapshot)
   const pageId = computed(() => (fixedPageId ? fixedPageId() : snapshot.value.activePage))
   const currentTab = computed<'champions' | 'champion'>(() =>
@@ -21,25 +22,35 @@ function createOpggContext(fixedPageId?: () => number) {
   const pageState = computed(() =>
     pageId.value === null ? snapshot.value.overviewState : snapshot.value.pages[pageId.value]
   )
+
+  const managedPage = computed(() => {
+    const page = pageId.value === null ? null : snapshot.value.pages[pageId.value]
+
+    return page?.currentGame ? page : null
+  })
+
   const championId = computed(() => pageState.value?.query.championId ?? null)
-  const flashPosition = computed(() => store.settings.opggFlashPosition)
   const mode = computed(() => pageState.value.query.mode)
   const position = computed(() => pageState.value.query.position)
   const region = computed(() => pageState.value.query.region)
   const tier = computed(() => pageState.value.query.tier)
   const version = computed(() => pageState.value.version)
   const versions = computed(() => pageState.value.versions)
+
   const champions = computed(() => snapshot.value.overview)
   const champion = computed(() =>
     pageId.value === null ? null : (snapshot.value.pages[pageId.value]?.champion ?? null)
   )
+
   const isLoading = computed(() => pageState.value?.status === 'loading')
   const isDataStale = computed(() => pageState.value?.stale ?? true)
   const error = computed(() => pageState.value?.error ?? null)
-  const isApplying = computed(() => store.opgg.isApplying)
   const isDataUnavailable = computed(() => !store.opgg.enabled)
+
   const openedPages = computed(() => snapshot.value.openedPages)
   const activePage = computed(() => snapshot.value.activePage)
+
+  const flashPosition = computed(() => store.settings.opggFlashPosition)
 
   const run = async <T>(request: () => Promise<T>) => {
     try {
@@ -113,10 +124,11 @@ function createOpggContext(fixedPageId?: () => number) {
     champions,
     champion,
     pageState,
+    managedPage,
     isLoading,
     isDataStale,
     error,
-    isApplying,
+    applying: computed(() => store.applying),
     isDataUnavailable,
     changeMode,
     changePosition,
@@ -145,7 +157,9 @@ export function provideOpggChampion(id: () => number) {
 
 export function useOpgg() {
   const context = inject(OpggContextKey)
-  if (!context) throw new Error('no opgg context found')
+  if (!context) {
+    throw new Error('no opgg context found')
+  }
 
   return context
 }

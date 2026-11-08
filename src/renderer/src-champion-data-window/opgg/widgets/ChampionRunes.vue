@@ -31,7 +31,8 @@
             @click="setRunes(r.recommendationId)"
             size="tiny"
             type="primary"
-            :disabled="!lcs.isConnected || isApplying || isLoading"
+            :disabled="!lcs.isConnected || applying.runes || isLoading"
+            :loading="applying.runes"
             secondary
           >
             {{ t('opgg.champion.apply') }}
@@ -56,7 +57,7 @@ import { useLoadout } from '../utils/loadout'
 import ExpandButton from '@champion-data-window/components/champion-statistics/ExpandButton.vue'
 import RecommendationStats from './RecommendationStats.vue'
 
-const { champion, isApplying, isLoading } = useOpgg()
+const { champion, applying, isLoading } = useOpgg()
 const { setRunes } = useLoadout()
 const { t } = useTranslation()
 const lcs = useLeagueClientStore()

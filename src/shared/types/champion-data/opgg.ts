@@ -157,7 +157,6 @@ export interface OpggChampionDataSnapshot {
   openedPages: number[]
   pages: Record<number, OpggChampionPage>
   overviewState: OpggQueryPageState
-  followSelectionId: number
   query: OpggChampionDataQuery
   version: string | null
   versions: string[]
@@ -181,7 +180,7 @@ export interface OpggQueryPageState extends OpggPageState {
 }
 
 export interface OpggChampionPage extends OpggQueryPageState {
-  currentGame?: CurrentGamePage
+  currentGame?: CurrentGamePage<OpggChampionDataQuery>
   champion: OpggChampionDataDetails | null
 }
 

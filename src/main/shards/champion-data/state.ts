@@ -5,23 +5,7 @@ import type {
   Qq101ChampionDataPreferences
 } from '@shared/types/champion-data'
 import type { OpggFlashPosition } from '@shared/types/champion-data/opgg'
-import type { OpggChampionBalance } from '@shared/types/champion-data/opgg'
 import { makeAutoObservable, observableRef } from 'mobx'
-
-export class OpggChampionDataState {
-  enabled = false
-  aramBalance: OpggChampionBalance[] | null = null
-
-  constructor() {
-    makeAutoObservable(this, {
-      aramBalance: observableRef
-    })
-  }
-
-  setAramBalance(aramBalance: OpggChampionBalance[] | null) {
-    this.aramBalance = aramBalance
-  }
-}
 
 export class ChampionDataSettings {
   automation = createChampionDataAutomationSettings()

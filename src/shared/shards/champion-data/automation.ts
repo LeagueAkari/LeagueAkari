@@ -21,6 +21,7 @@ export const championDataAutomationSettingsSchema = z.object({
 export type CurrentGameUnavailableReason = 'waitingChampion' | 'missingPosition' | 'unsupportedMode'
 
 /** The page still owns its query and requests; only its lifecycle belongs to the current game. */
-export interface CurrentGamePage {
+export interface CurrentGamePage<Query> {
+  requestedQuery: Query
   unavailableReason: CurrentGameUnavailableReason | null
 }

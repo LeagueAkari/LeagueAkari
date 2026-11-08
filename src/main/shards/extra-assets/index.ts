@@ -1,5 +1,8 @@
+import { createChampionDataHttpClient } from '@main/utils/champion-data-http'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { GtimgApi } from '@shared/data-sources/gtimg'
+import { OpggHttpApiAxiosHelper } from '@shared/http-api-axios-helper/opgg'
+import { OPGG_ARAM_BALANCE_SYNC_NAMESPACE } from '@shared/shards/extra-assets'
 
 import { FeatureGatingMain } from '../feature-gating'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
@@ -12,7 +15,8 @@ import {
   GTIMG_HERO_LIST_UPDATE_INTERVAL,
   GTIMG_KIWI_AUGMENTS_UPDATE_INTERVAL
 } from './context'
-import { ExtraAssetsStateGtimg } from './state'
+import { OpggAramBalanceLoader } from './opgg/aram-balance-loader'
+import { ExtraAssetsStateGtimg, ExtraAssetsStateOpgg } from './state'
 
 /**
  * 一些额外资源的拉取, 通常不属于 Akari 的一部分, 不影响核心逻辑, 可有可无
@@ -27,8 +31,10 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
   private readonly _logger: AkariLogger
   private readonly _context: ExtraAssetsMainContext
   private readonly _refreshController: ExtraAssetsRefreshController
+  private readonly _aramBalanceLoader: OpggAramBalanceLoader
 
   public readonly gtimg = new ExtraAssetsStateGtimg()
+  public readonly opgg = new ExtraAssetsStateOpgg()
 
   constructor(
     private readonly _network: NetworkMain,
@@ -51,6 +57,15 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
       )
     }
     this._refreshController = new ExtraAssetsRefreshController(this._context)
+
+    const opggHttp = createChampionDataHttpClient(this._network, {
+      baseURL: OpggHttpApiAxiosHelper.BASE_URL
+    })
+    this._aramBalanceLoader = new OpggAramBalanceLoader(
+      this.opgg,
+      this._logger,
+      new OpggHttpApiAxiosHelper(opggHttp)
+    )
   }
 
   async onInit() {
@@ -62,10 +77,16 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
       'guideCatalogs'
     ])
 
+    this._mobxUtils.propSync(OPGG_ARAM_BALANCE_SYNC_NAMESPACE, 'resources', this.opgg, [
+      'aramBalance'
+    ])
+
     this._refreshController.start()
+    this._aramBalanceLoader.start()
   }
 
   async onDispose() {
     this._refreshController.dispose()
+    this._aramBalanceLoader.dispose()
   }
 }

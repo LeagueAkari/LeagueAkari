@@ -1,0 +1,16 @@
+.query-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.query-filter-row > * {
+  flex: 1 1 max-content;
+  /* NSelect's empty placeholder does not contribute to its intrinsic width. */
+  min-width: min(5rem, 100%);
+  max-width: 100%;
+}
+
+.query-filter-row > .version-filter {
+  flex-grow: 0;
+}

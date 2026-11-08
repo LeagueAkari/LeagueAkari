@@ -30,9 +30,8 @@ import {
   type ChampionDataMainContext
 } from './context'
 import { ChampionDataIpcHandlers } from './ipc-handlers'
-import { OpggAramBalanceLoader } from './opgg/aram-balance-loader'
 import { ChampionDataProtocolController } from './protocol-controller'
-import { ChampionDataSettings, OpggChampionDataState } from './state'
+import { ChampionDataSettings } from './state'
 
 const opggPreferencesSchema: z.ZodType<OpggChampionDataPreferences> = z.object({
   mode: z.enum(OPGG_CHAMPION_DATA_MODES),
@@ -53,7 +52,7 @@ export class ChampionDataMain implements IAkariShardInitDispose {
   static id = CHAMPION_DATA_MAIN_NAMESPACE
 
   public readonly settings = new ChampionDataSettings()
-  public readonly opgg = new OpggChampionDataState()
+  public readonly opgg = makeAutoObservable({ enabled: false })
   public readonly qq101 = makeAutoObservable({ enabled: false })
   private readonly _protocolController: ChampionDataProtocolController
 
@@ -61,7 +60,6 @@ export class ChampionDataMain implements IAkariShardInitDispose {
   private readonly _settingService: SetterSettingService<ChampionDataSettings>
   private readonly _context: ChampionDataMainContext
   private readonly _ipcHandlers: ChampionDataIpcHandlers
-  private readonly _opggAramBalanceLoader: OpggAramBalanceLoader
 
   constructor(
     private readonly _network: NetworkMain,
@@ -112,10 +110,6 @@ export class ChampionDataMain implements IAkariShardInitDispose {
       this._protocol,
       this._network
     )
-    this._opggAramBalanceLoader = new OpggAramBalanceLoader(
-      { state: this.opgg, logger: this._logger },
-      this._protocolController.opggApi
-    )
     this._ipcHandlers = new ChampionDataIpcHandlers(this._context, this._ipc)
   }
 
@@ -132,9 +126,6 @@ export class ChampionDataMain implements IAkariShardInitDispose {
     this._mobxUtils.propSync(CHAMPION_DATA_OPGG_NAMESPACE, 'state', this.opgg, ['enabled'])
     this._mobxUtils.propSync(ChampionDataMain.id + '/qq101', 'state', this.qq101, ['enabled'])
 
-    this._mobxUtils.propSync(CHAMPION_DATA_OPGG_NAMESPACE, 'resources', this.opgg, ['aramBalance'])
-
-    this._opggAramBalanceLoader.start()
     this._watchFeatureGates()
 
     this._ipcHandlers.register()
@@ -142,7 +133,6 @@ export class ChampionDataMain implements IAkariShardInitDispose {
   }
 
   async onDispose() {
-    this._opggAramBalanceLoader.dispose()
     this._protocolController.unregister()
   }
 

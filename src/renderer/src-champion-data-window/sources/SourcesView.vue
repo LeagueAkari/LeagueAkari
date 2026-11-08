@@ -18,10 +18,8 @@
       </div>
     </div>
     <KeepAlive>
-      <Qq101View v-if="activeSource === 'qq101'" class="h-0 min-h-0 flex-1" />
-    </KeepAlive>
-    <KeepAlive>
-      <OpggView v-if="activeSource === 'opgg'" class="h-0 min-h-0 flex-1" />
+      <Qq101Tabs v-if="activeSource === 'qq101'" class="h-0 min-h-0 flex-1" />
+      <OpggTabs v-else-if="activeSource === 'opgg'" class="h-0 min-h-0 flex-1" />
     </KeepAlive>
   </div>
 </template>
@@ -33,8 +31,8 @@ import { NButton } from 'naive-ui'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-import OpggView from '../opgg/View.vue'
-import Qq101View from '../qq101/View.vue'
+import OpggTabs from '../opgg/OpggTabs.vue'
+import Qq101Tabs from '../qq101/Qq101Tabs.vue'
 
 const props = defineProps<{
   activeSource: ChampionDataSourceId | null

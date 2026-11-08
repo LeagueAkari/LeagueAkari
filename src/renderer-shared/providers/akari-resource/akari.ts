@@ -1,7 +1,6 @@
 import braveryIcon from '@renderer-shared/assets/champions/bravery-circle.png?inline'
 import { i18next } from '@renderer-shared/i18n'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { useChampionDataStore } from '@renderer-shared/shards/champion-data/store'
 import { useExtraAssetsStore } from '@renderer-shared/shards/extra-assets/store'
 import { championBaseSplashUri } from '@renderer-shared/shards/league-client/game-data-assets'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -28,7 +27,6 @@ function normalizeLcuPath(path: string) {
 export function createAkariResourceProvider(): AkariResourceProviderValue {
   const app = useAppCommonStore()
   const extra = useExtraAssetsStore()
-  const championData = useChampionDataStore()
   const leagueClient = useLeagueClientStore()
 
   const assets = {
@@ -189,7 +187,7 @@ export function createAkariResourceProvider(): AkariResourceProviderValue {
       },
 
       aramBalance(id: number) {
-        return championData.opggAramBalanceMap[id] ?? null
+        return extra.opggAramBalanceMap[id] ?? null
       }
     },
 

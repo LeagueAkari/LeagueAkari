@@ -72,11 +72,8 @@
             <span class="text-xs text-black/55 dark:text-white/55">{{
               t('opgg.filters.region')
             }}</span>
-            <QuerySelect
-              kind="region"
-              :aria-label="t('opgg.filters.region')"
+            <OpggRegionSelect
               :disabled="savingAutomation"
-              :options="regionOptions"
               :value="automation.opgg.region"
               @update:value="
                 emit('update:automation', {
@@ -90,11 +87,8 @@
             <span class="text-xs text-black/55 dark:text-white/55">{{
               t('opgg.filters.rankTier')
             }}</span>
-            <QuerySelect
-              kind="tier"
-              :aria-label="t('opgg.filters.rankTier')"
+            <OpggTierSelect
               :disabled="savingAutomation"
-              :options="tierOptions"
               :value="automation.opgg.tier"
               @update:value="
                 emit('update:automation', {
@@ -107,11 +101,8 @@
         </div>
         <div v-else class="flex w-full flex-col gap-1">
           <span class="text-xs text-black/55 dark:text-white/55">{{ t('qq101.tier') }}</span>
-          <QuerySelect
-            kind="tier"
-            :aria-label="t('qq101.tier')"
+          <Qq101TierSelect
             :disabled="savingAutomation"
-            :options="qq101Tiers"
             :value="automation.qq101.tier"
             @update:value="emit('update:automation', { ...automation, qq101: { tier: $event } })"
           />
@@ -122,14 +113,14 @@
 </template>
 
 <script setup lang="ts">
-import QuerySelect from '@champion-data-window/components/query-filter/QuerySelect.vue'
-import { useRegionOptions, useTierOptions } from '@champion-data-window/opgg/utils/options'
-import { useTierOptions as useQq101TierOptions } from '@champion-data-window/qq101/filters'
+import OpggRegionSelect from '../opgg/filters/OpggRegionSelect.vue'
+import OpggTierSelect from '../opgg/filters/OpggTierSelect.vue'
+import Qq101TierSelect from '../qq101/filters/Qq101TierSelect.vue'
 import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
 import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
 import { useInstance } from '@renderer-shared/shards'
-import { ChampionDataRenderer } from '@renderer-shared/shards/champion-data'
-import { useChampionDataStore } from '@renderer-shared/shards/champion-data/store'
+import { ChampionDataRenderer } from '@champion-data-window/shards/champion-data'
+import { useChampionDataStore } from '@champion-data-window/shards/champion-data/store'
 import type { ChampionDataAutomationSettings } from '@shared/shards/champion-data/automation'
 import {
   CHAMPION_DATA_SOURCE_ORDER,
@@ -156,9 +147,6 @@ const sourcePreferences = computed(() => store.settings.sourcePreferences)
 const tabs = useTemplateRef<TabsInst>('tabs')
 const saving = ref(false)
 const message = useMessage()
-const { regionOptions } = useRegionOptions()
-const { tierOptions } = useTierOptions()
-const { tierOptions: qq101Tiers } = useQq101TierOptions()
 
 const saveSources = async (preferences: ChampionDataSourcePreferences) => {
   saving.value = true
