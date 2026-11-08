@@ -61,7 +61,7 @@
       :to="playerTabRootEl ?? undefined"
       width="min(320px, calc(100% - 32px))"
       placement="left"
-      class="bg-neutral-900/90! backdrop-blur-xl"
+      class="bg-(--la-card-surface-90)! backdrop-blur-xl"
     >
       <NDrawerContent :native-scrollbar="false" body-content-style="padding: 8px">
         <PlayerTabSidebarContent />
