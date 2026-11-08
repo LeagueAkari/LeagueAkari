@@ -1,0 +1,39 @@
+::selection {
+  background: #c0c0c050;
+  text-shadow: none;
+}
+
+:root {
+  --la-background-color-primary: var(--la-color-bg-primary);
+  --la-app-min-height: 320px;
+  --la-app-min-width: 360px;
+  --la-scrollbar-height: 6px;
+  --la-scrollbar-width: 8px;
+}
+
+::-webkit-scrollbar {
+  width: var(--la-scrollbar-width);
+  height: var(--la-scrollbar-height);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--la-color-scrollbar-thumb);
+  border-radius: 2px;
+
+  &:hover {
+    background-color: var(--la-color-scrollbar-thumb-hover);
+  }
+}
+
+#app,
+html,
+body,
+#naive-ui-config-provider {
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+  user-select: none;
+  line-height: normal;
+}

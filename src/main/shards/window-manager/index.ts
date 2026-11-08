@@ -15,6 +15,7 @@ import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { AkariAuxWindow } from './aux-window/window'
 import { AkariCdTimerWindow } from './cd-timer-window/windows'
 import { WINDOW_MANAGER_MAIN_NAMESPACE, type WindowManagerMainContext } from './context'
+import { AkariDraftAdvisorWindow } from './draft-advisor-window/window'
 import { WindowManagerLifecycleController } from './lifecycle-controller'
 import { AkariMainWindow } from './main-window/window'
 import { AkariOngoingGameWindow } from './ongoing-game-window/window'
@@ -38,6 +39,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   public readonly opggWindow: AkariOpggWindow
   public readonly ongoingGameWindow: AkariOngoingGameWindow
   public readonly cdTimerWindow: AkariCdTimerWindow
+  public readonly draftAdvisorWindow: AkariDraftAdvisorWindow
 
   constructor(
     private readonly _ipc: AkariIpcMain,
@@ -71,12 +73,14 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this.opggWindow = new AkariOpggWindow(this._context)
     this.ongoingGameWindow = new AkariOngoingGameWindow(this._context)
     this.cdTimerWindow = new AkariCdTimerWindow(this._context)
+    this.draftAdvisorWindow = new AkariDraftAdvisorWindow(this._context)
     this._lifecycleController = new WindowManagerLifecycleController(this._context, {
       mainWindow: this.mainWindow,
       auxWindow: this.auxWindow,
       opggWindow: this.opggWindow,
       ongoingGameWindow: this.ongoingGameWindow,
-      cdTimerWindow: this.cdTimerWindow
+      cdTimerWindow: this.cdTimerWindow,
+      draftAdvisorWindow: this.draftAdvisorWindow
     })
   }
 
