@@ -93,6 +93,7 @@ export default defineConfig({
         '@opgg-window': resolve('src/renderer/src-opgg-window'),
         '@ongoing-game-window': resolve('src/renderer/src-ongoing-game-window'),
         '@cd-timer-window': resolve('src/renderer/src-cd-timer-window'),
+        '@lan-web': resolve('src/renderer/src-lan-web'),
         '@shared': resolve('src/shared'),
         '@renderer-shared': resolve('src/renderer-shared')
       }
@@ -117,7 +118,8 @@ export default defineConfig({
           auxWindow: resolve(__dirname, 'src/renderer/aux-window.html'),
           opggWindow: resolve(__dirname, 'src/renderer/opgg-window.html'),
           ongoingGameWindow: resolve(__dirname, 'src/renderer/ongoing-game-window.html'),
-          cdTimerWindow: resolve(__dirname, 'src/renderer/cd-timer-window.html')
+          cdTimerWindow: resolve(__dirname, 'src/renderer/cd-timer-window.html'),
+          lanWeb: resolve(__dirname, 'src/renderer/lan-web.html')
         }
       }
     }
