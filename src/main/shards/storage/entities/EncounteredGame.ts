@@ -47,4 +47,10 @@ export class EncounteredGame {
   @Column({ type: 'varchar', nullable: false })
   @Index('encountered_games_queue_type')
   queueType: string
+
+  /**
+   * 相遇这局中，该玩家使用的英雄。旧记录可能为 null
+   */
+  @Column({ type: 'integer', nullable: true })
+  championId: number | null
 }
