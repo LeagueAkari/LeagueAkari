@@ -14,6 +14,7 @@ notifications:
     ignoreThisVersion: Ignore This Version
     noUpdate: No updates
   simple:
+    administratorRelaunchFailed: Elevation was cancelled or the launch failed. This app is still running. Retry, or close it and choose “Run as administrator”. Check the logs if it still fails.
     elevatedStartup:
       title: Running as administrator
       content: $t(common:appName) is currently running with elevated privileges

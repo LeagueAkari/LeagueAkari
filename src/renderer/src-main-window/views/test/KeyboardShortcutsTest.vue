@@ -228,7 +228,7 @@
 
 <script setup lang="ts">
 import { KeyboardShortcutsRenderer } from '@renderer-shared/shards/keyboard-shortcut'
-import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
+import { useAdministratorRelaunch } from '@renderer-shared/shards/app-common/administrator-relaunch-controller'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useInstance } from '@renderer-shared/shards'
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
@@ -244,7 +244,7 @@ import { computed, onActivated, onBeforeUnmount, onDeactivated, ref, watch } fro
 
 const as = useAppCommonStore()
 const kbd = useInstance(KeyboardShortcutsRenderer)
-const app = useInstance(AppCommonRenderer)
+const relaunchAsAdmin = useAdministratorRelaunch()
 
 const debugState = ref<KeyboardShortcutsDebugState | null>(null)
 const lastShortcut = ref<ShortcutDetails | null>(null)
@@ -655,10 +655,6 @@ onBeforeUnmount(() => {
   pause()
   clearDebugStatefulShortcut()
 })
-
-const relaunchAsAdmin = () => {
-  app.relaunchAsAdministrator()
-}
 </script>
 
 <style scoped>

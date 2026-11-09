@@ -1,17 +1,28 @@
 import 'reflect-metadata'
 
-import { app } from 'electron'
+import { app, dialog } from 'electron'
 
+import { waitForAdministratorRelaunchParent } from './administrator-relaunch'
 import { bootstrap } from './bootstrap'
 
 if (process.platform === 'win32') {
   app.setAppUserModelId('sugar.cocoa.league-akari')
 }
 
-const gotTheLock = app.requestSingleInstanceLock()
+function start() {
+  try {
+    waitForAdministratorRelaunchParent()
+  } catch (error) {
+    dialog.showErrorBox('League Akari: administrator relaunch failed', String(error))
+    app.exit(1)
+    return
+  }
 
-if (gotTheLock) {
-  bootstrap()
-} else {
-  app.quit()
+  if (app.requestSingleInstanceLock()) {
+    bootstrap()
+  } else {
+    app.quit()
+  }
 }
+
+start()
