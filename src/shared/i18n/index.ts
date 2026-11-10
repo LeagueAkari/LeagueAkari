@@ -3,6 +3,8 @@ const chineseNumber = ['一', '二', '三', '四', '五', '六', '七', '八', '
 export function formatI18nOrdinal(n: number, locale: string, simplified = false) {
   if (locale.startsWith('zh')) {
     return simplified ? chineseNumber[n - 1] || ' ? ' : `第${chineseNumber[n - 1] || ' ? '}名`
+  } else if (locale.startsWith('es')) {
+    return `${n}.º`
   } else {
     const suffix = ['th', 'st', 'nd', 'rd']
     const v = n % 100

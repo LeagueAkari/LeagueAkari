@@ -1,0 +1,92 @@
+notifications:
+  updateModal:
+    newVersion: Nueva versión
+    versionFeatures: Novedades de la versión
+    releasePage: Página de la versión
+    startUpdate: Actualizar
+    downloading: Descargando {{progress}}%
+    cancelUpdate: Cancelar actualización
+    waitingForRestart: Cerrar y actualizar
+    downloadFailed: Error en la descarga
+    retryUpdate: Reintentar actualización
+    externalDownload: Descarga externa
+    noUpdateMd: Sin notas de la versión
+    ignoreThisVersion: Ignorar esta versión
+    noUpdate: No hay actualizaciones
+  simple:
+    elevatedStartup:
+      title: Ejecutando como administrador
+      content: $t(common:appName) se está ejecutando con privilegios elevados
+    nativeInputInitializationFailed:
+      title: Error al iniciar la entrada nativa
+      content: Se desactivaron los atajos y la entrada simulada dentro del juego. Comprueba si algún software de seguridad bloqueó el componente y reinicia $t(common:appName). Consulta los registros para más detalles.
+    newReleaseHints:
+      title: Nueva versión disponible
+      content: La versión {{version}} ya está disponible
+      takeALook: Ver
+      dismiss: Descartar
+    liveStreamingHints:
+      dismiss: Descartar
+      neverShowAgain: No volver a mostrar
+      toSettings: Ir a Configuración
+      detected:
+        title: ¿Estás transmitiendo en vivo?
+        liveTools: $t(common:appName) detectó una o más herramientas de transmisión en ejecución. Puedes activar el modo streamer para ocultar información sensible
+        bySettings: $t(common:appName) detectó que el modo de transmisión del cliente de League está activado. Puedes activar el modo streamer para ocultar información sensible
+    login-queue-task:
+      name: Cola de inicio de sesión
+      description: 'En cola: {{position}} / {{maxPosition}} (aprox. {{waitTime}})'
+    higherVersionDb:
+      title: Se detectó una base de datos de una versión superior
+      content: La versión de la base de datos es superior a la que admite esta aplicación. Actualiza $t(common:appName) a la última versión para evitar problemas de compatibilidad
+      positiveText: Ver actualización
+    badSgpConnection:
+      title: Mala conexión con la fuente de datos SGP
+      content:
+        usingSgp: Estás usando la fuente de datos SGP, pero se detectó una mala calidad de conexión, lo que puede afectar a la obtención de datos y a algunas funciones.
+        recommendation: Te recomendamos ir a "Configuración → $t(settings.app.title) → $t(settings.app.basic.title) → $t(settings.app.basic.preferredLolSource.label)" y cambiar la fuente de datos a LCU para una experiencia más estable.
+        vpnReason: Esto puede deberse a una red inestable al usar una VPN para acceder a servidores de otras regiones.
+      positiveText: Ir a Configuración
+      negativeText: Descartar
+      neverShowAgain: No volver a recordar
+    replay-download-progress-task:
+      name: Descarga de repetición
+      checking: Comprobando los datos de la repetición...
+      found: Se encontraron los datos de la repetición
+      downloading: Descargando la repetición...
+      watch: Repetición descargada
+      incompatible: Repetición incompatible
+      closeButton: Cerrar
+      watchButton: Ver repetición
+    wmiRequiresAdministrator:
+      title: Se requiere administrador
+      content: Se está usando WMI para obtener la línea de comandos del cliente de League, lo que requiere ejecutar esta aplicación como administrador
+      positiveText: Reiniciar como administrador
+      negativeText: Cancelar
+    cannotGetUxCommandLine:
+      title: No se puede obtener la línea de comandos de League Client UX
+      alreadyUseWmi: Se detectó que League Client UX está en ejecución, pero no se pudo obtener su línea de comandos. Es posible que $t(common:appName) no funcione en este equipo
+      noAdminContent: Se detectó que League Client UX está en ejecución, pero no se pudo obtener su línea de comandos. Reinicia esta aplicación como administrador y luego activa o desactiva "Usar WMI para obtener la línea de comandos" en la configuración para intentar solucionarlo. Si la conexión sigue sin funcionar, informa del problema al equipo de desarrollo
+      withAdminContent: Se detectó que League Client UX está en ejecución, pero no se pudo obtener su línea de comandos. Activa o desactiva "Usar WMI para obtener la línea de comandos" en la configuración para intentar solucionarlo. Si la conexión sigue sin funcionar, informa del problema al equipo de desarrollo
+      extraContent: 'Ten en cuenta que en algunos sistemas recortados o en cibercafés, debido a ciertas restricciones, es posible que $t(common:appName) no funcione correctamente'
+      withAdminPositiveText: Confirmar
+      noAdminPositiveText: Reiniciar como administrador
+    autoReconnect:
+      title: Reconexión automática
+      content: Se reconectará en {{timeLeft}}.
+    runInTempDirWarning:
+      title: Ejecución en una carpeta temporal
+      content: La aplicación se está ejecutando desde una carpeta temporal, lo que puede causar problemas de seguridad. Puede deberse a que no está en la ubicación de instalación correcta o a que no se descomprimió bien.
+      negativeText: Descartar
+    updateDownloadFailed:
+      title: Error al descargar la actualización
+      content: 'No se pudo descargar la actualización: {{error}}. Revisa tu conexión a internet o consulta el aviso para ver posibles soluciones.'
+      positiveText: Ver aviso
+      negativeText: Descartar
+selfUpdate:
+  tasks:
+    title: Actualización
+    start-update: Iniciando la actualización de $t(common:appName)
+    updateOnQuit: Actualización aplicada. Reinicia la aplicación para completarla
+    lastUpdateFailed: La última actualización falló. Revisa los registros e intenta descargar la última versión desde el repositorio oficial
+    lastUpdateSuccess: Actualizado a {{version}}

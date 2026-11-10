@@ -1,0 +1,577 @@
+toolkit:
+  client:
+    nativeSupport:
+      unsupportedCurrentPlatform: No compatible con esta plataforma
+      supportedButRequiresElevation: Compatible con esta plataforma, pero requiere privilegios de administrador
+    leagueClient:
+      title: Cliente de League
+      disconnect:
+        label: Desconectar
+        description: Desconecta $t(common:appName) del cliente de League.
+        button: Desconectar
+      quitClient:
+        label: Cerrar el proceso del cliente
+        description: Cierra el cliente de League.
+        button: Cerrar el proceso del cliente
+        dialog:
+          title: Cerrar el proceso del cliente
+          content: ¿Seguro que quieres cerrar el proceso del cliente? Esto cerrará el juego directamente.
+          positiveText: Cerrar
+          negativeText: Cancelar
+    gameClient:
+      title: Cliente del juego
+      windowsOnlyNativeAddon: Requiere complementos nativos (por ahora esta versión solo los incluye en Windows).
+      nativeAddonRequiresAdministrator: Esta función es compatible con esta plataforma, pero requiere ejecutar como administrador.
+      nativeAddonInitializationFailed: Falló el inicio de la entrada nativa, por lo que se desactivaron los atajos relacionados. Comprueba si algún software de seguridad bloqueó el componente y reinicia la aplicación.
+      terminateGameClientWithShortcut:
+        labelAdminRequired: Cerrar el cliente del juego con un atajo (requiere administrador)
+        label: Activar el atajo para cerrar el cliente del juego
+        description: Cuando el cliente del juego está abierto y en primer plano, el atajo puede forzar el cierre del proceso. Ten en cuenta que esto termina el proceso a la fuerza y no es una salida normal del juego, por lo que puede tener efectos inesperados.
+      terminateShortcut:
+        label: Atajo para cerrar
+        labelAdminRequired: Atajo para cerrar (requiere administrador)
+        description: Define un atajo personalizado para forzar el cierre del proceso del cliente del juego.
+      settingsFileMode:
+        label: Bloquear la configuración del juego
+        description: Evita que los cambios dentro del juego sobrescriban la configuración que ya usas. Desbloquéala cuando necesites editarla.
+        details:
+          readonly: Al bloquearla, League Akari pone el archivo de configuración de League en solo lectura. El juego puede seguir leyendo tu configuración actual, pero los cambios nuevos no se guardarán encima.
+          writable: Al desbloquearla se recupera el permiso de escritura, así que los gráficos, las teclas y otros cambios del juego se vuelven a guardar con normalidad.
+          scope: Esto solo afecta al archivo de configuración de la instalación del cliente conectada.
+        setToReadonly: Configuración del juego bloqueada
+        setToWritable: Configuración del juego desbloqueada
+        failedToSet: 'No se pudo cambiar el bloqueo de la configuración: {{reason}}'
+    leagueClientUx:
+      title: League Client UX
+      fixWindowMethodAOptions:
+        label: Ajustar el tamaño de la ventana
+        labelAdminRequired: Ajustar el tamaño de la ventana (requiere administrador)
+        description: <a target="_blank" href="https://github.com/LeagueTavern/fix-lcu-window">FixLCUWindow</a> - Ajusta el tamaño de la ventana con WinAPI. Puedes probarlo cuando el tamaño de la interfaz del cliente sea incorrecto.
+        unsupportedCurrentPlatform: Ajustar el tamaño de la ventana no es compatible con esta plataforma.
+        requiresAdministrator: Ajustar el tamaño de la ventana es compatible con esta plataforma, pero requiere ejecutar como administrador.
+        button: Ajustar
+        dialog:
+          title: Ajustar el tamaño de la ventana
+          content: ¿Quieres ajustar el tamaño de la ventana? Prueba esta opción si el cliente no se ve bien.
+          positiveText: Ajustar
+          negativeText: Cancelar
+      restartUx:
+        label: Reiniciar la interfaz del cliente
+        description: Reinicia el proceso de renderizado al instante. No afecta a las actividades en curso y sirve para arreglar errores de la interfaz del cliente.
+        button: Reiniciar el proceso UX
+        dialog:
+          title: Reiniciar el proceso UX
+          content: ¿Quieres reiniciar el proceso UX? Prueba esta opción si el cliente no se ve bien.
+          positiveText: Reiniciar
+          negativeText: Cancelar
+      killUx:
+        label: Cerrar el proceso UX
+        description: Termina el proceso de renderizado al instante. No afecta a las actividades en curso.
+        button: Cerrar el proceso UX
+        dialog:
+          title: Cerrar el proceso UX
+          content: ¿Seguro que quieres cerrar el proceso UX? Puede que tengas que volver a abrirlo. Cerrar el proceso UX no cierra el juego, pero puede reducir mucho el uso de recursos.
+          positiveText: Cerrar
+          negativeText: Cancelar
+      launchUx:
+        label: Abrir el proceso UX
+        description: Abre el proceso de renderizado al instante si se había cerrado.
+        button: Abrir el proceso UX
+        dialog:
+          title: Abrir el proceso UX
+          content: ¿Quieres abrir el proceso UX?
+          positiveText: Abrir
+          negativeText: Cancelar
+  home:
+    title: Herramientas
+    client: Cliente de League / Cliente del juego
+    in-process: En curso
+    in-game-send: Envío en partida
+    lobby: Herramientas de sala
+    misc: Varios
+    claim-tools: Herramientas de recompensas
+    friend-tools: Herramientas de amigos
+    loot-tools: Herramientas de botín
+  championBench:
+    title: Banca de campeones
+    reroll: Cambiar campeón
+    charity: Caridad
+    charityTitle: Cambia de campeón pero recupera al instante el campeón que tenías asignado
+    notInBenchMode: No estás en un modo aleatorio
+    notInPhase: No estás en la selección de campeones
+    swapFailedNotification:
+      title: Banca de campeones
+      description: No se pudo intercambiar el campeón; puede que ya no esté disponible
+    rerollFailedNotification:
+      title: Banca de campeones
+      description: No se pudo cambiar de campeón; puede que ya no esté disponible
+  gameflowInProgress:
+    title: En curso
+    dodge:
+      label: Abandonar la selección de campeones
+      description: Sale al instante de la selección de campeones actual sin cerrar el cliente.
+      button: Abandonar
+      failedNotification:
+        title: Abandonar la selección de campeones
+        description: 'No se pudo abandonar la selección de campeones: {{reason}}'
+    playAgain:
+      label: Salir de la pantalla de fin de partida
+      description: Sale al instante de la pantalla de fin de partida. Útil cuando el cliente no consigue salir de ella correctamente.
+      button: Volver a la sala
+      failedNotification:
+        title: Salir de la pantalla de fin de partida
+        description: 'No se pudo salir de la pantalla de fin de partida: {{reason}}'
+    leaveLobby:
+      label: Salir de la sala
+      description: Sale al instante de la sala actual.
+      button: Salir de la sala
+  lobby:
+    title: Herramientas de sala
+    createIdLobby:
+      label: Crear sala de cola
+      description: Crea una sala para un ID de cola concreto, si el servidor tiene disponible esa cola.
+      button: Crear
+      selectPlaceholder: Elige o escribe un ID
+      failedNotification:
+        title: Crear sala de cola
+        description: 'No se pudo crear la sala de cola: {{reason}}'
+    loadEligibleQueuesFailedNotification:
+      title: Error al cargar las colas
+      description: 'No se pudo cargar la lista de colas disponibles: {{reason}}'
+    queueOptions:
+      available: Colas disponibles
+      unavailable: Colas desactivadas por ahora
+  strawberry:
+    title: Horda
+    unavailable: No estás en el modo Horda
+    champion:
+      label: Usar como campeón actual
+      description: Puedes probar a elegir otros campeones.
+      button: Usar
+      failedMessage: 'No se pudo cambiar el campeón actual: {{reason}}'
+    championOptions:
+      modeSpecific: Campeones del modo
+      other: Otros campeones
+    map:
+      label: Elegir mapa
+      description: Mapas disponibles ahora mismo.
+      button: Usar
+      failedMessage: 'No se pudo cambiar el mapa: {{reason}}'
+    difficulty:
+      label: Elegir dificultad
+      description: Las dificultades predefinidas son [Historia], [Difícil] y [Extrema]. Por ahora no puedes elegir una dificultad que no hayas desbloqueado.
+      button: Usar
+      failedMessage: 'No se pudo cambiar la dificultad: {{reason}}'
+    requestSent: Solicitud enviada
+  chatAvailability:
+    title: Estado del chat
+    availability:
+      label: Estado del chat
+      description: Muestra o cambia tu estado del chat. Algunos estados solo están disponibles en ciertas condiciones.
+      radio:
+        chat: Disponible
+        mobile: En línea (móvil)
+        away: Ausente
+        dnd: No molestar
+        offline: Desconectado
+        spectating: Espectando
+        online: En línea
+      failedNotification:
+        title: Cambiar el estado del chat
+        description: 'No se pudo cambiar el estado del chat: {{reason}}'
+    lockOfflineStatus:
+      label: Intentar mantener el estado desconectado
+      description: Pone el estado desconectado e intenta corregir el estado ausente automático del cliente.
+      button: Aplicar
+  chatStatusMessage:
+    title: Mensaje de estado
+    message:
+      saved: Guardado
+      success: Guardado y aplicado
+      failedNotification:
+        title: Cambiar el mensaje de estado
+        description: 'No se pudo cambiar el mensaje de estado: {{reason}}'
+    resetOnLogin:
+      label: Restablecer al iniciar sesión
+      description: Vuelve a aplicar el último mensaje guardado cada vez que el cliente inicia sesión.
+    text:
+      label: Mensaje
+      description: Guarda y aplica el mensaje de estado del chat. Déjalo vacío para borrarlo.
+      placeholder: Escribe tu mensaje
+      save: Guardar
+  summonerProfile:
+    title: Invocador
+    commonSuccess: Acción realizada
+    commonFailed: No se pudo aplicar
+    skinSelectModal:
+      title: Selección de aspecto
+      button: Usar como aspecto actual
+      augment: Aumento
+      unset: Sin asignar
+      failedNotification:
+        title: Fondo del perfil
+        description: 'No se pudo aplicar el aspecto: {{reason}}'
+    profileBackground:
+      label: Elegir el fondo del invocador
+      description: Busca el campeón o el aspecto que quieras.
+      button: Elegir
+    bannerAccent:
+      label: Usar el estandarte de la temporada pasada
+      description: Cambia al estandarte de la temporada pasada; puede que el estandarte desaparezca.
+      button: Aplicar
+      failedNotification:
+        title: Usar el estandarte de la temporada pasada
+        description: 'No se pudo cambiar el estandarte: {{reason}}'
+    prestigeCrest:
+      label: Quitar el marco de prestigio
+      description: Quita el marco de prestigio.
+      descriptionInsufficientLevel: 'Quita el marco de prestigio (el nivel de invocador debe ser 525 o superior; nivel actual: {{level}})'
+      button: Aplicar
+      failedNotification:
+        title: Quitar el marco de prestigio
+        description: 'No se pudo quitar el marco de prestigio: {{reason}}'
+    token:
+      label: Quitar todas las fichas
+      description: Quita todas las fichas.
+      button: Aplicar
+      failedNotification:
+        title: Quitar todas las fichas
+        description: 'No se pudieron quitar todas las fichas: {{reason}}'
+    emotes:
+      label: Quitar todos los gestos
+      description: Quita todos los gestos, incluidos los de la rueda y las respuestas a eventos.
+      button: Aplicar
+  gameView:
+    title: Ver partida
+    game:
+      label: ID de partida
+      description: Busca y muestra una partida por su ID.
+      button: Ver
+  fakeRanked:
+    title: Rango falso
+    commonSuccess: Guardado y aplicado
+    saved: Guardado
+    resetOnLogin:
+      label: Restablecer al iniciar sesión
+      description: Vuelve a aplicar el último rango guardado cada vez que el cliente inicia sesión.
+    set:
+      label: Guardar rango
+      description: Guarda el rango que se muestra en la tarjeta del chat
+      button: Guardar
+      failedNotification:
+        title: Rango falso
+        description: 'No se pudo falsear el rango: {{reason}}'
+    queue: Cola
+    tier: Nivel
+    division: División
+  spectate:
+    title: Espectar
+    leaveButton: Salir de la sala
+    needToLeaveLobby: Tienes que salir de la sala actual para espectar.
+    spectate:
+      label: Espectar a un invocador
+      description: Especta a un jugador del servidor actual por su PUUID o nombre de invocador, siempre que esté en una partida que se pueda espectar.
+      button: Empezar a espectar
+      placeholder: Nombre de invocador / PUUID
+      errorNoPlayer: El jugador no existe.
+      notFoundNotification:
+        title: Espectar
+        description: No se encontró al jugador {{name}}.
+      failedNotification:
+        title: Espectar
+        description: 'No se pudo empezar a espectar. Puede que el jugador no esté en partida o que el modo no se pueda espectar: {{reason}}'
+      successNotification:
+        title: Espectar
+        description: Empezaste a espectar.
+    token:
+      label: Espectar con token
+      description: Usa un token especial con el formato correcto para abrir la vista de espectador en el cliente del juego.
+      button: Empezar a espectar
+      placeholder: Token
+      successNotification:
+        title: Espectar
+        description: Empezaste a espectar.
+        useRememberedInstallLocation: Empezaste a espectar usando la ubicación del cliente detectada.
+      failedNotification:
+        title: Espectar
+        description: 'No se pudo empezar a espectar: {{reason}}'
+    failedToLoadFriends: No se pudo cargar la lista de amigos
+  inGameSend:
+    settings:
+      title: Configuración
+      cancelShortcut:
+        label: Atajo para cancelar
+        description: Define un atajo para cancelar cualquier envío
+      sendInterval:
+        label: Intervalo de envío (ms)
+        description: Define el tiempo entre cada envío simulado
+    presets:
+      title: Envíos predefinidos
+      footer:
+        shortcutUnavailable: Los atajos no están disponibles por ahora, {{reason}}.
+        shortcutUsage: Con un atajo configurado, puedes enviar al chat durante la selección de campeones o en la sala, o simular el teclado dentro de la partida mientras el juego está en primer plano.
+        draftOnly: El modo borrador solo permite la vista previa y no envía nada al chat ni al juego.
+      nativeInput:
+        needAdmin: ejecuta como administrador
+        unsupported: no es compatible con esta plataforma
+        initializationFailed: falló el inicio de la entrada nativa
+      teams:
+        friendly: Aliados
+        enemy: Enemigos
+        labelWithName: '{{side}} · {{team}}'
+      targets:
+        friendly:
+          label: Enviar aliados
+          description: Envía los jugadores aliados seleccionados
+        enemy:
+          label: Enviar enemigos
+          description: Envía los jugadores enemigos seleccionados
+        all:
+          label: Enviar todos
+          description: Envía los jugadores seleccionados de ambos equipos
+      controls:
+        shortcut: Atajo
+        sendToGame: Enviar al juego
+        sendToChat: Enviar al chat
+        send: Enviar
+        dryRun: Vista previa
+        dryRunDescription: Genera las líneas y las muestra abajo sin escribir nada en el cliente.
+        sendSucceeded: Envío realizado ({{preset}} → {{target}})
+        disabled:
+          draftOnly: El modo borrador solo permite la vista previa.
+          unavailable: Solo disponible en la selección de campeones, en la sala o en partida.
+      preview:
+        title: Vista previa
+        empty: No hay contenido para enviar
+        copy: Copiar
+        copied: Copiado al portapapeles
+        copyFailed: No se pudo copiar
+        close: Cerrar
+      selection:
+        playersTitle: Destinatarios ({{selected}} / {{total}})
+        premadeTitle: Grupos premade seleccionados ({{selected}} / {{total}})
+        selectAll: Seleccionar todo
+        clear: Borrar
+        groupCount_one: '{{count}} grupo premade'
+        groupCount_other: '{{count}} grupos premade'
+        emptyPremadeGroups: Sin grupos premade
+        bucketSize: 'Grupo de {{count}}'
+      nameDisplayStrategy:
+        title: Nombres
+        options:
+          preferName:
+            label: Preferir el nombre del jugador
+            description: Usa el nombre del jugador para identificarlo en el texto
+          preferChampionName:
+            label: Preferir el nombre del campeón
+            description: Usa el nombre del jugador cuando no hay campeón elegido o hay campeones repetidos
+          championNameWithName:
+            label: Campeón con jugador
+            description: Usa el nombre del campeón con el del jugador entre paréntesis
+      rating:
+        label: Valoración del desempeño
+        description: Resume el desempeño reciente de cada jugador, incluidos la tasa de victorias, el KDA y sus campeones principales.
+        displayOptionsTitle: Qué mostrar
+        displayOptions:
+          winRate:
+            label: Tasa de victorias
+            description: Tasa de victorias de las partidas recientes
+          kda:
+            label: KDA
+            description: Asesinatos / muertes / asistencias
+          avgSoloKills:
+            label: Asesinatos en solitario prom.
+            description: Asesinatos en solitario promedio; requiere la fuente de datos SGP
+          avgVisionScore:
+            label: Puntuación de visión promedio
+            description: Puntuación de visión promedio en las partidas recientes
+          avgChampionDamage:
+            label: Daño
+            description: Muestra el porcentaje promedio del daño a campeones del equipo
+          avgDamageTaken:
+            label: Daño recibido
+            description: Muestra el porcentaje promedio del daño recibido del equipo
+          avgGold:
+            label: Oro
+            description: Muestra el porcentaje promedio del oro del equipo
+          avgCsPerMinute:
+            label: Súbditos
+            description: Muestra los súbditos por minuto promedio
+          avgKillParticipation:
+            label: Participación en asesinatos
+            description: Muestra la participación en asesinatos promedio
+          avgDamageGoldEfficiency:
+            label: Daño / oro
+            description: Muestra la eficiencia daño-oro promedio
+          mainChampions:
+            label: Campeones principales
+            description: Muestra hasta tres campeones claramente preferidos según las estadísticas recientes; muestra “Sin campeones principales claros” si ninguno cumple; se oculta al filtrar por el campeón actual
+          mainPositions:
+            label: Posiciones principales
+            description: Muestra hasta dos posiciones principales cuando las estadísticas recientes tienen datos de posición claros
+        configOptionsTitle: Configuración
+        configOptions:
+          showCurrentChampion:
+            label: Filtrar por el campeón actual
+            description: Solo incluye las partidas recientes con el campeón elegido por cada jugador; muestra un aviso si no hay campeón elegido
+      jungle:
+        label: Preferencia de jungla
+        description: Muestra la actividad inicial, la distribución del primer recorrido y la tendencia de control de objetivos.
+        displayOptionsTitle: Qué mostrar
+        displayOptions:
+          activityPreference:
+            label: Preferencia de actividad
+            description: Muestra qué zonas del mapa suele visitar el jungla al inicio, con la distribución superior/central/inferior
+          firstClearDistribution:
+            label: Distribución del primer recorrido
+            description: Muestra las tasas de inicio normal/invasión del lado azul y rojo y la distribución por campamento, solo al filtrar por el campeón actual
+          earlyGank:
+            label: Ganks tempranos
+            description: Muestra la tasa de ganks a nivel 3 y 4
+          dragonControl:
+            label: Control de dragones
+            description: Muestra la tasa de primer dragón, el tiempo promedio del primer dragón y los dragones promedio
+          monsterControl:
+            label: Objetivos épicos
+            description: Muestra las larvas, heraldos y barones promedio
+          mainChampions:
+            label: Campeones principales
+            description: Muestra hasta tres campeones con claramente más muestras detalladas de jungla; muestra “Sin campeones principales claros” si ninguno cumple; solo se aplica si el filtro por campeón actual está desactivado
+        configOptionsTitle: Configuración
+        configOptions:
+          showCurrentChampion:
+            label: Filtrar por el campeón actual
+            description: Solo incluye los detalles de jungla con el campeón elegido por cada jugador; muestra un aviso si no hay campeón elegido. Activado por defecto.
+      premade:
+        label: Grupos premade
+        description: Detecta los grupos premade de cada equipo y muestra sus miembros por grupo.
+      fixedText:
+        label: Texto fijo
+        empty:
+          description: Todavía no hay textos fijos. Añade uno y define su título, su atajo y su contenido de varias líneas.
+          action: Añadir texto fijo
+        listTitle: Textos fijos
+        addLimitReached: Puedes crear hasta {{count}} textos fijos.
+        unnamed: Sin título
+        unsaved: Cambios sin guardar
+        editTitle: Editar título
+        expand: Ampliar editor
+        expandedTitle: 'Editar texto fijo: {{title}}'
+        editorLoadFailed: 'No se pudo cargar el editor Monaco: {{reason}}'
+        shortcutLabel: Atajo
+        shortcutDescription: Envía este texto fijo guardado.
+        save: Guardar
+        revert: Deshacer cambios
+        saved: Guardado
+        saveFailed: No se pudo guardar
+        createFailed: No se pudo crear
+        delete: Borrar
+        deleted: Borrado
+        deleteFailed: No se pudo borrar
+        deleteConfirm: ¿Borrar?
+        dragHandle: Arrastra “{{title}}” para reordenarlo
+        sendToGame: Enviar al juego
+        sendToChat: Enviar al chat
+        send: Enviar
+        sendSucceeded: Envío realizado
+        sendSucceededWithTitle: 'Envío realizado (texto fijo: {{title}})'
+        disabled:
+          noSelection: Elige un texto fijo
+          saveFirst: Guarda primero los cambios
+          draftOnly: El modo borrador no puede enviar.
+          unavailable: Solo disponible en la selección de campeones, en la sala o en partida.
+      customTemplate:
+        label: Plantilla personalizada
+        risk:
+          title: Léelo antes de usarla
+          description: Las plantillas personalizadas pueden leer y modificar información de la aplicación. Una plantilla no confiable, sin revisar o con errores puede filtrar información, dañar datos o cerrar la aplicación. Usa solo plantillas de fuentes confiables cuyo contenido hayas comprobado; no uses una plantilla si no tienes claro lo que hace. Las plantillas generadas con IA también deben revisarse antes de usarlas.
+        empty:
+          description: Todavía no hay plantillas personalizadas. Añade una y luego escribe y guarda su código JavaScript.
+          action: Añadir plantilla personalizada
+        listTitle: Plantillas
+        addLimitReached: Puedes crear hasta {{count}} plantillas personalizadas.
+        unnamed: Plantilla sin título
+        unsaved: Cambios sin guardar
+        dragHandle: Arrastra “{{title}}” para reordenarla
+        delete: Borrar
+        deleteConfirm: ¿Borrar esta plantilla?
+        deleted: Borrada
+        deleteFailed: No se pudo borrar
+        createFailed: No se pudo crear
+        editTitle: Editar título
+        save: Guardar
+        saved: Guardada
+        saveFailed: No se pudo guardar
+        revert: Deshacer cambios
+        expand: Ampliar editor
+        expandedTitle: 'Editar plantilla: {{title}}'
+        editorLoadFailed: 'No se pudo cargar el editor Monaco: {{reason}}'
+        runFailed: Falló la ejecución de la plantilla. Revisa el indicador de error.
+        lastErrorTitle: La última ejecución de la plantilla falló
+        disabled:
+          saveFirst: Guarda primero los cambios
+  claim:
+    rewards:
+      title: Recompensas
+      hint: Para encontrar algo que se te haya olvidado.
+      columns:
+        rewardList: Objetos para reclamar
+      refreshButton: Actualizar
+      claimButton: Reclamar
+      claimButtonC: Reclamar ({{count}})
+      cancelButton: Cancelar
+      refreshSuccess: Actualizado
+      refreshFailed: Error al obtener {{reason}}
+      claimFailed: Error al reclamar {{reason}}
+      claimed: Reclamado {{item}}
+    eventHub:
+      title: Portal del evento
+      hint: Algunos objetos de esta columna pueden coincidir con los de "Recompensas". Basta con reclamar uno de ellos.
+      columns:
+        rewardList: Objetos para reclamar
+      refreshButton: Actualizar
+      claimButton: Reclamar
+      claimButtonC: Reclamar ({{count}})
+      cancelButton: Cancelar
+      refreshSuccess: Actualizado
+      refreshFailed: Error al obtener {{reason}}
+      claimFailed: Error al reclamar {{reason}}
+      claimed: Reclamado {{item}}
+    missions:
+      title: Misiones
+      hint: Completar misiones antes de tiempo puede causar datos inconsistentes. Úsalo con cuidado.
+      columns:
+        rewardList: Objetos para reclamar
+      refreshButton: Actualizar
+      claimButton: Reclamar
+      claimButtonC: Reclamar ({{count}})
+      cancelButton: Cancelar
+      refreshSuccess: Actualizado
+      refreshFailed: Error al obtener {{reason}}
+      claimFailed: Error al reclamar {{reason}}
+      claimed: Reclamado {{item}}
+    item:
+      untranslatedC: Grupo sin nombre ({{count}})
+  friends:
+    title: Amigos
+    searchPlaceholder: Buscar por nombre o etiqueta del amigo
+    deleteButtonC: Borrar ({{count}})
+    deleteButton: Borrar
+    cancelButton: Cancelar
+    refreshButton: Actualizar
+    deleteSuccess_one: Se borró {{count}} amigo
+    deleteSuccess_other: Se borraron {{count}} amigos
+    deletePopconfirm: Esta acción borrará amigos y no se puede deshacer
+    refreshSuccess: Actualizado
+    neverPlayed: Sin datos de partidas
+    unknown: Desconocido
+    groupNames:
+      '**Default': General
+    columns:
+      groupName: Grupo de amigos
+      lastGameDate: Última partida
+      friendSince: Amigos desde
+  loot:
+    title: Herramientas de botín
+    refreshSuccess: Actualizado
+    refreshFailed: Error al obtener {{reason}}

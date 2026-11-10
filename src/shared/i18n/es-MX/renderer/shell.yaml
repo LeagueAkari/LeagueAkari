@@ -1,0 +1,220 @@
+notices:
+  modal:
+    title: Aviso
+    close: Cerrar
+    read: Ya lo leí
+    updatedAt: Actualizado {{time}}
+    noNoticeMd: |
+      ***Sin avisos***
+    contacts:
+      open: Abrir
+      openChannel: Abrir {{name}}
+      password: 'Contraseña: {{password}}'
+      platforms:
+        qq: QQ
+        telegram: Telegram
+        discord: Discord
+        email: Correo
+        website: Sitio web
+        other: Otro
+legal:
+  declaration:
+    title: Aviso legal
+    isFree: es gratuito
+    ok: Entiendo que este software {isFree} y acepto el aviso legal
+    quit: Salir
+    newContent: |
+      <div class="akari-disclaimer">
+
+      <style>
+      .akari-disclaimer{
+        background-color:#ffffff;
+        color:#333333;
+        line-height:1.65;
+        padding:1.75rem 2rem;
+        box-shadow:0 2px 6px rgba(0,0,0,.15);
+      }
+      .akari-disclaimer h1,
+      .akari-disclaimer h2{
+        color:#d97706;
+        margin-top:1.5rem;
+        margin-bottom:.75rem;
+        line-height:1.25;
+      }
+      .akari-disclaimer h1{font-size:1.6rem;}
+      .akari-disclaimer h2{font-size:1.25rem;}
+      .akari-disclaimer ul{margin-left:1.5rem;}
+      .akari-disclaimer li{margin-bottom:.65rem;}
+      .akari-disclaimer a{color:#2563eb;text-decoration:none;}
+      .akari-disclaimer a:hover{text-decoration:underline;}
+      [data-theme='dark'] .akari-disclaimer{
+        background-color:#1e1e1e;
+        color:#e6e6e6;
+        box-shadow:0 2px 6px rgba(0,0,0,.35);
+      }
+      [data-theme='dark'] .akari-disclaimer h1,
+      [data-theme='dark'] .akari-disclaimer h2{
+        color:#ffd866;
+      }
+      [data-theme='dark'] .akari-disclaimer a{
+        color:#8ab4f8;
+      }
+      </style>
+
+      # Guía de uso y aviso legal de $t(common:appName)
+
+      > **Antes de descargar, instalar o usar este software, lee y comprende por completo esta guía y aviso legal.**
+      > Al empezar a usarlo, se considera que entendiste y aceptaste todos los términos siguientes.
+
+      ---
+
+      ## I. Naturaleza del software y forma de obtenerlo
+      - **$t(common:appName)** es totalmente de código abierto y gratuito; todas sus funciones se ofrecen "tal cual".
+      - Este software no se vende de ninguna forma: ni de pago, ni incluido en paquetes, ni con fines de lucro. Si encuentras cualquier forma de reventa, paquete u otra actividad con fines de lucro, no lo compres. Si ya lo compraste, **solicita el reembolso de inmediato**.
+
+      ## II. Aviso de riesgos y limitación de responsabilidad
+      - Usar este software **puede** provocar, entre otras cosas:
+        1. La suspensión temporal o permanente de tu cuenta de juego;
+        2. La pérdida, corrupción o falta de coincidencia de los datos del juego con los del servidor;
+        3. Cierres inesperados del cliente, pérdida de rendimiento u otras malas experiencias de juego.
+      - El equipo de desarrollo de **$t(common:appName)** y todos sus colaboradores no asumen ninguna responsabilidad por daños directos, indirectos, incidentales, especiales o consecuentes derivados del uso o de la imposibilidad de usar este software; todos los riesgos corren por cuenta del usuario.
+
+      > Consulta la sección **Mejoras en el seguimiento de información del juego** de las [Notas de la versión 25.17](https://www.leagueoflegends.com/es-mx/news/game-updates/patch-25-17-notes/).
+
+      ## III. Compatibilidad con servidores
+      - **A partir de la publicación de este aviso, $t(common:appName) deja de ofrecer cualquier tipo de soporte para los servidores de Tencent Games.**
+      - Usar este software en servidores de Tencent tiene muchas probabilidades de infringir los acuerdos de usuario, las normas de gestión o las medidas de protección técnica de Tencent Games; cualquier suspensión de cuenta, pérdida de datos u otra consecuencia negativa es responsabilidad exclusiva del usuario.
+
+      ## IV. Recopilación de información y privacidad
+      - Para mejorar la calidad del producto, analizar errores y elaborar estadísticas de seguridad, el software recopila durante su funcionamiento información del sistema y registros de errores **necesarios y limitados**.
+      - La información recopilada **no** contiene datos de identificación personal, no se sube a ningún servidor de terceros y no se usa con fines comerciales.
+
+      ## V. Otros
+      - Si pulsas el botón de confirmar tres veces seguidas, esta ventana se cierra rápidamente. Al hacerlo, se considera que leíste y aceptaste esta guía y aviso legal.
+
+      ---
+
+      > **Si tienes alguna duda sobre esta guía y aviso legal, o necesitas más información sobre el software, visita**
+      > <https://github.com/LeagueAkari/LeagueAkari> .
+
+      </div>
+titlebar:
+  automation:
+    trigger_one: Automatización ({{count}})
+    trigger_other: Automatizaciones ({{count}})
+    title: Automatizaciones activas
+    configuredModes_one: Configurada para {{count}} modo
+    configuredModes_other: Configurada para {{count}} modos
+    configuredChampions_one: '{{count}} campeón configurado'
+    configuredChampions_other: '{{count}} campeones configurados'
+    scheduledFriends_one: Esperando a {{count}} amigo
+    scheduledFriends_other: Esperando a {{count}} amigos
+    items:
+      autoAccept: Aceptar partida automáticamente
+      autoHonor: Honor automático
+      playAgain: Volver a la sala automáticamente
+      autoMatchmaking: Búsqueda automática
+      autoReconnect: Reconexión automática
+      autoSkipLeader: Ceder el liderazgo de la sala automáticamente
+      autoHandleInvitations: Gestionar invitaciones automáticamente
+      aramTeamSide: Mensaje automático del lado del mapa
+      autoPickBan: Selección y bloqueo automáticos de campeones
+      autoTrade: Gestionar intercambios de campeones automáticamente
+      autoChampConfig: Configuración automática de campeones
+      autoReply: Respuesta automática
+      scheduledInvitation: Invitación programada a amigos
+      lockOffline: Mantener estado desconectado
+      resetStatusMessage: Restablecer el estado del chat al iniciar sesión
+      resetRankedStatus: Restablecer el rango mostrado al iniciar sesión
+  search:
+    open: Buscar
+    summoner: Buscar invocador
+    settings: Buscar en la configuración
+    streamerModeTitle: Modo streamer
+    streamerModeWarning: Buscar jugadores mostrará información sensible, ¿quieres continuar?
+    continue: Continuar
+    cancel: Cancelar
+  actions:
+    notice: Aviso
+    noticeSummary: Resumen del aviso
+    noticeOk: Entendido
+    noticeSeeMore: Ver más
+    github: GitHub del proyecto
+    auxWindow: Ventana auxiliar
+    opggWindow: Datos de campeones
+    backgroundTasks: Tareas en segundo plano
+    themeSelector:
+      title: Paleta de temas
+      groups:
+        system: Sistema
+        brightBuiltin: Claros
+        darkBuiltin: Oscuros
+      tone:
+        light: Claro
+        dark: Oscuro
+      presets:
+        followSystem: Seguir al sistema
+        light: Claro
+        dark: Oscuro
+        graphite: Azul grafito
+        cyber: Neón cyber
+        sakura: Rosa sakura
+        mint: Verde menta
+        aurora: Violeta aurora
+        butter: Amarillo mantequilla
+    toggleTheme:
+      toLight: Cambiar a claro
+      toDark: Cambiar a oscuro
+  windowControls:
+    minimize: Minimizar
+    maximize: Maximizar
+    restore: Restaurar
+    close: Cerrar
+window:
+  closeConfirm:
+    title: Salir de $t(common:appName)
+    options:
+      minimize-to-tray: Minimizar a la bandeja
+      quit: Salir
+    remember: Recordar
+    ok: Aceptar
+    cancel: Cancelar
+navigation:
+  sidebar:
+    menu:
+      match-history: Historial
+      ongoing-game: Partida en curso
+      automation: Automatización
+      toolkit: Herramientas
+      test: Prueba
+    status:
+      respawned: Reapareciste
+      respawnedContent: Reapareciste en la partida, ¡diviértete!
+      currentConnected: Conectado
+      launchedClients: Clientes abiertos
+      noClientTitle: Ningún cliente disponible
+      noClient: No hay ningún cliente disponible, abre el juego
+      settings: Configuración
+      notConnected: Sin conexión
+      inConnectionLoop: Conectando...
+      unknown: Desconocido
+      connectedClient: Cliente conectado
+      launchedClientPlaceholder: Cliente abierto {{index}}
+      update:
+        available: Actualizar
+        downloading: Descargando {{progress}}%
+        retry: Reintentar descarga
+        ready: Reiniciar para actualizar
+      respawnTimer:
+        detail: Reaparición en {{seconds}} s ({{totalSeconds}} s)
+startup:
+  launcher:
+    tcls: Cliente TCLS
+    weGame: WeGame
+    riotClient: Riot Client
+    successMessage: 'Se abrió correctamente: {{name}}'
+    failedMessage: 'No se pudo abrir {{name}}: {{reason}}'
+    newVersionAvailable: Nuevo
+backgroundTasks:
+  taskTitle: Tareas en curso ({{count}})
+  emptyPlaceholder: No hay tareas en segundo plano

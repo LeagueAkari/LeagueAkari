@@ -1,0 +1,292 @@
+ongoingGame:
+  titlebar:
+    draftMode: Modo borrador
+    exitDraft: Salir del modo borrador
+    refresh: Actualizar
+    spectating: Espectando
+    settings:
+      title: Vista de la partida en curso
+      orderPlayerBy:
+        label: Orden de jugadores
+      showJunglePathingForAllPlayers:
+        label: Mostrar rutas de jungla de quienes no son junglas
+        description: Si está activado, quienes no juegan de jungla también muestran esta sección cuando su historial tiene muestras de rutas de jungla.
+        disabledDescription: Las rutas de jungla están desactivadas en la configuración de la partida en curso. Actívalas en más opciones de la partida en curso antes de cambiar esta opción.
+      openOngoingGameSettings: Más opciones de la partida en curso
+    orderOptions:
+      default: Predeterminado
+      position: Posición
+      premade-team: Grupo premade
+      win-rate: '% V desc.'
+      kda: KDA desc.
+      akari-score: Puntuación desc.
+  junglePathing:
+    title: Jungla
+    thisGame: Esta partida
+    hero: Campeón
+    overall: Todas
+    currentChampion: Este
+    mapPref: Pref. del mapa
+    zoneWeight: Peso por zona
+    zoneWeightShort: Peso
+    positionWeight: peso de posición
+    takedownWeight: peso de participación en asesinatos
+    first14Minutes: primeros 14 minutos
+    preferenceDecision: Decisión de preferencia
+    singleZone: Zona única
+    firstClearDecision: Decisión del primer recorrido
+    oneMinutePosition: posición al minuto 1
+    level3Decision: Decisión de gank a nv. 3
+    level4Decision: Decisión de gank a nv. 4
+    threeMinuteFrame: fotograma del minuto 3
+    fourMinuteFrame: fotograma del minuto 4
+    championDamage: daño a campeones
+    championDamageIncrease: aumento del daño a campeones
+    takedownParticipation: participación en asesinatos
+    aggregation: Agregación
+    sampleScope: alcance de la muestra
+    blueRedSide: lado azul / rojo
+    ganks: Ganks
+    topsidePref: Superior
+    midPref: Central
+    botsidePref: Inferior
+    topMidPref: Sup./Cen.
+    midBotPref: Cen./Inf.
+    balanced: Equilibrado
+    balancedShort: Equil.
+    prefShort:
+      top: Sup.
+      mid: Cen.
+      bot: Inf.
+      topMid: S/C
+      midBot: C/I
+      balanced: Equil.
+    firstClear: 1.er recorrido
+    topsideStart: Sup. {{pct}}%
+    botsideStart: Inf. {{pct}}%
+    campRed: Rojo
+    campBlue: Azul
+    campWolves: Lobos
+    campRaptors: Raptores
+    campOwnStart: Normal {pct}
+    campStart: '{{camp}} {pct}'
+    campInvadeStart: Invasión {pct}
+    campPopoverCampGames_one: 'Este campamento: {count} partida'
+    campPopoverCampGames_other: 'Este campamento: {count} partidas'
+    campPopoverKindGames_one: 'Muestras de {{kind}}: {count} partida'
+    campPopoverKindGames_other: 'Muestras de {{kind}}: {count} partidas'
+    campPopoverSideGames_one: 'Total del lado {{side}}: {count} partida'
+    campPopoverSideGames_other: 'Total del lado {{side}}: {count} partidas'
+    blueTeam: Azul
+    redTeam: Rojo
+    earlyGank: Ganks tempranos
+    firstClearOwnLegend: Inicio normal
+    firstClearInvadeLegend: Inicio con invasión
+    level3KillLegend: Asesinatos nv. 3
+    level4KillLegend: Asesinatos nv. 4
+    level3Gank: Ganks nv. 3 {count} / {total}
+    level4Gank: Ganks nv. 4 {count} / {total}
+    objectives: Objetivos
+    firstDragonRate: 1.er dragón {{pct}}%
+    firstDragonRateLabel: 1.er dragón
+    soloDragonRate: Dragón en solitario {{pct}}%
+    soloDragonRateLabel: Dragón en solitario
+    dragons: Dragón {{count}}
+    voidgrubs: Larvas {{count}}
+    heralds: Heraldo {{count}}
+    barons: Barón {{count}}
+    avgDragons: Dragón prom. {{count}}
+    avgDragonsLabel: Dragón prom.
+    avgVoidgrubs: Larvas prom. {{count}}
+    avgVoidgrubsLabel: Larvas prom.
+    avgHeralds: Heraldo prom. {{count}}
+    avgHeraldsLabel: Heraldo prom.
+    avgBarons: Barón prom. {{count}}
+    avgBaronsLabel: Barón prom.
+    firstTime: 1.º {{time}}
+    noData: Sin muestras
+    noDataShort: N/D
+    noSideData: Sin muestras por lado
+    noOwnStartData: Sin muestras de inicio normal
+    noInvadeData: Sin muestras de invasión
+    noGankData: Sin muestras de ganks
+    noLevel3GankData: Sin muestras de ganks a nv. 3
+    noLevel4GankData: Sin muestras de ganks a nv. 4
+    noCurrentChampion: Ningún campeón seleccionado
+    noCurrentChampionData: No hay muestras de jungla con el campeón actual
+    minuteLegend: Puntos de posición
+    gankLegend: Puntos de asesinatos
+    mapSemanticHint: Leyenda
+    mapSemanticDescription: Los puntos son muestras de posición por minuto de los primeros 14 minutos. Las cruces son posiciones de participación en asesinatos dentro de los 14 minutos. Los puntos del minimapa pueden ser una muestra; usa el Peso por zona para ver los valores exactos.
+    algorithmSummaryZoneWeight: El Peso por zona mide la intensidad de actividad en superior / central / inferior durante los primeros 14 minutos.
+    algorithmSummaryPathing: El primer recorrido y los ganks tempranos se agregan dentro del alcance de muestra actual y se separan por lado azul / rojo.
+    loadedSamples: Se cargaron {{details}} de este jugador, incluidas {{jungle}}.
+    loadedDetailedSamples_one: '{{count}} muestra detallada de partida'
+    loadedDetailedSamples_other: '{{count}} muestras detalladas de partidas'
+    loadedJungleSamples_one: '{{count}} partida de jungla'
+    loadedJungleSamples_other: '{{count}} partidas de jungla'
+    algorithmDetails: Algoritmo
+    algorithmDetailZoneWeight: '{zoneWeight} = Σ {positionWeight} + Σ {takedownWeight}. {positionWeight}: durante los {first14Minutes}, cada fotograma por minuto suma {pointOne} a la zona superior / central / inferior donde está el jungla. {takedownWeight}: cada participación en un asesinato dentro de los 14 minutos suma {pointFive} a la zona donde ocurrió.'
+    algorithmDetailPreference: '{preferenceDecision}: si central + inferior suman ≥ 70% y superior ≤ 28%, es {midBot}. Si superior + central suman ≥ 70% e inferior ≤ 28%, es {topMid}. Si una {singleZone} tiene ≥ 40% y al menos 8 puntos porcentuales más que la segunda, es Superior / Central / Inferior. Si no, es {balanced}.'
+    algorithmDetailFirstClear: '{firstClearDecision}: se usa el campamento de jungla más cercano a la {oneMinutePosition}. Si el campamento está en la mitad enemiga, cuenta como {invadeStart}.'
+    algorithmDetailLevel3Gank: '{level3Decision}: en el {threeMinuteFrame}, los súbditos (súbditos + jungla) están en {csRange}, el nivel es {level3} y se detecta {championDamage}. Sin datos detallados de daño, se usa la {takedownParticipation} dentro de los 3 minutos como condición de daño.'
+    algorithmDetailLevel4Gank: '{level4Decision}: hasta el {fourMinuteFrame}, se detecta un {championDamageIncrease} respecto al minuto 3, o hubo {takedownParticipation} entre los minutos 3 y 4. Sin datos detallados de daño, solo se usa la {takedownParticipation}.'
+    algorithmDetailAggregation: '{aggregation}: la pestaña activa define el {sampleScope} (campeón actual o todos). El primer recorrido y los ganks tempranos se acumulan por separado para el {blueRedSide}.'
+    gamesUnit: ' partidas'
+    copyAll: Copiar resumen
+    copied: Análisis copiado
+    allyJungler: Jungla aliado
+    enemyJungler: Jungla enemigo
+    top: Superior
+    mid: Central
+    bot: Inferior
+    topShort: Sup.
+    midShort: Cen.
+    botShort: Inf.
+    zoneTiny:
+      top: S
+      mid: C
+      bot: I
+    gamesAnalyzed_one: '{{count}} partida'
+    gamesAnalyzed_other: '{{count}} partidas'
+  playerCard:
+    reload: Recargar
+    empty: No hay partidas de esta cola
+    loadingMatchHistory: Cargando...
+    errorLoadingMatchHistory: No se pudo cargar
+    top4Rate: Tasa de top 4
+    1stRate: Tasa de 1.er lugar
+    1st: '{{rate}}%'
+    position:
+      recentlyPlayed: 'Preferencia:'
+      selection: 'Selección:'
+    cherryWinRatePopover_one: En la última {{count}} partida, la tasa de victorias de este jugador es del {{winRate}}%. En {{cherryCount}} partidas de Arena, su tasa de 1.er lugar es del {{top1Rate}}%.
+    cherryWinRatePopover_other: En las últimas {{count}} partidas, la tasa de victorias de este jugador es del {{winRate}}%. En {{cherryCount}} partidas de Arena, su tasa de 1.er lugar es del {{top1Rate}}%.
+    winRatePopover_one: En la última {{count}} partida, la tasa de victorias de este jugador es del {{winRate}}%, con {{wins}} victorias y {{losses}} derrotas.
+    winRatePopover_other: En las últimas {{count}} partidas, la tasa de victorias de este jugador es del {{winRate}}%, con {{wins}} victorias y {{losses}} derrotas.
+    kdaPopover_one: En la última {{count}} partida, el KDA promedio de este jugador es {{kda}} ({{kills}} / {{deaths}} / {{assists}})
+    kdaPopover_other: En las últimas {{count}} partidas, el KDA promedio de este jugador es {{kda}} ({{kills}} / {{deaths}} / {{assists}})
+    premadePopover: Son un grupo premade. Marcados como Grupo {{team}}.
+    editTag: Marcar jugador
+    collectByChampion: Recopilar partidas de {{champion}}
+    collectByPosition: Recopilar partidas de {{position}}
+    sameChampionHistory: Historial con el campeón
+    highWinRatePopover_one: La tasa de victorias de este jugador es excepcionalmente alta. En la última {{count}} partida, ganó {{winCount}}.
+    highWinRatePopover_other: La tasa de victorias de este jugador es excepcionalmente alta. En las últimas {{count}} partidas, ganó {{winCount}}.
+    teamDamageShare: Daño {{rate}}%
+    teamDamageSharePopover_one: En la última {{count}} partida, este jugador hizo en promedio el {{rate}}% del daño de su equipo
+    teamDamageSharePopover_other: En las últimas {{count}} partidas, este jugador hizo en promedio el {{rate}}% del daño de su equipo
+    teamDamageTakenShare: Daño recibido {{rate}}%
+    teamDamageTakenSharePopover_one: En la última {{count}} partida, este jugador recibió en promedio el {{rate}}% del daño de su equipo
+    teamDamageTakenSharePopover_other: En las últimas {{count}} partidas, este jugador recibió en promedio el {{rate}}% del daño de su equipo
+    teamGoldShare: Oro {{rate}}%
+    teamGoldSharePopover_one: En la última {{count}} partida, este jugador obtuvo en promedio el {{rate}}% del oro de su equipo
+    teamGoldSharePopover_other: En las últimas {{count}} partidas, este jugador obtuvo en promedio el {{rate}}% del oro de su equipo
+    csPerMinute: '{{value}} súbditos / min'
+    csPerMinutePopover_one: En la última {{count}} partida, este jugador promedió {{value}} súbditos por minuto.
+    csPerMinutePopover_other: En las últimas {{count}} partidas, este jugador promedió {{value}} súbditos por minuto.
+    csTeamSharePopover: En promedio, consigue el {{rate}}% de los súbditos de su equipo.
+    damageGoldEfficiency: Daño-oro {{rate}}%
+    damageGoldEfficiencyPopover_one: En la última {{count}} partida, la eficiencia daño-oro promedio de este jugador es del {{rate}}%
+    damageGoldEfficiencyPopover_other: En las últimas {{count}} partidas, la eficiencia daño-oro promedio de este jugador es del {{rate}}%
+    damageGoldEfficiencyPopoverDefinition: Eficiencia daño-oro = daño total a campeones dividido entre el oro obtenido; muestra cuánto daño a campeones genera cada moneda de oro.
+    damageGoldEfficiencyPopoverUsage: Sirve para valorar qué tan bien convierte el jugador su oro en daño a campeones.
+    enemyMissingPings: Pings de desaparecido {{count}}
+    enemyMissingPingsPopover_one: Este jugador marca a enemigos como desaparecidos un promedio de {{count}} vez por partida
+    enemyMissingPingsPopover_other: Este jugador marca a enemigos como desaparecidos un promedio de {{count}} veces por partida
+    visionScore: Puntuación de visión {{count}}
+    visionScorePopover: La puntuación de visión promedio de este jugador es {{count}}
+    killDamageEfficiencyHigh: KS
+    killDamageEfficiencyLow: Hace el daño
+    killDamageEfficiencyHighPopover: En las últimas {{count}} partidas, la eficiencia asesinatos-daño promedio de este jugador es del {{rate}}%; consigue más asesinatos con menos daño del equipo.
+    killDamageEfficiencyLowPopover: En las últimas {{count}} partidas, la eficiencia asesinatos-daño promedio de este jugador es del {{rate}}%; consigue menos asesinatos con más daño del equipo.
+    metPopover:
+      title_one: Te cruzaste con este jugador por última vez el {{date}}. Se han cruzado {{count}} vez en total.
+      title_other: Te cruzaste con este jugador por última vez el {{date}}. Se han cruzado {{count}} veces en total.
+      titleNote_one: Solo se muestra la última {{count}} partida.
+      titleNote_other: Solo se muestran las últimas {{count}} partidas.
+      gameId: ID de partida
+      inspectByGameId: Ver {{gameId}}
+      date: Fecha
+      result: Resultado
+      relation: Lado
+      self: Tú
+      encounteredPlayer: Jugador
+      winResult:
+        abort: Cancelada
+        loss: Derrota
+        remake: Rehecha
+        win: Victoria
+      team:
+        teammate: Aliado
+        opponent: Enemigo
+    privatePopover: Este jugador tiene su perfil en privado, por lo que nadie puede ver su perfil, historial de partidas ni logros. Además, no se puede espectar.
+    winningStreakPopover_one: Lleva una racha de {{count}} victoria. ¡Bien hecho!
+    winningStreakPopover_other: Lleva una racha de {{count}} victorias. ¡Bien hecho!
+    losingStreakPopover_one: Lleva una racha de {{count}} derrota.
+    losingStreakPopover_other: Lleva una racha de {{count}} derrotas.
+    akariScorePopoverDescription: La Puntuación Akari resume algunas métricas recientes del jugador y es solo orientativa.
+    suspiciousFlashPosition: Destello raro
+    suspiciousFlashPositionPopoverTitle: Distribución de la tecla de Destello
+    suspiciousFlashPositionPopoverDescription: Este jugador usó Destello tanto en la D como en la F últimamente, así que su preferencia de tecla parece inconsistente.
+    suspiciousFlashPositionPopoverDLabel: Tecla D
+    suspiciousFlashPositionPopoverFLabel: Tecla F
+    suspiciousFlashPositionPopoverDCount_one: Tecla D {{count}} partida ({{rate}}%)
+    suspiciousFlashPositionPopoverDCount_other: Tecla D {{count}} partidas ({{rate}}%)
+    suspiciousFlashPositionPopoverFCount_one: Tecla F {{count}} partida ({{rate}}%)
+    suspiciousFlashPositionPopoverFCount_other: Tecla F {{count}} partidas ({{rate}}%)
+    suspiciousFlashPositionPopoverTotal_one: Basado en la última {{count}} partida analizada
+    suspiciousFlashPositionPopoverTotal_other: Basado en las últimas {{count}} partidas analizadas
+    hardGank: Difícil de gankear
+    easyGank: Fácil de gankear
+    veryEasyGank: Muy fácil de gankear
+    easyGankPopover_one: En la última {{count}} partida analizada de la Grieta del Invocador, este jugador muere en promedio {{times}} veces antes del minuto 15 con participación del jungla enemigo
+    easyGankPopover_other: En las últimas {{count}} partidas analizadas de la Grieta del Invocador, este jugador muere en promedio {{times}} veces antes del minuto 15 con participación del jungla enemigo
+    soloKills: '{{times}} asesinatos en solitario'
+    soloKillsPopover_one: En la última {{count}} partida, este jugador consigue en promedio {{times}} asesinatos en solitario
+    soloKillsPopover_other: En las últimas {{count}} partidas, este jugador consigue en promedio {{times}} asesinatos en solitario
+    akariLoved:
+      outstanding: Destacado
+      extraordinary: Extraordinario
+      outstandingPopover: Este jugador ha tenido un buen desempeño en sus últimas partidas.
+      extraordinaryPopover: Este jugador ha tenido un desempeño excepcional en sus últimas partidas.
+    champion:
+      recentStats: Estadísticas recientes
+      winRate_one: Última {{count}} partida, tasa de victorias {{winRate}}%
+      winRate_other: Últimas {{count}} partidas, tasa de victorias {{winRate}}%
+    matchHistory:
+      winResult:
+        na: '-'
+        win: V
+        loss: D
+        remake: R
+        abort: Canc.
+    self: Tú
+    tagged: Marcado
+    taggedBySelf: Marcado
+    taggedByOther: Marcado por
+    unknown: Desconocido
+    premade: Grupo {{team}}
+    highWinRate: '% V alto'
+    met: Conocido
+    metLastGameTeammate: Aliado anterior
+    metLastGameOpponent: Rival anterior
+    private: Privado
+    winningStreak_one: '{{count}} victoria'
+    winningStreak_other: '{{count}} victorias'
+    losingStreak_one: '{{count}} derrota'
+    losingStreak_other: '{{count}} derrotas'
+    reloadMatchHistory: Recargar
+  teamTags:
+    winRateTeam: Equipo ganador
+    loseRateTeam: Equipo perdedor
+    premade: Premade {{size}}
+    winRate: Victorias {{rate}}%
+    kda: KDA {{kda}}
+  panel:
+    disconnected: Sin conexión con el cliente
+    waitingForSpectate: Esperando el retraso de espectador
+    noOngoingGame: No hay ninguna partida en curso
+    disabled: El análisis de partidas está desactivado; vuelve a activarlo en la configuración
+    avgTeamWinRate: Tasa de victorias promedio del equipo
+    avgTeamKda: KDA promedio del equipo

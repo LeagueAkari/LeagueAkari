@@ -13,6 +13,21 @@ import rankedEn from '@shared/i18n/en/renderer/ranked.yaml'
 import settingsEn from '@shared/i18n/en/renderer/settings.yaml'
 import shellEn from '@shared/i18n/en/renderer/shell.yaml'
 import toolkitEn from '@shared/i18n/en/renderer/toolkit.yaml'
+import commonEsMX from '@shared/i18n/es-MX/common.yaml'
+import automationEsMX from '@shared/i18n/es-MX/renderer/automation.yaml'
+import auxWindowEsMX from '@shared/i18n/es-MX/renderer/aux-window.yaml'
+import cdTimerEsMX from '@shared/i18n/es-MX/renderer/cd-timer.yaml'
+import gameAssetsEsMX from '@shared/i18n/es-MX/renderer/game-assets.yaml'
+import leagueClientEsMX from '@shared/i18n/es-MX/renderer/league-client.yaml'
+import matchCardEsMX from '@shared/i18n/es-MX/renderer/match-card.yaml'
+import notificationsEsMX from '@shared/i18n/es-MX/renderer/notifications.yaml'
+import ongoingGameEsMX from '@shared/i18n/es-MX/renderer/ongoing-game.yaml'
+import opggEsMX from '@shared/i18n/es-MX/renderer/opgg.yaml'
+import playerEsMX from '@shared/i18n/es-MX/renderer/player.yaml'
+import rankedEsMX from '@shared/i18n/es-MX/renderer/ranked.yaml'
+import settingsEsMX from '@shared/i18n/es-MX/renderer/settings.yaml'
+import shellEsMX from '@shared/i18n/es-MX/renderer/shell.yaml'
+import toolkitEsMX from '@shared/i18n/es-MX/renderer/toolkit.yaml'
 import commonZhCN from '@shared/i18n/zh-CN/common.yaml'
 import automationZhCN from '@shared/i18n/zh-CN/renderer/automation.yaml'
 import auxWindowZhCN from '@shared/i18n/zh-CN/renderer/aux-window.yaml'
@@ -63,6 +78,23 @@ const rendererEn = mergeRendererResources(
   notificationsEn
 )
 
+const rendererEsMX = mergeRendererResources(
+  shellEsMX,
+  settingsEsMX,
+  automationEsMX,
+  leagueClientEsMX,
+  rankedEsMX,
+  matchCardEsMX,
+  playerEsMX,
+  toolkitEsMX,
+  gameAssetsEsMX,
+  ongoingGameEsMX,
+  auxWindowEsMX,
+  opggEsMX,
+  cdTimerEsMX,
+  notificationsEsMX
+)
+
 const rendererZhCN = mergeRendererResources(
   shellZhCN,
   settingsZhCN,
@@ -82,7 +114,7 @@ const rendererZhCN = mergeRendererResources(
 
 i18next.init({
   lng: 'en',
-  fallbackLng: 'zh-CN',
+  fallbackLng: { 'es-MX': ['en'], default: ['zh-CN'] },
   debug: import.meta.env.DEV,
   interpolation: {
     escapeValue: false
@@ -97,6 +129,10 @@ i18next.init({
     en: {
       renderer: rendererEn,
       common: commonEn
+    },
+    'es-MX': {
+      renderer: rendererEsMX,
+      common: commonEsMX
     }
   }
 })

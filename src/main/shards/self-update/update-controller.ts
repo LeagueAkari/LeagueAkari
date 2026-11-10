@@ -1,5 +1,5 @@
 import { IntervalTask } from '@main/utils/timer'
-import type { AkariApiLanguage } from '@shared/shards/akari-api'
+import { toAkariApiLanguage } from '@shared/shards/akari-api'
 import type { SelfUpdateReleaseInfo } from '@shared/shards/self-update'
 import { compareShallow } from 'mobx'
 
@@ -58,7 +58,7 @@ export class SelfUpdateController {
     this._context.state.setCheckingUpdates(true)
 
     const releaseCheckPromise = this._context.akariApi
-      .updateLatestRelease(this._context.appCommon.settings.locale as AkariApiLanguage)
+      .updateLatestRelease(toAkariApiLanguage(this._context.appCommon.settings.locale))
       .then(() => this._context.state.releaseInfo)
       .finally(() => {
         if (this._releaseCheckPromise !== releaseCheckPromise) {

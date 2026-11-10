@@ -1,0 +1,17 @@
+gameAssets:
+  summonerSpell:
+    cooldown: 'Enfriamiento: {{time}} s'
+    levelRequirement: 'Requiere nivel {{level}}'
+  item:
+    combinePrice: Combinar por {{gold}} de oro
+  augment:
+    bronze: Bronce
+    silver: Plata
+    gold: Oro
+    prismatic: Prismático
+    eventChoice: Elección de evento
+    rarity: '{{rarity}}'
+sharedUi:
+  copyableText:
+    copy: Copiar
+    copied: Copiado al portapapeles

@@ -1,0 +1,192 @@
+tray:
+  about: Acerca de
+  settings: Configuración
+  quit: Salir
+  auxWindow: Ventana auxiliar
+  opggWindow: Ventana de datos de campeones
+  dev:
+    toggleMainWindowDevtools: Alternar DevTools - Ventana principal
+    toggleAuxWindowDevtools: Alternar DevTools - Ventana auxiliar
+    toggleOpggWindowDevtools: Alternar DevTools - Ventana de datos de campeones
+    toggleOngoingGameWindowDevtools: Alternar DevTools - Ventana de partida en curso
+    toggleCdTimerWindowDevtools: Alternar DevTools - Ventana del temporizador de enfriamientos
+  adjustAllWindowPositions: Reajustar la posición de todas las ventanas
+
+windowOpenHandler:
+  toAkari: Ir al GitHub de $t(common:appName) ❤️
+  toExternalLink: Ir al sitio externo {{target}}
+
+auto-gameflow-main:
+  error-auto-honor: 'Error al honrar automáticamente: {{reason}}'
+  error-accept-match: 'Error al aceptar la partida automáticamente: {{reason}}'
+  error-matchmaking: 'No se pudo iniciar la búsqueda automática: {{reason}}'
+  auto-matchmaking-canceled: Búsqueda automática cancelada
+  auto-matchmaking-canceled-wait-for-invitees: Búsqueda automática cancelada, esperando a los invitados
+  auto-matchmaking-canceled-not-leader: Búsqueda automática cancelada, no eres el líder de la sala
+  auto-matchmaking-canceled-wait-for-penalty: Búsqueda automática cancelada, esperando a que termine la penalización
+  auto-matchmaking-in: Búsqueda automática en {{seconds}} segundos
+  skip-leader: Intentando no ser el líder
+  aram-team-side-1: Tu equipo es el 🟦azul (↙️ abajo a la izquierda)
+  aram-team-side-1-tw: Tu equipo es el 🟦azul (↙️ abajo a la izquierda)
+  aram-team-side-2: Tu equipo es el 🟥rojo (↗️ arriba a la derecha)
+  aram-team-side-2-tw: Tu equipo es el 🟥rojo (↗️ arriba a la derecha)
+  auto-invitation-sent: '[$t(common:appName)] Invitación enviada a {{name}}'
+
+auto-select-main:
+  error-pick: 'Error al seleccionar automáticamente el campeón {{champion}}: {{reason}}'
+  error-intent: 'Error al mostrar automáticamente la intención de {{champion}}: {{reason}}'
+  error-ban: 'Error al bloquear automáticamente el campeón {{champion}}: {{reason}}'
+  error-bench-swap: 'Error al intercambiar automáticamente el campeón {{champion}}: {{reason}}'
+  cancel-bench-swap: Se canceló la selección de {{champion}}
+  bench-swap: Se intercambiará {{champion}} en {{seconds}} segundos
+  accept-champion-swap: Se aceptará el intercambio de {{champion}} en {{seconds}} segundos
+  decline-champion-swap: Se rechazará el intercambio de {{champion}} en {{seconds}} segundos
+  show-ban: Se mostrará el bloqueo de {{champion}} en {{seconds}} segundos
+  complete-ban: Se confirmará el bloqueo de {{champion}} en {{seconds}} segundos
+  show-pick: Se mostrará la selección de {{champion}} en {{seconds}} segundos
+  complete-pick: Se confirmará la selección de {{champion}} en {{seconds}} segundos
+  intent-pick: Se mostrará la intención de jugar {{champion}} en {{seconds}} segundos
+  user-takeover: El usuario intervino en el proceso automático
+
+self-update-main:
+  title: Actualización
+  start-update: Iniciando la actualización de $t(common:appName)
+  updateOnQuit: Actualización aplicada. Reinicia la aplicación para completarla
+  lastUpdateSuccess: Actualizado a {{version}}
+
+auto-champ-config-main:
+  summonerSpells:
+    applied: 'Los hechizos de invocador de {{name}} se actualizaron a [{{spell1}}] [{{spell2}}]'
+    appliedWithPosition: 'Los hechizos de invocador de {{name}} - {{position}} se actualizaron a [{{spell1}}] [{{spell2}}]'
+    errorApplied: 'No se pudieron actualizar los hechizos de invocador de {{name}}'
+    errorAppliedWithPosition: 'No se pudieron actualizar los hechizos de invocador de {{name}} - {{position}}'
+
+  runes:
+    pageName: '{{name}}'
+    pageNameWithPosition: '{{name}} - {{position}}'
+    applied: 'Las runas de {{name}} se actualizaron a {{primary}} / {{sub}} ({{all}})'
+    appliedWithPosition: 'Las runas de {{name}} - {{position}} se actualizaron a {{primary}} / {{sub}} ({{all}})'
+    errorApplied: 'No se pudieron actualizar las runas de {{name}}'
+    errorAppliedWithPosition: 'No se pudieron actualizar las runas de {{name}} - {{position}}'
+
+  auto-config-enabled-no-champion: La configuración automática está activada, pero no hay ningún campeón configurado
+  auto-config-enabled: 'Configuración automática activada, campeones configurados: {{names}}'
+
+window-manager-main:
+  aux-window:
+    quickClose:
+      title: ¿No quieres la mini ventana?
+      body: Puedes desactivarla de forma permanente en la configuración (Configuración > Multiventana)
+  download:
+    dialogTitle: Guardar archivo
+    dialogButtonLabel: Guardar
+
+ongoing-game-main:
+  taggedPlayer: Jugador marcado
+
+client-installation-main:
+  jumpList:
+    launchTcls:
+      title: Abrir el cliente TCLS
+      description: Abrir League Akari y el cliente TCLS
+    launchRiot:
+      title: Abrir Riot Client
+      description: Abrir League Akari y Riot Client
+    launchWeGame:
+      title: Abrir WeGame
+      description: Abrir League Akari y WeGame
+
+in-game-send-main:
+  presets:
+    punctuation:
+      lineSeparator: ': '
+      listSeparator: ', '
+      memberSeparator: ', '
+      groupSeparator: ' '
+    common:
+      unknownPosition: Posición desconocida
+      unsetChampion: Campeón pendiente
+      championId: Campeón {{id}}
+      playerBaseLine: '{{position}} {{player}} | {{champion}}'
+      currentChampion: Campeón actual
+      thisChampion: este campeón
+      noChampionSelected: Ningún campeón seleccionado
+      noMainChampions: Sin campeones principales claros
+      championWithPlayer: '{{champion}} ({{player}})'
+      target:
+        friendly: Aliados
+        enemy: Enemigos
+        all: Todos
+      team:
+        friendly: Aliado
+        enemy: Enemigo
+        labelWithName: '{{side}} · {{team}}'
+      selection:
+        empty: '[Seleccionados: ninguno]'
+        summary: '[Seleccionados: {{parts}}]'
+        teamPart: '{{team}} {{count}}'
+        partSeparator: ' / '
+    rating:
+      noRecentMatches: Sin partidas recientes
+      noChampionMatches: Sin partidas recientes con {{champion}}
+      matchCount_one: '{{count}} partida'
+      matchCount_other: '{{count}} partidas'
+      championMatchCount_one: '{{count}} partida con {{champion}}'
+      championMatchCount_other: '{{count}} partidas con {{champion}}'
+      countWithStats: '{{countText}}, {{stats}}'
+      metrics:
+        winRate: Victorias {{value}}
+        kda: KDA {{value}}
+        avgSoloKills: Asesinatos en solitario prom. {{value}}
+        avgVisionScore: Visión {{value}}
+        avgChampionDamage: Daño {{value}}
+        avgDamageTaken: Recibido {{value}}
+        avgGold: Oro {{value}}
+        avgCsPerMinute: Súbditos {{value}}/min
+        avgKillParticipation: PA {{value}}
+        avgDamageGoldEfficiency: Daño/Oro {{value}}
+        mainChampions: Campeones principales [{{champions}}]
+        mainPositions: Posiciones principales [{{positions}}]
+    jungle:
+      noRecords: Sin registros detallados de jungla
+      noChampionRecords: Sin registros detallados de jungla con {{champion}}
+      sampleCount_one: '{{count}} muestra de jungla'
+      sampleCount_other: '{{count}} muestras de jungla'
+      championSampleCount_one: '{{count}} muestra de jungla con {{champion}}'
+      championSampleCount_other: '{{count}} muestras de jungla con {{champion}}'
+      firstDragonAverageTime: ', primer dragón prom. {{time}}'
+      camps:
+        blue: Centinela Azul
+        red: Brambleback Rojo
+        wolves: Lobos
+        raptors: Raptores
+      campRate: '{{camp}} {{rate}}'
+      lanes:
+        top: superior
+        mid: central
+        bot: inferior
+      lanePreference:
+        unclear: sin preferencia clara de carril
+        single: prefiere {{lane}}
+        double: prefiere {{first}}/{{second}}
+      firstClear:
+        normal: estándar
+        invade: invasión
+        blue: lado azul
+        red: lado rojo
+        pattern: '{{side}} {{kind}} {{rate}}{{distribution}}'
+      metrics:
+        activityPreference: Inicio {{preference}}, superior {{top}} central {{mid}} inferior {{bot}}
+        level3Gank: Gank nv. 3 {{value}}
+        level4Gank: Gank nv. 4 {{value}}
+        firstDragon: Primer dragón {{value}}{{time}}
+        avgDragons: Dragones prom. {{value}}
+        monsterControl: Objetivos larvas {{voidgrubs}}/heraldos {{heralds}}/barones {{barons}}
+        mainChampions: Campeones principales [{{champions}}]
+    premade:
+      blueTeamTitle: Premades azules
+      redTeamTitle: Premades rojas
+      teamTitle: Premades
+      blueTeamEmpty: Sin premades en el equipo azul
+      redTeamEmpty: Sin premades en el equipo rojo
+      empty: Sin grupos premade

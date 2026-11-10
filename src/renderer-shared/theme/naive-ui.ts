@@ -4,8 +4,10 @@ import {
   GlobalThemeOverrides,
   darkTheme,
   dateEnUS,
+  dateEsAR,
   dateZhCN,
   enUS,
+  esAR,
   lightTheme,
   zhCN
 } from 'naive-ui'
@@ -18,6 +20,11 @@ export const NAIVE_UI_LOCALE_MAP = {
   en: {
     dateLocale: dateEnUS,
     locale: enUS
+  },
+  // Naive UI ships Latin American Spanish as esAR
+  'es-MX': {
+    dateLocale: dateEsAR,
+    locale: esAR
   }
 }
 

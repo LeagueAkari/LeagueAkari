@@ -606,7 +606,8 @@ const closeActions = computed(() => {
 
 const locales = [
   { label: '中文', value: 'zh-CN' },
-  { label: 'English', value: 'en' }
+  { label: 'English', value: 'en' },
+  { label: 'Español (Latinoamérica)', value: 'es-MX' }
 ]
 
 const lolSourceOptions = [

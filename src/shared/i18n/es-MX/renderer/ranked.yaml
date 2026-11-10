@@ -1,0 +1,20 @@
+ranked:
+  table:
+    queueType: Tipo de cola
+    tier: Nivel
+    leaguePoints: PL
+    ratedRating: Puntuación
+    wins: Victorias
+    losses: Derrotas
+    winRate: '% V'
+    previousSeasonEndTier: Nivel al final de la temporada anterior
+    previousSeasonHighestTier: Nivel más alto de la temporada anterior
+    highestTier: Nivel más alto
+  display:
+    unranked: Sin clasificar
+    win: V
+    lose: D
+    point: P
+    leaguePoint: PL
+    highest: Más alto
+    empty: Sin contenido

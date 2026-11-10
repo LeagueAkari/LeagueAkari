@@ -31,7 +31,7 @@
           >
             <LcuImage class="mr-2 h-4 w-4" :src="group.iconPath" />
             <span class="flex-1 truncate">
-              {{ group.name[app.settings.locale === 'en' ? 'en' : 'zh-CN'] }}
+              {{ group.name[app.settings.locale === 'zh-CN' ? 'zh-CN' : 'en'] }}
             </span>
             <div class="ml-auto flex gap-1">
               <NIcon

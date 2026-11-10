@@ -1,0 +1,126 @@
+auxWindow:
+  titlebar:
+    opgg: Vista OP.GG
+    opggTitle: Ver en OP.GG
+    close: Cerrar
+    minimize: Minimizar
+    indicator: Aux.
+    indicatorTitle: Ventana auxiliar de $t(common:appName)
+    pin: Fijar
+    unpin: Desfijar
+    repositionToAlignLeagueClientUx: Alinear con League Client UX
+  championBench:
+    title: Banca de campeones
+    reroll: 'Cambiar campeón (quedan {{count}})'
+    charity: 'Cambiar y recuperar (quedan {{count}})'
+    notInBenchMode: No estás en un modo con banca
+    notInPhase: No estás en la selección de campeones
+    rerollFailed: Error al cambiar de campeón {{reason}}
+    swapFailed: Error al intercambiar {{reason}}
+    balanceTypes:
+      damage-dealt: Daño infligido
+      damage-taken: Daño recibido
+      healing: Curación
+      shielding: Escudos
+      ability-haste: Velocidad de habilidades
+      mana-regen: Regen. de maná
+      health-regen: Regen. de vida
+      attack-speed: Velocidad de ataque
+      movement-speed: Velocidad de movimiento
+      tenacity: Tenacidad
+      energy-regen: Regen. de energía
+      area-of-effect-damage: Daño en área
+  champSelect:
+    actions:
+      picked: Seleccionado
+      voted: Votado
+      banned: Bloqueado
+      autoPick: Selección auto.
+      autoBan: Bloqueo auto.
+      picking: Seleccionando
+      banning: Bloqueando
+      voting: Votando
+      tenBansRevealing: Revelando bloqueos
+      inProgress: En curso
+      completed: Completado
+      ceremonies:
+        ten_bans_reveal: Revelación de 10 bloqueos
+        TEN_BANS_REVEAL: Revelación de 10 bloqueos
+        phase_transition: Transición de fase
+        vote_transition: Transición de votación
+        team_vote_reveal: Revelación del voto del equipo
+    operations:
+      dodge:
+        label: Salir de la selección de campeones
+        button: Abandonar ahora
+        popconfirm: Esto te sacará de la selección de campeones.
+        positiveText: Salir
+        negativeText: Cancelar
+        cancel: Cancelar
+      temporarilyDisabled:
+        label: Desactivar temporalmente el bloqueo/selección automáticos
+  lounge:
+    operations:
+      immediately: Inmediatamente
+      second: s
+      autoAccept:
+        label: Aceptar automáticamente
+        unavailable: No disponible
+      autoMatchmaking:
+        label: Búsqueda automática
+        unavailable: No disponible
+      autoMatchmakingMinimumMembers:
+        label: Mínimo de miembros
+      autoMatchmakingDelaySeconds:
+        label: Espera antes de buscar
+      autoMatchmakingWaitForInvitees:
+        label: Esperar a los invitados
+    panel:
+      map: Mapa
+      gameMode: Modo
+      wait: Esperando
+      atMost: Como máximo
+      autoAccept:
+        acceptIn: Se aceptará en {{seconds}} s
+        cancelButton: Cancelar esta aceptación automática
+        declineButton: Rechazar partida
+        acceptButton: Aceptar partida
+        accepted: Aceptada
+        pending: Esperando a aceptar la partida
+        subtitle1: Las partidas ya aceptadas aún se pueden rechazar
+        subtitle2: Las partidas ya canceladas aún se pueden aceptar
+        declined: Rechazada
+      matchmaking:
+        stopAndDisable: Detener la búsqueda y desactivar la búsqueda automática
+        stop: Detener la búsqueda
+        cancel: Cancelar esta búsqueda automática
+        searching: Buscando
+        searchIn: Buscando {{seconds}} s
+        waitingForPenalty: Esperando la penalización por abandono {{seconds}} s
+        waitingForMembers_one: La búsqueda automática requiere {{count}} jugador
+        waitingForMembers_other: La búsqueda automática requiere {{count}} jugadores
+        waitingForInvitees: Esperando a los miembros invitados
+  skinSelection:
+    skins_one: '{{count}} aspecto disponible'
+    skins_other: '{{count}} aspectos disponibles'
+    button: Aplicar
+    success: Aspecto aplicado
+    failed: No se pudo aplicar el aspecto
+  placeholder:
+    inProgress: En curso
+    idle: Sin actividades en curso
+    spectating: Espectando
+  automationPlan:
+    autoPick:
+      title: Selección automática
+      willPick: Seleccionará
+    autoBan:
+      title: Bloqueo automático
+      willBan: Bloqueará
+    autoBenchSwap:
+      title: Intercambio automático de banca
+      willSwap: Intercambiará
+    autoChampionSwap:
+      title: Intercambio automático de campeón
+      willAccept: Aceptará
+      willDecline: Rechazará

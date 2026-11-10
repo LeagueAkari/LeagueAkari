@@ -1,0 +1,533 @@
+settings:
+  modal:
+    title: Configuración
+  commandPalette:
+    searchPlaceholder: Buscar en la configuración
+    searchAriaLabel: Buscar en la configuración
+    empty: Ninguna opción coincide
+    openHint: Abrir
+    closeHint: Cerrar
+  app:
+    title: Aplicación
+    basic:
+      title: Básico
+      locale:
+        label: Idioma
+        description: Elige el idioma principal de League Akari
+      mainWindowCloseAction:
+        label: Al cerrar la ventana principal
+        description: La acción que se realiza al cerrar la ventana principal
+        options:
+          minimize-to-tray: Minimizar a la bandeja
+          quit: Salir
+          ask: Preguntar siempre
+      preferredLolSource:
+        label: Fuente de datos preferida
+        description: Elige la fuente de datos preferida de la API de League of Legends
+        howToChoose: ¿Cómo elegir?
+        unsupported: 'API SGP no compatible: {{server}}'
+        options:
+          sgp: API SGP
+          lcu: API LCU
+        tip:
+          sgp:
+            title: API SGP
+            feature1: Consultas rápidas con respuesta ágil
+            feature2: Ofrece datos de partidas más detallados
+            feature3: Permite consultar historiales de otras regiones en los servidores de China continental
+            warning: Si usas una VPN o un acelerador para jugar en servidores extranjeros, la conexión puede fallar o ser muy lenta
+          lcu:
+            title: API LCU (local del cliente)
+            feature1: Muy estable, no depende de la red
+            feature2: Fiable aunque uses una VPN o un acelerador
+            warning: 'Problema conocido: consultar historiales durante la selección de campeones puede cerrar el cliente del juego'
+      theme:
+        label: Tema
+        description: Tema de color de $t(common:appName)
+        groups:
+          system: Sistema
+          brightBuiltin: Claros
+          darkBuiltin: Oscuros
+        tone:
+          light: Claro
+          dark: Oscuro
+        options:
+          default: Seguir al sistema
+          light: Claro
+          dark: Oscuro
+          graphite: Azul grafito
+          cyber: Neón cyber
+          sakura: Rosa sakura
+          mint: Verde menta
+          aurora: Violeta aurora
+          butter: Amarillo mantequilla
+    selfUpdate:
+      title: Actualizaciones
+      temporarilyUnsupported: Las actualizaciones desde la aplicación no están disponibles en esta plataforma. La comprobación y las actualizaciones automáticas están desactivadas.
+      autoCheckUpdates:
+        label: Buscar actualizaciones automáticamente
+        description: Comprueba periódicamente si hay versiones nuevas
+      autoDownloadUpdates:
+        label: Descargar actualizaciones automáticamente
+        description: Inicia la actualización automáticamente cuando se detecta una versión nueva
+      checkUpdates: Buscar actualizaciones
+      currentRelease: Versión actual
+      downloadRelease: Descargar versión
+      newRelease: Versión nueva
+      cancelUpdate: Cancelar actualización
+      restartNow: Reiniciar ahora
+      updateProgress:
+        label: Progreso de la actualización
+        description: La actualización en curso
+        downloading: Descargando el paquete de actualización
+        finished: Completado {{progress}}%
+        remain: Quedan {{time}}
+        downloadFailed: Error en la descarga
+        waitingForRestart: Esperando el reinicio
+        waitingForRestartDescription: La actualización automática se realizará después de cerrar la aplicación
+      checkUpdatesResult:
+        no-updates: No hay versiones nuevas
+        new-updates: Hay una versión nueva disponible
+        failed: Error al buscar actualizaciones {{reason}}
+      updateDir:
+        label: Carpeta de actualización
+        description: La ubicación de la actualización descargada. Si no se puede completar la actualización automática, tendrás que actualizar manualmente
+        open: Abrir
+    mainWindowUi:
+      title: Interfaz de la ventana principal
+      background:
+        label: Fondo
+        description: Elige el modo de fondo de la ventana principal
+        options:
+          profileSkin: Fondo de campeón
+          customImage: Fondo personalizado
+          none: Predeterminado
+          system: Material del sistema
+        tooltips:
+          profileSkin: Usa el aspecto de fondo del perfil del jugador actual como fondo de la ventana principal
+          system: Usa Mica en Windows y el desenfoque nativo de la ventana en macOS. Si no está disponible o falla, vuelve al fondo sólido predeterminado
+      customBackground:
+        label: Fondo personalizado
+        description: Usa una imagen o un video local como fondo fijo. El fondo se recorta desde el centro
+        filePath: Ruta del archivo
+        filePlaceholder: Ningún archivo de fondo seleccionado
+        browse: Examinar
+        overlayStrength: Intensidad de la capa
+      backgroundMaterial:
+        label: Material del fondo
+        description: Elige el material del fondo de la interfaz; requiere una versión del sistema compatible
+        options:
+          none: Ninguno
+          system: Material del sistema
+          systemUnsupported: Material del sistema (no compatible)
+    lcConnection:
+      title: Conexión con LCU
+      autoConnect:
+        label: Conectar automáticamente
+        description: Se conecta automáticamente al cliente cuando solo hay uno abierto
+      useWmi:
+        label: Usar WMIC
+        description: Usa WMIC para obtener la línea de comandos del cliente en lugar del método predeterminado de la API de Win32. Requiere privilegios de administrador
+      rebuildWmi:
+        label: Reconstruir WMI
+        description: Si WMIC no funciona bien, prueba esto
+        rebuildButton: Reconstruir WMI
+    httpProxy:
+      title: Proxy de red
+      strategy:
+        label: Proxy HTTP
+        description: Configura el proxy de las peticiones de red de toda la aplicación, incluidos datos, imágenes y descargas de actualizaciones. Las conexiones locales con el cliente no se ven afectadas
+        options:
+          fixed-servers: Proxy manual
+          system: Seguir al sistema
+          direct: Desactivado
+      host:
+        label: Host del proxy
+        description: El host del servidor proxy
+      port:
+        label: Puerto del proxy
+        description: El puerto del servidor proxy
+    misc:
+      title: Varios
+      logLevel:
+        label: Nivel de registro
+        description: Elige el nivel de registro de la aplicación
+      disableHardwareAcceleration:
+        label: Desactivar la aceleración por hardware
+        description: Desactiva la aceleración por hardware, lo que puede solucionar algunos problemas de renderizado, como el texto borroso
+      disableHardwareAccelerationDialog:
+        enableText: Activar la aceleración por hardware
+        disableText: Desactivar la aceleración por hardware
+        disableConfirmation: Se desactivará la aceleración por hardware; reinicia la aplicación para aplicar el cambio
+        enableConfirmation: Se activará la aceleración por hardware; reinicia la aplicación para aplicar el cambio
+        positiveText: Reiniciar y salir
+        negativeText: Cancelar
+      uninstallApp:
+        label: Desinstalar la aplicación
+        description: Desinstala la aplicación, lo que borrará todos los datos y la configuración
+        button: Desinstalar la aplicación
+        title: Desinstalar la aplicación
+        content: ¿Seguro que quieres desinstalar $t(common:appName)? También se borrarán todos los datos de la aplicación.
+        positiveText: Desinstalar
+        negativeText: Cancelar
+  matchHistory:
+    title: Pestañas del historial
+    refreshTabsAfterGameEnds:
+      label: Actualizar las pestañas al terminar la partida
+      description: Actualiza automáticamente las pestañas del historial cuando termina la partida. Por el retraso del servidor remoto, puede que no se actualicen a tiempo
+    loadCount:
+      label: Partidas a cargar
+      description: Número de partidas que se cargan en cada pestaña del historial.
+    showJunglePathing:
+      label: Activar las rutas de jungla
+      description: Muestra el acceso y la tarjeta de análisis de rutas de jungla en las páginas del historial.
+  ongoingGame:
+    title: Partida en curso
+    titleCommon: Partida en curso
+    titlePlayerCard: Tarjeta de jugador
+    enabled:
+      label: Activar
+      description: Analiza la partida al entrar en la selección de campeones o durante la partida.
+    autoRouteWhenGameStarts:
+      label: Ir a la partida en curso automáticamente
+      description: Cambia automáticamente a la página de partida en curso al entrar en la selección de campeones o al empezar la partida. No se aplica en la sala.
+    matchHistoryLoadCount:
+      label: Partidas del historial a cargar
+      description: Número de partidas que se consultan para analizar el desempeño de cada jugador en la página de la partida.
+    concurrency:
+      label: Límite de peticiones simultáneas
+      description: Limita el total de peticiones de red simultáneas durante el análisis de la partida. No afecta a los límites de otros módulos.
+    matchHistoryTagPreference:
+      label: Filtro de cola preferido
+      description: Filtro de cola preferido al cargar el historial con la API SGP.
+      options:
+        all: Todos los modos
+        current: Modo actual
+    queryInLobbyPhase:
+      label: Consultar en la sala
+      description: Además de en la selección de campeones y durante la partida, también puedes ver los datos de todos los miembros de la sala.
+    premadeTeamInferMatchCountThreshold:
+      label: Partidas mínimas para detectar premades
+      description: Número mínimo de partidas juntos para confirmar que son un grupo premade.
+    gameDetailsLoadCount:
+      label: Detalles de partidas a cargar
+      description_one: Se cargará además la información detallada de la primera {{count}} partida para el análisis.
+      description_other: Se cargará además la información detallada de las primeras {{count}} partidas para el análisis.
+    jungleAnalysisMatchHistoryLoadCount:
+      label: Partidas del historial para el análisis de jungla
+      description_one: El análisis de jungla puede seguir consultando el historial hasta la primera {{count}} partida para reunir 20 muestras de jungla del campeón actual y 50 en total.
+      description_other: El análisis de jungla puede seguir consultando el historial hasta las primeras {{count}} partidas para reunir 20 muestras de jungla del campeón actual y 50 en total.
+    showRecentlyUsedChampions:
+      label: Mostrar campeones usados recientemente
+      description: Muestra los campeones usados recientemente en la tarjeta del jugador.
+    showChampionUsage:
+      label: Mostrar uso de campeones
+      description: Muestra el uso de campeones en la tarjeta del jugador.
+      options:
+        none: Nada
+        recent: Usados recientemente
+        mastery: Nivel de maestría
+    showJunglePathing:
+      label: Activar las rutas de jungla
+      description: Muestra el análisis de rutas de jungla en las tarjetas de jugador de la partida en curso.
+    showMatchHistoryItemBorder:
+      label: Mostrar el borde de cada partida
+      description: Muestra un borde alrededor de cada partida del historial.
+    playerCardTags:
+      label: Etiquetas de la tarjeta de jugador
+      description: Estas etiquetas se mostrarán en las tarjetas de jugador
+      tags:
+        showPremadeTeamTag:
+          label: Texto de grupo premade
+        showWinningStreakTag:
+          label: Racha de victorias
+        showLosingStreakTag:
+          label: Racha de derrotas
+        showSoloKillsTag:
+          label: Asesinatos en solitario promedio por partida
+        showEasyGankTag:
+          label: Etiqueta de fácil/difícil de gankear
+        showAverageTeamDamageTag:
+          label: Porcentaje de daño del equipo promedio
+        showAverageTeamDamageTakenTag:
+          label: Porcentaje de daño recibido del equipo promedio
+        showSuspiciousFlashPositionTag:
+          label: Detección de tecla de Destello inusual
+        showAverageTeamGoldTag:
+          label: Porcentaje de oro del equipo promedio
+        showAverageCsPerMinuteTag:
+          label: Súbditos por minuto promedio
+        showGreatPerformanceTag:
+          label: Etiqueta de desempeño destacado
+        showMetTag:
+          label: Jugadores con los que ya coincidiste
+        showTaggedTag:
+          label: Jugadores marcados
+        showSelfTag:
+          label: Etiqueta propia
+        showWinRateTeamTag:
+          label: Etiqueta de tasa de victorias alta
+        showAverageDamageGoldEfficiencyTag:
+          label: Etiqueta de eficiencia daño-oro
+        showPrivacyTag:
+          label: Etiqueta de perfil oculto
+        showAverageEnemyMissingPingsTag:
+          label: Pings de enemigo desaparecido promedio
+        showAverageVisionScoreTag:
+          label: Puntuación de visión promedio
+        showAkariScoreTag:
+          label: Puntuación Akari
+        showAverageKillDamageEfficiencyTag:
+          label: Eficiencia asesinatos-daño promedio
+  multiWindow:
+    title: Multiventana
+    auxWindow:
+      title: Ventana auxiliar
+      enabled:
+        label: Activar la ventana auxiliar
+        description: Usa una ventana pequeña en ciertas fases de la partida para mostrar el estado y ofrecer acciones adicionales.
+        descriptionWithIcon: Se puede abrir con el icono rápido a la derecha de la barra de título ({icon}) o con clic derecho en el icono de la bandeja y eligiendo "Ventana auxiliar").
+      autoShow:
+        label: Mostrar y cerrar automáticamente
+        description: Muestra o cierra automáticamente la ventana auxiliar en ciertas fases de la partida.
+      opacity:
+        label: Opacidad de la ventana
+        description: Ajusta la transparencia de la ventana auxiliar.
+      resetWindowPosition:
+        label: Restablecer la posición de la ventana
+        description: Devuelve la ventana auxiliar a su posición predeterminada en el centro de la pantalla principal.
+        button: Restablecer
+    opggWindow:
+      title: Ventana de datos de campeones
+      enabled:
+        label: Activar los datos de campeones
+        description: Consulta datos de campeones de OP.GG o 101 (CN)
+        descriptionWithIcon: Ábrela con el icono rápido a la derecha de la barra de título ({icon}) o desde "Ventana de datos de campeones" en el menú de la bandeja.
+      autoShow:
+        label: Mostrar y cerrar automáticamente
+        description: Muestra o cierra automáticamente la ventana de datos de campeones en ciertas fases de la partida.
+      opacity:
+        label: Opacidad de la ventana
+        description: Ajusta la transparencia de la ventana de datos de campeones.
+      resetWindowPosition:
+        label: Restablecer la posición de la ventana
+        description: Devuelve la ventana de datos de campeones a su posición predeterminada en el centro de la pantalla principal.
+        button: Restablecer
+      showShortcut:
+        label: Atajo para mostrar
+        description: Usa el atajo de teclado para mostrar u ocultar la ventana de datos de campeones. Si el juego está en primer plano, se fijará automáticamente. Asegúrate de que el juego esté en modo sin bordes o en ventana para que se vea correctamente.
+      showSkinSelector:
+        label: Selector de aspectos
+        description: Muestra la selección rápida de aspectos en el asistente de selección de campeones.
+    ongoingGameWindow:
+      title: Ventana superpuesta de la partida en curso
+      titleRequireAdmin: Ventana superpuesta de la partida en curso (requiere administrador)
+      enabled:
+        label: Activar la ventana de la partida en curso
+        description: Muestra una ventana superpuesta durante la partida con información de la partida en curso. Requiere que el cliente del juego esté en modo ventana o sin bordes.
+      showShortcut:
+        label: Atajo para mostrar
+        description: Mantén pulsado el atajo para mostrar la ventana superpuesta durante la partida
+    cdTimerWindow:
+      title: Ventana superpuesta de temporizadores
+      titleRequireAdmin: Ventana superpuesta de temporizadores (requiere administrador)
+      description:
+        lineA: Los temporizadores de hechizos de invocador enemigos solo están disponibles en los modos compatibles
+        leftClick1: Clic izquierdo
+        leftClick2: Inicia o detiene este temporizador
+        rightDoubleClick1: Doble clic derecho
+        rightDoubleClick2: Envía al chat de la partida un temporizador de hechizo ya iniciado
+        wheel1: Rueda
+        wheel2: Ajusta el tiempo de un temporizador ya iniciado
+      enabled:
+        label: Activar la ventana de temporizadores
+        description: Muestra una ventana superpuesta durante la partida con temporizadores. Requiere que el cliente del juego esté en modo ventana o sin bordes.
+      showShortcut:
+        label: Atajo para mostrar
+        description: Usa el atajo de teclado para mostrar u ocultar la ventana superpuesta
+      resetWindowPosition:
+        label: Restablecer la posición de la ventana
+        description: Devuelve la ventana de temporizadores al centro de la pantalla principal.
+        button: Restablecer
+      timerType:
+        label: Tipo de temporizador
+        description: Elige el tipo de temporizador. La cuenta regresiva usa el tiempo predefinido de los hechizos de invocador (puede tener errores), mientras que el cronómetro empieza desde 0. Los temporizadores personalizados siempre usan el cronómetro.
+        options:
+          countdown: Cuenta regresiva
+          countup: Cronómetro
+      reverseAdjustmentDirection:
+        label: Invertir la dirección del ajuste
+        description: Invierte la dirección del ajuste del temporizador. Al subir la rueda el tiempo disminuye, y al bajarla aumenta. Solo se aplica cuando el tipo de temporizador es Cronómetro.
+  misc:
+    title: Varios
+    respawnTimer:
+      title: Temporizador de reaparición
+      enabled:
+        label: Activar
+        description: Muestra un indicador en la barra lateral con el tiempo que falta para reaparecer.
+    streamerMode:
+      title: Modo streamer
+      streamerMode:
+        label: Ocultar información sensible
+        description: Oculta información sensible, como el nombre del jugador, en la interfaz de la aplicación.
+      useAkariStyledName:
+        label: Usar nombres al estilo Akari
+        description: Usa nombres al estilo Akari como sustitutos de los invocadores.
+      contentProtection:
+        label: Protección de contenido
+        description: Activa la protección de contenido para impedir que otras aplicaciones capturen la ventana. Esto puede afectar al uso normal de algunas herramientas de grabación de pantalla.
+  debug:
+    title: Depuración
+    electron:
+      title: Electron de Akari
+      devTools:
+        label: Herramientas de desarrollo
+        description: Alternar DevTools
+        button: Alternar DevTools
+      reload:
+        label: Recargar la página
+        description: Actualiza la interfaz de $t(common:appName).
+        button: Recargar la página
+    files:
+      title: Carpetas
+      logs:
+        label: Carpeta de registros
+        description: Abre la carpeta de registros.
+        button: Carpeta de registros
+      appData:
+        label: Carpeta de datos de la aplicación
+        popoverTrigger: Detalles
+        button: Abrir carpeta
+        description:
+          full: Abre la carpeta donde $t(common:appName) guarda sus datos. Se crea la primera vez que abres la aplicación; si la borras, se perderá todo lo guardado. {details}
+          part2: Contiene la configuración del usuario, los jugadores marcados y otra información.
+          part3: Archivos temporales de las próximas actualizaciones automáticas.
+          part4: Archivos de configuración editables.
+          part5: Archivos de configuración especiales.
+    lcuEvent:
+      label: Mostrar los eventos de LCU en la consola
+      printAll: Mostrar todos los eventos
+      logAll: Guardar todos los eventos en un archivo
+      addRule: Añadir regla
+      empty: Sin reglas
+      enable: Activar
+      rule: Regla
+      delete: Borrar
+      modal:
+        title: Añadir regla
+        button: Añadir
+        placeholder: Escribe una regla de coincidencia, por ejemplo /path/:name/to
+    lcuConnection:
+      titleConnected: LCU
+      titleDisconnected: LCU (desconectado)
+      port: Puerto
+      pid: ID de proceso
+      auth: Clave de autenticación
+      rsoPlatform: Plataforma
+      region: Región
+    gameflow:
+      title: Flujo de partida
+      unavailable: No disponible (desconectado)
+      Matchmaking: Buscando partida
+      ChampSelect: En la selección de campeones
+      ReadyCheck: Confirmando partida
+      InProgress: Partida en curso
+      EndOfGame: Fin de la partida
+      Lobby: Sala
+      GameStart: Inicio de la partida
+      None: Ninguno
+      Reconnect: Reconectando
+      WaitingForStats: Esperando las estadísticas
+      PreEndOfGame: Antes del fin de la partida
+      WatchInProgress: Espectando
+      TerminatedInError: Terminado con error
+    inAdministrator:
+      description: $t(common:appName) se está ejecutando con privilegios de administrador.
+    testPage:
+      label: Página de pruebas
+      description: Muestra la página "Prueba" en la barra lateral para que los desarrolladores prueben distintas funciones
+  storage:
+    title: Almacenamiento
+    tabs:
+      settings: Configuración
+      tagged-players: Jugadores marcados
+  savedSettings:
+    title: Configuración
+    export:
+      label: Exportar configuración
+      description: Exporta la configuración actual de la aplicación a un archivo JSON
+      button: Exportar
+    import:
+      label: Importar configuración
+      description: Importa la configuración desde un archivo JSON
+      dialogWarning: Al importar se sobrescribirá la configuración actual y se reiniciará la aplicación. ¿Quieres continuar?
+      dialogPositiveText: Importar
+      dialogNegativeText: Cancelar
+      button: Importar
+    errorCode:
+      InvalidSettingsFile: Archivo de configuración no válido
+      InvalidDatabaseVersion: La versión del archivo de configuración no es compatible
+      importDefault: 'Error al importar la configuración: {{reason}}'
+    exported: 'Configuración exportada: {{path}}'
+    errorExport: 'Error al exportar la configuración: {{reason}}'
+  taggedPlayers:
+    editModal:
+      title: Editar jugador marcado
+      inputPlaceholder: Edita esta etiqueta
+    columns:
+      tagger: Marcado por
+      tagged: Marcado
+      tag: Etiqueta
+      sgpServer: Servidor
+    refreshButton: Actualizar
+    onlyCurrentAccountCheckbox: Solo la cuenta actual
+    na: (No disponible) {{truncatedPuuid}}...
+    player: 'Jugador: {{puuid}}'
+    empty: (Vacío)
+    naPopoverContent: No se puede obtener la información de este invocador porque el servidor no está disponible o no se cargó
+    saveButton: Guardar
+    cancelButton: Cancelar
+    editButton: Editar
+    deleteButton: Borrar
+    importButton: Importar
+    exportButton: Exportar
+    streamerModeWarning: Se mostrará información sensible
+    showButton: Mostrar
+    deletePopconfirmContent: ¿Confirmas el borrado? No se puede deshacer
+    updated: Actualizado
+    updateFailed: Error al actualizar {{reason}}
+    errorCode:
+      InvalidTaggedPlayersFile: Archivo no válido
+      InvalidDatabaseVersion: La versión del archivo no es compatible
+      importDefault: 'Error al importar los jugadores marcados: {{reason}}'
+    exported: 'Jugadores marcados exportados: {{path}}'
+    imported: 'Jugadores marcados importados: {{path}}'
+    errorExport: 'Error al exportar los jugadores marcados: {{reason}}'
+  about:
+    title: Acerca de
+    descriptionBefore: ' es un software de código abierto que ofrece funciones adicionales para mejorar la experiencia de juego en League of Legends; casi todo su funcionamiento se apoya en'
+    actions:
+      github: GitHub
+    stats:
+      stars: Estrellas en GitHub
+      version: Versión
+      license: Licencia
+      loading: Cargando
+      unknown: Desconocido
+      rabiTag: Beta
+    copyright: © 2026 Hanxven. Este software es de código abierto y usa la licencia MIT.
+  shortcutSelector:
+    title: Grabar atajo
+    hint: Pulsa las teclas para grabar el atajo
+    clear: Borrar
+    unset: Sin asignar
+    tooComplicated: Esta combinación de teclas es muy compleja, confírmala
+    notRunAsAdministrator: No se está ejecutando como administrador, no se pueden usar atajos de teclado
+    nativeGlobalShortcutsWindowsOnly: Los atajos globales nativos requieren complementos nativos. Por ahora esta versión solo los incluye en Windows.
+    nativeInputInitializationFailed: Falló el inicio de la entrada nativa, por lo que se desactivaron los atajos. Comprueba si algún software de seguridad bloqueó el componente y reinicia la aplicación.
+    reservedShortcut: Esta combinación de teclas está reservada
+    beingOccupied: Esta combinación de teclas ya está en uso
+    unchanged: (Sin cambios)
+    ok: Confirmar
+    cancel: Cancelar
+    select: Seleccionar

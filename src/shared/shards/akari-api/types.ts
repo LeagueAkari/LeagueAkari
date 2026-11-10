@@ -20,6 +20,11 @@ export interface AkariApiBootstrapDocument {
 export type AkariApiLanguage = 'zh-CN' | 'en'
 export const DEFAULT_AKARI_API_LANGUAGE: AkariApiLanguage = 'zh-CN'
 
+/** The Akari API only serves Chinese and English; other app locales use English. */
+export function toAkariApiLanguage(locale: string): AkariApiLanguage {
+  return locale === 'zh-CN' ? 'zh-CN' : 'en'
+}
+
 export type AkariNoticeSeverity = 'low' | 'medium' | 'high'
 
 export interface AkariNotice {
