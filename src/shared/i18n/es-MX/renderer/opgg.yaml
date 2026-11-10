@@ -1,0 +1,201 @@
+opgg:
+  titlebar:
+    title: Datos de campeones
+    close: Cerrar
+    minimize: Minimizar
+    pin: Fijar
+    unpin: Desfijar
+    repositionToAlignLeagueClientUx: Alinear con League Client UX
+  filters:
+    source: Fuente de datos
+    openSource: Abrir {{source}}
+    refresh: Actualizar
+    champions: Nivel
+    champion: Campeón
+    empty: Ninguno
+    mode: Modo
+    region: Región
+    rankTier: Rango
+    position: Posición
+    version: Versión
+    sourceActive: 'Fuente actual: {{source}}'
+    sourceFallback: 'La fuente preferida no está disponible; se cambió a {{source}}'
+    sources:
+      opgg: OP.GG
+      qq101: 101 (CN)
+    modes:
+      ranked: Clasificatoria
+      classic: Clásico
+      aram: ARAM
+      aram_mayhem: 'ARAM: Caos'
+      arena: Arena
+      nexus_blitz: Frenesí en el Nexo
+      urf: URF
+      none: Ninguno
+    positions:
+      top: Superior
+      jungle: Jungla
+      mid: Central
+      adc: Tirador
+      support: Soporte
+      none: Ninguna
+    regions:
+      global: Global
+      na: Norteamérica
+      euw: Europa Occidental
+      kr: Corea
+      br: Brasil
+      eune: Europa Nórdica y del Este
+      jp: Japón
+      lan: Latinoamérica Norte
+      las: Latinoamérica Sur
+      oce: Oceanía
+      tr: Turquía
+      ru: Rusia
+      sg: Singapur
+      id: Indonesia
+      ph: Filipinas
+      th: Tailandia
+      vn: Vietnam
+      tw: Taiwán
+      me: Medio Oriente
+    tiers:
+      all: Todos los rangos
+      ibsg: Oro -
+      gold_plus: Oro +
+      platinum_plus: Platino +
+      emerald_plus: Esmeralda +
+      diamond_plus: Diamante +
+      master: Maestro
+      master_plus: Maestro +
+      grandmaster: Gran Maestro
+      challenger: Retador
+    settings:
+      button: Configuración
+  mayhemOverview:
+    dataDate: Datos del {{date}}
+    noDataToday: No hay datos para esta fecha
+    sections:
+      champions: Campeones
+      augments: Aumentos
+      synergies: Combinaciones
+    columns:
+      augment: Aumento
+      rarity: Rareza
+      bestChampions: Mejores campeones
+      combination: Combinación
+  workspace:
+    data: Datos de campeones
+    champSelect: Selección de campeones
+  champSelectAssistant:
+    status: Asistente de selección de campeones
+    active: Activo
+    waitingForChampion: Esperando campeón
+  championTable:
+    searchPlaceholder: Buscar por nombre
+    columns:
+      champion: Nombre
+      tier: Nivel
+      winRate: '% V'
+      pickRate: '% S'
+      counter: Counters
+      banRate: '% B'
+    cancel: Cancelar
+  view:
+    replace: Reemplazar
+    create: Crear
+    noVersionFound: No se encontró ninguna versión
+    dataUnavailable: La fuente seleccionada no admite este modo o no está disponible
+    settings:
+      title: Configuración de datos de campeones
+      enabled:
+        label: Activar
+        description: Activa la ventana de datos de campeones. Si la desactivas, puedes volver a abrirla desde la configuración principal
+      defaultSource:
+        label: Fuente de datos predeterminada
+        description: La fuente preferida al abrir la ventana; las fuentes no disponibles aparecen desactivadas
+      flashPosition:
+        label: Posición preferida de Destello
+        description: La tecla para Destello al configurar los hechizos de invocador
+        auto: Posición actual
+        options:
+          d: Destello en la D por defecto
+          f: Destello en la F por defecto
+          auto: Según la posición actual de Destello
+      autoApplyRunes:
+        label: Aplicar runas automáticamente
+        description: Aplica automáticamente las runas con mayor tasa de selección si los datos del campeón coinciden con el modo actual. Solo funciona cuando la ventana de datos de campeones está activada y visible
+      autoApplySpells:
+        label: Aplicar hechizos de invocador automáticamente
+        description: Aplica automáticamente los hechizos de invocador con mayor tasa de selección si los datos del campeón coinciden con el modo actual. Solo funciona cuando la ventana de datos de campeones está activada y visible
+      autoApplyItems:
+        label: Aplicar objetos automáticamente
+        description: Aplica automáticamente los armados de objetos si los datos del campeón coinciden con el modo actual. Solo funciona cuando la ventana de datos de campeones está activada y visible
+    success: 'Solicitud enviada: {{reason}}'
+    summonerSpells: Hechizos de invocador
+    runes: Runas
+    setSpellsFailedMessage: 'No se pudieron configurar los hechizos de invocador: {{reason}}'
+    setRunesFailedMessage: 'No se pudieron configurar las runas: {{reason}}'
+    spellsSet: '[$t(common:appName)] Hechizos de invocador configurados: {{spell1}} | {{spell2}}'
+    runesSet: '[$t(common:appName)] {{action}} página de runas: {{name}}'
+    sessionChampions:
+      title: Campeones de la sesión
+  champion:
+    boots: Botas
+    adorableRabi: Conejito kawaii
+    avgPlace: Puesto prom.
+    1st: 1.er lugar
+    winRate: Tasa de victorias
+    pickRate: Tasa de selección
+    plays: Partidas totales
+    banRate: Tasa de bloqueo
+    counter: Counter
+    allCounters: Todos
+    counterC: Counter
+    allC: Todos
+    empty: No hay datos disponibles
+    times: '{{times}} partidas'
+    showAll: Mostrar todo
+    spells: Hechizos de invocador
+    apply: Aplicar
+    runes: Runas
+    abilityBuild: Orden de habilidades
+    starterItemText: Objetos iniciales
+    prismItemText: Objetos prismáticos
+    coreItemText: Objetos principales
+    itemText: Objetos
+    tierText: T{{tier}}
+    applyRunes: Importar el armado de objetos actual
+    applyRunesText: Armado aplicado
+    augmentAll: Todos
+    augmentGold: Oro
+    augmentSilver: Plata
+    augmentPrism: Prism.
+    augmentPerformance: Desemp.
+    augmentPopular: Popular
+    augmentSort:
+      default: Predeterminado
+      performance: Desempeño
+      popular: Popularidad
+    showAdvancedStats: Ver avanzado
+    synergies: Sinergias
+    balance:
+      title: Equilibrio
+      attack_speed: Velocidad de ataque
+      damage_dealt: Daño infligido
+      damage_taken: Daño recibido
+      cooldown_reduction: Reducción de enfriamiento
+      healing: Curación
+      tenacity: Tenacidad
+      shield_amount: Escudos
+      energy_regen: Regen. de energía
+      area_of_effect_damage: Daño en área
+    writeToDisk: '[$t(common:appName)] Guardado en el armado de objetos: {{name}}'
+    writtenToDisk: Archivo guardado correctamente
+    writeFileFailedMessage: No se pudo guardar el archivo {{reason}}
+    bootsDesc: Botas (por tasa de selección)
+    prismItemsDesc: Objetos prismáticos (por tasa de selección)
+    itemsDesc: Objetos (por tasa de selección)
+    coreItem: 'Objeto principal #{{index}} | Tasa de selección {{pickRate}}%'
+    starterItem: 'Objeto inicial #{{index}} | Tasa de selección {{pickRate}}%'
+    cancel: Cancelar

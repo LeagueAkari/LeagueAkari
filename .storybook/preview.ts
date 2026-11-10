@@ -17,6 +17,7 @@ import {
 import { type AppThemeId, getThemeColorTheme } from '@shared/types/app-theme'
 import { type Preview, setup } from '@storybook/vue3-vite'
 import dayjs from 'dayjs'
+import 'dayjs/locale/es-mx'
 import 'dayjs/locale/zh-cn'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -63,7 +64,8 @@ const preview: Preview = {
         icon: 'globe',
         items: [
           { value: 'zh-CN', title: 'zh-CN' },
-          { value: 'en', title: 'en' }
+          { value: 'en', title: 'en' },
+          { value: 'es-MX', title: 'es-MX' }
         ]
       }
     }
@@ -92,7 +94,9 @@ const preview: Preview = {
           return THEME_IDS.includes(value) ? value : 'dark'
         })
         const colorTheme = computed(() => getThemeColorTheme(themeId.value))
-        const locale = computed(() => (context.globals.locale === 'zh-CN' ? 'zh-CN' : 'en'))
+        const locale = computed(() =>
+          ['zh-CN', 'es-MX'].includes(context.globals.locale) ? context.globals.locale : 'en'
+        )
         const naiveUiTheme = computed(() => getNaiveUiTheme(colorTheme.value))
         const naiveUiThemeOverrides = computed(() => getNaiveUiThemeOverrides(themeId.value))
         const naiveUiLocale = computed(() => getNaiveUiLocale(locale.value))

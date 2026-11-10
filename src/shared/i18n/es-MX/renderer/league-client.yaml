@@ -1,0 +1,25 @@
+leagueClient:
+  connection:
+    noData: Sin datos
+    connectedGroup: Conectado
+    launchedClientsGroup: Clientes abiertos
+    launchedOtherClientsGroup: Otros clientes abiertos
+    noClientGroup: Ningún cliente disponible
+    noClient: No hay ningún cliente disponible, abre el cliente
+    connecting: Conectando...
+    restartUx: Reiniciar UX
+    killUx: Cerrar UX
+    launchUx: Abrir UX
+    quitClient: Cerrar el proceso del cliente
+    disconnect: Desconectar
+    more: Más
+    playAgain: Jugar de nuevo
+  tasks:
+    initialization-task:
+      name: Inicialización de LCU
+      current: Completado {{finishedCount}}/{{allCount}}
+    connection-task:
+      name: Conectar a LCU
+      target: Intentando conectar a {{target}}...
+selfHostedLcuData:
+  reloadFriendsFailed: No se pudo recargar la lista de amigos

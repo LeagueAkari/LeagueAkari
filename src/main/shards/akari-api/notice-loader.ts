@@ -1,8 +1,8 @@
 import { IntervalTask } from '@main/utils/timer'
 import {
-  type AkariApiLanguage,
   AkariContactChannelsSchema,
-  AkariNoticeSchema
+  AkariNoticeSchema,
+  toAkariApiLanguage
 } from '@shared/shards/akari-api'
 
 import { AKARI_API_NOTICE_UPDATE_INTERVAL, type AkariApiMainContext } from './context'
@@ -41,7 +41,7 @@ export class AkariApiNoticeLoader {
     try {
       const [noticeResult, contactChannelsResult] = await Promise.allSettled([
         api
-          .getLatestNotice(appCommon.settings.locale as AkariApiLanguage)
+          .getLatestNotice(toAkariApiLanguage(appCommon.settings.locale))
           .then((response) => AkariNoticeSchema.parse(response.data)),
         api.getContactChannels().then((response) => AkariContactChannelsSchema.parse(response.data))
       ])

@@ -1,0 +1,649 @@
+playerSearch:
+  title: Buscar invocador
+  combinedServersReference: Referencia de servidores combinados
+  searchTypePuuid: PUUID
+  searchTypeExact: Exacta
+  searchTypeFuzzy: Aproximada
+  cancel: Cancelar
+  search: Buscar
+  resultCount: 'Resultados: {{count}}'
+  privacy: Privado
+  searching: Buscando
+  noResult: Sin resultados
+  noResultHintFuzzy: Busca solo por nombre, por ejemplo
+  noResultHintExact: Busca por nombre y etiqueta exactos, por ejemplo
+  noResultHintPuuid: Busca por PUUID, por ejemplo
+  noResultHintFuzzyExample: Yui Fumani
+  noResultHintExactExample: 'Akari #Akaza'
+  noResultHintPuuidExample: deadbeef-cafe-5eed-babe-f00df00df00d
+  recentVisits: Visitas recientes
+  pinned: Fijados ({{count}})
+  recent: Recientes ({{count}})
+  noRecentVisits: Sin visitas recientes
+  friends: Amigos ({{count}})
+  noFriends: Sin amigos
+  getFriendsFailed: No se pudo obtener la lista de amigos
+  spectate: Espectar
+  spectateStarted: Empezando a espectar
+  spectateFailed: 'No se pudo empezar a espectar: {{reason}}'
+playerTags:
+  editModal:
+    title: Editar la etiqueta del jugador
+    loading: Cargando...
+    save: Guardar
+    cancel: Cancelar
+    placeholder: Escribe la etiqueta del jugador {{name}}
+    phrases:
+      title: Frases rápidas
+      count: '{{count}} / {{max}}'
+      clearTag: Borrar etiqueta
+      clearTagConfirm: ¿Borrar la etiqueta escrita?
+      confirmClearTag: Borrar
+      addPlaceholder: Añade una frase rápida
+      add: Añadir frase
+      cancelAdd: Cancelar
+      delete: Borrar “{{phrase}}”
+      empty: Todavía no hay frases rápidas. Añade una para insertarla en las etiquetas de jugador con un clic.
+      duplicate: Esta frase ya existe.
+      updateFailed: No se pudieron guardar las frases rápidas.
+akariScore:
+  title: Puntuación Akari
+  na: N/D
+  noFixedCap: Sin límite fijo
+  parts:
+    kda: KDA
+    winRate: Tasa de victorias
+    damage: Daño
+    damageTaken: Daño recibido
+    healing: Curación
+    cs: Súbditos
+    gold: Oro
+    participation: Participación en asesinatos
+    vision: Visión
+playerTabs:
+  ranked:
+    unranked: Sin clasificar
+    win: V
+    lose: D
+    winRate: '% V'
+    point: P
+    leaguePoint: PL
+    highest: Más alto
+    empty: Sin contenido
+    crossRegion: Otra región
+    unavailable: No disponible
+  challenges:
+    titleAssets: Colección
+    champions: Campeones
+    championSkins: Aspectos de campeones
+    wardSkins: Aspectos de centinelas
+    summonerIcons: Íconos de invocador
+    emotes: Gestos
+    chromaSkins: Cromas
+  titlebar:
+    loading: Cargando...
+    refresh: Actualizar
+    close: Cerrar
+    closeOthers: Cerrar las demás
+    closeToTheRight: Cerrar las de la derecha
+    screenshot: Capturar pestaña
+  shell:
+    disconnected: Sin conexión con el cliente
+    queueing: Iniciando sesión...
+    noActiveTab: No hay ninguna pestaña de historial abierta
+    copiedToClipboard: Copiado al portapapeles
+    dropZoneRosterMember: Suelta aquí para ir al perfil del jugador
+  profile:
+    prevPage: Anterior
+    nextPage: Siguiente
+    firstPage: Ir a la primera página
+    goToPage: Ir a la página
+    refreshPage: Actualizar la página
+    rankedMore: Más
+    tagPlayer: Marcar jugador
+    byCount: Por cantidad
+    byTime: Por tiempo
+    queue: Cola
+    sgpQueueOnlyTooltip: Esta opción solo está disponible con la fuente de datos SGP.
+    itemPerPage_one: '{{count}} partida'
+    itemPerPage_other: '{{count}} partidas'
+    previousName: 'Nombre anterior: {{name}}'
+    summonerNotFoundTitle: No se encontró al invocador {{puuid}}
+    summonerNotFoundContent: El invocador que buscas no existe
+    failedToLoadSummonerTitle: Error al cargar el invocador
+    failedToLoadSummonerContent: 'No se pudo cargar la información del invocador: {{reason}}'
+    failedToLoadMatchHistoryTitle: Error al cargar el historial
+    failedToLoadMatchHistoryContent: 'No se pudo cargar el historial de partidas: {{reason}}'
+    failedToLoadRankedStatsTitle: Error al cargar las clasificatorias
+    failedToLoadRankedStatsContent: 'No se pudieron cargar las estadísticas de clasificatorias: {{reason}}'
+    noMatchHistory: Sin historial de partidas
+    noFilteredMatchHistory: Ninguna partida coincide con el filtro
+    clearFilters: Quitar los filtros
+    loading: Cargando...
+    summoner404: No se encontró al invocador
+    failedToLoadTitle: Error al cargar
+    failedToLoadSummoner: 'No se pudo cargar la información del invocador: {{reason}}'
+    failedToLoadSummonerProfile: 'No se pudo cargar el perfil del invocador: {{reason}}'
+    failedToLoadRankedStats: 'No se pudieron cargar las estadísticas de clasificatorias: {{reason}}'
+    failedToLoadMatchHistory: 'No se pudo cargar el historial de partidas: {{reason}}'
+    failedToLoadEncounteredGames: 'No se pudieron cargar las partidas en común: {{reason}}'
+    failedToLoadMatchHistoryHN1: |
+      No se pudo cargar el historial de partidas: {{reason}}
+      La región de esta página es Jonia. Ten en cuenta que en ciertos horarios (sobre todo por la noche) es posible que el historial no se devuelva correctamente.
+    failedToLoadMatchHistoryGame: 'No se pudo cargar la partida: {{reason}}'
+    failedToLoadTags: 'No se pudieron cargar las etiquetas del jugador: {{reason}}'
+    failedToUpdateTag: 'No se pudo actualizar la etiqueta del jugador: {{reason}}'
+    failedToDeleteTag: 'No se pudo borrar la etiqueta del jugador: {{reason}}'
+    operationSuccessTitle: Acción realizada
+    operationFailedTitle: Error en la acción
+    failedToTakeScreenshotNoData: No se pudo hacer la captura, no se obtuvo la imagen
+    failedToTakeScreenshot: 'No se pudo hacer la captura: {{reason}}'
+    copiedToClipboard: Copiado al portapapeles
+    failedToLaunchReplay: 'No se pudo abrir la repetición: {{reason}}'
+    failedToDownloadReplay: 'No se pudo descargar la repetición: {{reason}}'
+  matchHistory:
+    pagination: Paginación
+    sidebar:
+      open: Abrir la barra lateral del historial
+    filters:
+      title: Filtros
+      pageFilter: Filtro de página
+      simpleTab: Filtros simples
+      advancedTab: Filtros avanzados
+      reset: Quitar filtros
+      resetAll: Restablecer todas las condiciones
+      winLoss: Resultado
+      timeRange: Periodo
+      all: Todos
+      win: Victoria
+      loss: Derrota
+      summoners: Invocadores presentes
+      champions: Campeones presentes
+      searchResults: Resultados de búsqueda
+      pageSummoners: Invocadores de la página
+      selectedSummoners: Seleccionados
+      showPractice: Mostrar modo práctica
+      showIrregularGames: Mostrar rehechas, canceladas, etc.
+      addCondition: Añadir condición
+      addRule: Añadir condición
+      addGroup: Añadir grupo
+      exclude: Excluir
+      removeExclude: Dejar de excluir
+      addFirstConditionHint: Añade la primera condición para crear un filtro complejo
+      addFirstRule: Empieza con una regla
+      addFirstRuleHint: Por defecto coincide con todo; añade grupos solo para lógica anidada o exclusiones
+      and: Todas (AND)
+      or: Cualquiera (OR)
+      add: Añadir
+      switchToOr: Cualquiera (OR)
+      switchToAnd: Todas (AND)
+      delete: Borrar
+      needAddCondition: Hay que añadir una condición
+      addNestedRuleHint: Añade otra regla o subgrupo dentro del grupo actual
+      matchAllRules: Cumplir todas las reglas
+      matchAnyRules: Cumplir cualquier regla
+      groupDescriptionAll: Deben cumplirse todas las reglas de este grupo
+      groupDescriptionAny: Basta con que se cumpla una regla de este grupo
+      anyone: Para cualquier miembro
+      everyone: Todos los miembros deben
+      selectCondition: Elegir condición
+      needSelectCondition: Hay que elegir una condición
+      forPlayer: Para el jugador
+      targetPlayer: Comprobar el jugador elegido
+      targetPlayerTeam: Comprobar el equipo de este jugador
+      targetPlayerOpponents: Comprobar los rivales de este jugador
+      targetAnyMember: Comprobar cualquier jugador
+      targetEveryMember: Comprobar cada jugador
+      targetAllMembers: Comprobar todos los jugadores
+      searchHint: (Se buscará por nombre y etiqueta)
+      notMatch: No
+      excludeRulesTitle: Excluir las siguientes reglas
+      excludeRulesHint: Se excluirán los resultados que cumplan este grupo
+      forAllMembers: Para todos los miembros
+      forAllies: Para los aliados
+      forEnemies: Para los enemigos
+      relativeTo: Respecto a
+      referencePlayer: Jugador de referencia
+      position: Posición
+      queue: Cola
+      gameDuration: Duración de la partida (segundos)
+      min: Mín.
+      max: Máx.
+      isWin: Victoria
+      isLoss: Derrota
+      isAbort: Cancelada
+      isRemake: Rehecha
+      surrenderLoss: Derrota por rendición
+      kills: Asesinatos
+      deaths: Muertes
+      assists: Asistencias
+      gold: Oro
+      isMatchedGame: Partida emparejada
+      isPveGame: Partida JcE
+      summonerSpell: Hechizo de invocador
+      hasItem: Tiene el objeto
+      augment: Aumento
+      hasPlayer: La partida incluye al jugador
+      playerPuuid: Jugador
+      select: Elegir
+      atPosition: En la posición
+      have: Tiene
+      measureMode: Medida
+      minPercent: Mín. (%)
+      maxPercent: Máx. (%)
+      measureModes:
+        value: Valor bruto
+        teamShare: Porcentaje del equipo (%)
+        teamMaxShare: Porcentaje del máximo del equipo (%)
+        gameShare: Porcentaje de todos los jugadores (%)
+        gameMaxShare: Porcentaje del máximo de la partida (%)
+      anyPosition: Cualquier posición
+      positionN: Posición {{n}}
+      primaryStyle: Estilo principal
+      subStyle: Estilo secundario
+      spellGroupNormal: Normales
+      spellGroupSpecial: Especiales
+      augmentGroupHextech: Arena Hextech
+      augmentGroupArena: Arena
+      augmentGroupOther: Otros
+      augmentTypeHai: H
+      augmentTypeDou: A
+      isChampion: Campeón
+      sections:
+        logicGroups: Lógica
+        scopeGroups: Alcance y objetivos
+        gameConditions: Detalles de la partida
+        resultConditions: Resultado y final
+        matchConditions: Miembros y alcance
+        participantConditions: Selecciones y equipamiento del jugador
+        statConditions: Estadísticas del jugador
+      descriptions:
+        isWin: Coincide con jugadores o grupos de miembros que ganaron
+        isAbort: Coincide con partidas que no terminaron con normalidad
+        isRemake: Coincide con partidas rehechas
+        isMatchedGame: Solo coincide con partidas creadas por el emparejamiento
+        isPveGame: Solo coincide con colas de bots u otras JcE
+      gameModes:
+        CLASSIC: Clásico
+        ARAM: ARAM
+        URF: URF
+        CHERRY: Arena
+        KIWI: 'ARAM: Caos'
+        STRAWBERRY: Horda
+        PRACTICETOOL: Herramienta de práctica
+        TUTORIAL: Tutorial
+        NEXUSBLITZ: Frenesí en el Nexo
+        ULTBOOK: Libro de Hechizos Definitivo
+        ONEFORALL: Uno para Todos
+        SNOWURF: URF Nevado
+        DOOMBOTSTEEMO: Bots Apocalípticos
+        RUBY: Bots Apocalípticos
+        ARSR: Modo rotativo
+        ASSASSINATE: Luna de Sangre
+        FIRSTBLOOD: Sobrecarga
+        PROJECT: PROJECT
+        STARGUARDIAN: Guardianas Estelares
+        BRAWL: Pelea
+      examples:
+        title: Ejemplos rápidos
+        applyHint: Haz clic para importarlo y reemplazar el filtro avanzado actual
+        cleanMatchSamples:
+          title: Conservar solo {matched} de más de {duration}, sin {remake}, {abort} ni {pve}
+          matched: partidas emparejadas
+          duration: 10 minutos
+          remake: rehechas
+          abort: canceladas
+          pve: partidas JcE
+        strongSelfPerformance:
+          title: Buscar partidas limpias en las que tuviste {kda}, {deaths} y {contribution}
+          kda: KDA ≥ 4
+          deaths: muertes ≤ 4
+          contribution: una victoria o mucha contribución
+        kiwiJayceSlowAndSteady:
+          title: Buscar partidas de {queue} en las que un {champion} enemigo usó {augment}
+      combinatorLabels:
+        game: Partida
+        and: Y
+        or: O
+        not: No
+        isQueue: Cola
+        isGameMode: Modo de juego
+        isMap: Mapa
+        isAbort: Cancelada
+        isRemake: Rehecha
+        hasAugment: Aumento
+        hasPerk: Runa
+        hasPerkStyle: Estilo de runas
+        enemies: Comprobar los rivales de este jugador
+        allies: Comprobar el equipo de este jugador
+        all: Comprobar todos los jugadores
+        anyone: Comprobar cualquier jugador
+        everyone: Comprobar cada jugador
+        isChampion: Campeón
+        durationBetween: Duración de la partida
+        kdaBetween: KDA
+        killsBetween: Asesinatos
+        deathsBetween: Muertes
+        assistsBetween: Asistencias
+        goldBetween: Oro obtenido
+        goldSpentBetween: Oro gastado
+        levelBetween: Nivel
+        csBetween: Súbditos
+        killParticipationBetween: Participación en asesinatos (%)
+        damageDealtToChampionsBetween: Daño a campeones
+        physicalDamageDealtToChampionsBetween: Daño físico a campeones
+        magicDamageDealtToChampionsBetween: Daño mágico a campeones
+        trueDamageDealtToChampionsBetween: Daño verdadero a campeones
+        damageTakenBetween: Daño recibido
+        physicalDamageTakenBetween: Daño físico recibido
+        magicDamageTakenBetween: Daño mágico recibido
+        trueDamageTakenBetween: Daño verdadero recibido
+        damageToTowersBetween: Daño a torretas
+        healBetween: Curación
+        visionScoreBetween: Puntuación de visión
+        timeCCingOthersBetween: Tiempo de control de masas
+        dgrBetween: Eficiencia daño-oro (%)
+        soloKillsBetween: Asesinatos en solitario
+        doubleKillsBetween: Dobles asesinatos
+        tripleKillsBetween: Triples asesinatos
+        quadraKillsBetween: Cuádruples asesinatos
+        pentaKillsBetween: Pentakills
+        isWin: Victoria
+        isLoss: Derrota
+        isMatchedGame: Partida emparejada
+        isPveGame: Partida JcE
+        player: Comprobar el jugador elegido
+        hasPlayer: La partida incluye al jugador
+        hasSpell: Hechizo de invocador
+        isPosition: Posición
+        hasItem: Tiene el objeto
+      positionHint: Con la fuente LCU, las posiciones se deducen del carril/rol y son aproximadas
+      positionUnsupportedHint: La API LCU no ofrece registros de posición fiables. Cambia a la API SGP para usar esta condición
+    timeRange:
+      all: Todo el tiempo
+      last3Hours: Últimas 3 horas
+      last12Hours: Últimas 12 horas
+      last24Hours: Últimas 24 horas
+      last3Days: Últimos 3 días
+      last7Days: Últimos 7 días
+      last30Days: Últimos 30 días
+    collectMode:
+      pageSizeOptionTag: Recopilar
+      collectedPageTitle: Resultados recopilados
+      collectedPageDescription: Esta página es el resultado del modo recopilación, con {collected} de {scanned}.
+      scannedMatches_one: '{count} partida revisada'
+      scannedMatches_other: '{count} partidas revisadas'
+      collectedMatches_one: '{count} partida recopilada'
+      collectedMatches_other: '{count} partidas recopiladas'
+      reloadNormalPage: Salir del modo recopilación
+      collectingProgress: Recopilando ({{count}} / {{expected}})
+      stoppingProgress: Deteniendo la recopilación ({{count}} / {{expected}})
+      roundProgress: Ronda {{current}} / {{max}}
+      stopCollect: Detener
+      tooltipDescription: El modo recopilación revisa automáticamente las páginas del historial desde la primera, con los filtros actuales, hasta llegar a la cantidad objetivo o al límite máximo de consultas.
+      tooltipUseCase: Úsalo para reunir partidas que cumplen el filtro y están repartidas en varias páginas del historial.
+      openSettings: Recopilar con los filtros actuales
+      settingsTitle: Configuración de la recopilación
+      countPerIterationLabel: Partidas cargadas por ronda
+      countPerIterationDescription: La recopilación consulta las páginas del historial una a una. Esto define cuántas partidas se cargan cada vez.
+      expectedCountLabel: Cantidad objetivo
+      expectedCountDescription: Deja de recopilar al encontrar esta cantidad de partidas que cumplen el filtro. Evita valores muy altos porque pueden afectar al rendimiento.
+      maxIterationLabel: Rondas máximas
+      maxIterationDescription: La recopilación no se ejecuta para siempre. Si llega a esta cantidad de rondas sin encontrar suficientes partidas, se detiene.
+      cancel: Cancelar
+      startCollect: Empezar a recopilar
+    list:
+      empty: No hay datos disponibles.
+    card:
+      kprTitle: 'Participación en asesinatos del equipo: {{rate}}%'
+      ddrTitle: 'Daño infligido a campeones: {{rate}}%'
+      dtrTitle: 'Daño recibido del equipo: {{rate}}%'
+      grTitle: 'Porcentaje del oro del equipo: {{rate}}%'
+      kpr: PA {{rate}}%
+      ddr: Daño {{rate}}%
+      dtr: Recibido {{rate}}%
+      gr: Oro {{rate}}%
+      misc: Varios
+      perfect: Perfecto
+      expand: Expandir
+      collapse: Contraer
+      loading: Cargando...
+      error: Error al cargar
+      practiceTool: Práctica
+      win: Victoria
+      lose: Derrota
+      remake: Rehecha
+      abort: Cancelada
+      surrender: Rendición
+    previewer:
+      noData: No hay datos disponibles.
+      notFound: No se encontró la partida
+      error: Error al cargar la partida
+      reload: Recargar
+      loading: Cargando...
+      errorNotification:
+        title: Error al cargar {{gameId}}
+        description: 'No se pudo obtener la partida: {{reason}}'
+    miscellaneous:
+      gameId: ID de partida {{gameId}}
+      gameDate: Fecha {{date}}
+      server: 'Servidor: {{server}}'
+      bans: 'Bloqueos:'
+      replay:
+        download: Descargar repetición
+        watch: Ver repetición
+        incompatible: Repetición incompatible
+        downloading: Descargando repetición
+      stats:
+        championId: Campeón
+        spells: Hechizos de invocador
+        teams: Equipo
+        assists: Asistencias
+        causedEarlySurrender: Inició la rendición temprana
+        champLevel: Nivel de campeón
+        combatPlayerScore: Puntuación de combate
+        damageDealtToObjectives: Daño a objetivos
+        damageDealtToTurrets: Daño a torretas
+        damageSelfMitigated: Daño mitigado
+        deaths: Muertes
+        doubleKills: Dobles asesinatos
+        earlySurrenderAccomplice: Cómplice de la rendición temprana
+        firstBloodAssist: Asistencia en Primera Sangre
+        firstBloodKill: Primera Sangre
+        firstInhibitorAssist: Asistencia en el primer inhibidor
+        firstInhibitorKill: Primer inhibidor destruido
+        firstTowerAssist: Asistencia en la primera torreta
+        firstTowerKill: Primera torreta destruida
+        gameEndedInEarlySurrender: Terminó en rendición temprana
+        gameEndedInSurrender: Terminó en rendición
+        goldEarned: Oro obtenido
+        goldSpent: Oro gastado
+        inhibitorKills: Inhibidores destruidos
+        item0: Objeto 0
+        item1: Objeto 1
+        item2: Objeto 2
+        item3: Objeto 3
+        item4: Objeto 4
+        item5: Objeto 5
+        item6: Objeto 6
+        killingSprees: Rachas de asesinatos
+        kills: Asesinatos
+        largestCriticalStrike: Mayor golpe crítico
+        largestKillingSpree: Mayor racha de asesinatos
+        largestMultiKill: Mayor asesinato múltiple
+        longestTimeSpentLiving: Mayor tiempo con vida
+        magicDamageDealt: Daño mágico infligido
+        magicDamageDealtToChampions: Daño mágico a campeones
+        magicalDamageTaken: Daño mágico recibido
+        neutralMinionsKilled: Monstruos neutrales asesinados
+        neutralMinionsKilledEnemyJungle: Monstruos neutrales asesinados (jungla enemiga)
+        neutralMinionsKilledTeamJungle: Monstruos neutrales asesinados (jungla propia)
+        objectivePlayerScore: Puntuación de objetivos
+        participantId: ID del participante
+        pentaKills: Pentakills
+        perk0: Runa 0
+        perk0Var1: Runa 0 var. 1
+        perk0Var2: Runa 0 var. 2
+        perk0Var3: Runa 0 var. 3
+        perk1: Runa 1
+        perk1Var1: Runa 1 var. 1
+        perk1Var2: Runa 1 var. 2
+        perk1Var3: Runa 1 var. 3
+        perk2: Runa 2
+        perk2Var1: Runa 2 var. 1
+        perk2Var2: Runa 2 var. 2
+        perk2Var3: Runa 2 var. 3
+        perk3: Runa 3
+        perk3Var1: Runa 3 var. 1
+        perk3Var2: Runa 3 var. 2
+        perk3Var3: Runa 3 var. 3
+        perk4: Runa 4
+        perk4Var1: Runa 4 var. 1
+        perk4Var2: Runa 4 var. 2
+        perk4Var3: Runa 4 var. 3
+        perk5: Runa 5
+        perk5Var1: Runa 5 var. 1
+        perk5Var2: Runa 5 var. 2
+        perk5Var3: Runa 5 var. 3
+        perkPrimaryStyle: Estilo de runas principal
+        perkSubStyle: Estilo de runas secundario
+        physicalDamageDealt: Daño físico infligido
+        physicalDamageDealtToChampions: Daño físico a campeones
+        physicalDamageTaken: Daño físico recibido
+        playerAugment1: Aumento 1
+        playerAugment2: Aumento 2
+        playerAugment3: Aumento 3
+        playerAugment4: Aumento 4
+        playerAugment5: Aumento 5
+        playerAugment6: Aumento 6
+        playerScore0: Puntuación del jugador 0
+        playerScore1: Puntuación del jugador 1
+        playerScore2: Puntuación del jugador 2
+        playerScore3: Puntuación del jugador 3
+        playerScore4: Puntuación del jugador 4
+        playerScore5: Puntuación del jugador 5
+        playerScore6: Puntuación del jugador 6
+        playerScore7: Puntuación del jugador 7
+        playerScore8: Puntuación del jugador 8
+        playerScore9: Puntuación del jugador 9
+        playerSubteamId: ID del subequipo
+        quadraKills: Cuádruples asesinatos
+        sightWardsBoughtInGame: Centinelas de visión comprados
+        subteamPlacement: Posición del subequipo
+        teamEarlySurrendered: El equipo se rindió temprano
+        timeCCingOthers: Tiempo aplicando control de masas
+        totalDamageDealt: Daño total infligido
+        totalDamageDealtToChampions: Daño total a campeones
+        totalDamageTaken: Daño total recibido
+        totalHeal: Curación total
+        totalMinionsKilled: Súbditos asesinados
+        totalPlayerScore: Puntuación total del jugador
+        totalScoreRank: Puesto en la puntuación total
+        totalTimeCrowdControlDealt: Tiempo total de control de masas
+        totalUnitsHealed: Unidades curadas
+        tripleKills: Triples asesinatos
+        trueDamageDealt: Daño verdadero infligido
+        trueDamageDealtToChampions: Daño verdadero a campeones
+        trueDamageTaken: Daño verdadero recibido
+        turretKills: Torretas destruidas
+        unrealKills: Asesinatos irreales
+        visionScore: Puntuación de visión
+        visionWardsBoughtInGame: Centinelas de control comprados
+        wardsKilled: Centinelas destruidos
+        wardsPlaced: Centinelas colocados
+        win: Victoria
+        currentPlatformId: Servidor actual
+        platformId: ID de plataforma
+    details:
+      win: Victoria
+      lose: Derrota
+      controlWard: Centinelas de control
+      wardPlaced: Colocados {{count}}, destruidos {{cleared}}
+      csPerMinute: '{{count}} / min'
+      bot: Bot
+      header:
+        kda: KDA
+        dmg: Daño / recibido
+        ward: Centinelas
+        cs: Súbditos
+        gold: Oro
+        item: Objetos
+        augment: Aumentos
+  profilePrivacy:
+    title: Perfil oculto
+    content: Este jugador tiene su perfil en privado.
+  taggedStatus:
+    title: Marcado
+    content: Este jugador está marcado.
+    taggedByOther: Marcado desde otra cuenta.
+    deletePopconfirm: ¿Confirmas que quieres borrar esta etiqueta?
+  summary:
+    title: Resumen
+    akariScore: Puntuación Akari
+    na: N/D
+    avgKda: KDA promedio
+    avgKp: Participación en asesinatos
+    avgDmg: Porcentaje de daño
+    avgDmgTaken: Porcentaje de daño recibido
+    avgGold: Porcentaje de oro
+    avgCs: Porcentaje de súbditos
+    avgCsPerMinute: Súbditos/min
+    perMinuteValue: '{{value}}/min'
+    teamShare: Porcentaje {{value}}
+    collectChampionMatches: Recopilar partidas de {{champion}}
+    winLose: Victorias y derrotas
+    win: Victoria
+    lose: Derrota
+    winShort: V
+    lossShort: D
+    wr: Tasa de victorias
+    champions: Uso de campeones
+    times: Partidas
+    teamSides: Lados del equipo
+    activeSession: Victorias/derrotas de la sesión actual
+    level3Short: Nv. 3
+    level4Short: Nv. 4
+    winningStreak_one: '{{count}} victoria seguida'
+    winningStreak_other: '{{count}} victorias seguidas'
+    losingStreak_one: '{{count}} derrota seguida'
+    losingStreak_other: '{{count}} derrotas seguidas'
+  championMastery:
+    title: Maestría de campeones
+    viewAll: Más
+    modalTitle: Toda la maestría de campeones
+    filteredChampions: '{{count}} / {{total}} campeones'
+    filterPlaceholder: Filtrar por nombre, pinyin o ID del campeón
+    score: Puntuación {{score}}
+    level: Nv. {{level}}
+    levelLabel: Nivel
+    points: '{{points}} puntos de maestría'
+    pointsLabel: Puntos de maestría
+    highestGrade: Mejor nota {{grade}}
+    highestGradeLabel: Mejor nota
+    seasonMilestone: Hito de temporada {{milestone}}
+    seasonMilestoneLabel: Hito de temporada
+    lastPlayTime: Última partida {{time}}
+    lastPlayTimeLabel: Última partida
+    progressLabel: Progreso
+    progress: Progreso {{since}} / +{{until}}
+    tokensEarnedLabel: Fichas
+    tokensEarned: '{{count}} fichas'
+    noData: Sin datos de maestría de campeones
+    noFilterResult: Ningún campeón coincide
+    loadFailed: 'No se pudo cargar la maestría de campeones: {{reason}}'
+  recentPlayers:
+    teammatesTitle: Compañeros recientes
+    opponentsTitle: Rivales recientes
+    noRecentPlayers: Sin jugadores recientes
+    win: Victoria
+    lose: Derrota
+  encounteredGames:
+    title: Partidas en común
+    pageInfo: '{{page}} / {{totalPage}}'
+    noData: No hay datos disponibles.
+    deletePopconfirm: ¿Confirmas que quieres borrar el registro de esta partida?
+    loading: Cargando...
+    opponent: Enemigo
+    teammate: Aliado
+    win: Victoria
+    lose: Derrota

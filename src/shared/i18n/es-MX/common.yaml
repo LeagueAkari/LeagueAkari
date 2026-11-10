@@ -1,0 +1,215 @@
+appName: League Akari
+default: Predeterminado
+
+yes: sí
+no: no
+confirm: Confirmar
+na: N/D
+
+summonerPlaceholder: Invocador {{index}}
+summoner: Invocador
+region: Región
+
+positions:
+  all: Ninguna
+  ALL: Ninguna
+  top: Superior
+  jungle: Jungla
+  mid: Central
+  middle: Central
+  bot: Inferior
+  bottom: Inferior
+  support: Soporte
+  utility: Soporte
+  TOP: Superior
+  JUNGLE: Jungla
+  MID: Central
+  BOT: Inferior
+  MIDDLE: Central
+  BOTTOM: Inferior
+  SUPPORT: Soporte
+  UTILITY: Soporte
+
+positionAssignmentReason:
+  FILL_SECONDARY: Comodín secundario
+  FILL_PRIMARY: Comodín principal
+  PRIMARY: Principal
+  SECONDARY: Secundaria
+  AUTOFILL: Comodín automático
+  AUTOFILL_SHORT: Comodín
+
+teams:
+  TEAM-ALL: Todos
+  TEAM-100: Equipo azul
+  TEAM-200: Equipo rojo
+  LOBBY: Sala
+  CHERRY-0: '?'
+  CHERRY-1: Poro
+  CHERRY-2: Súbdito
+  CHERRY-3: Cangrejo Escurridizo
+  CHERRY-4: Krugs
+  CHERRY-5: Raptores
+  CHERRY-6: Centinela
+  CHERRY-7: Lobos
+  CHERRY-8: Gromp
+  unknown: Desconocido
+
+queueTypes:
+  RANKED_SOLO_5x5: Clasificatoria Solo/Dúo
+  JADE_RANKED_SOLO_5x5: League Classic
+  RANKED_FLEX_SR: Clasificatoria Flexible
+  RANKED_PREMADE_5x5: Clasificatoria premade 5c5
+  NORMAL: Normal (Grieta)
+  ARAM_UNRANKED_5x5: ARAM
+  KIWI: 'ARAM: Caos'
+  CHERRY: Arena
+  URF: URF
+  RANKED_FLEX_TT: Clasificatoria Flexible TT
+  NORMAL_TFT: TFT
+  RANKED_TFT: TFT clasificatoria
+  RANKED_TFT_TURBO: TFT Turbo
+  RANKED_TFT_DOUBLE_UP: TFT Doble
+
+gameModes:
+  CLASSIC: Clásico
+  ARAM: ARAM
+  URF: URF
+  TFT: TFT
+
+sgpMatchHistoryTags:
+  groupGeneral: General
+  groupGameModes: Modos de juego
+  all: Todos los modos
+  ranked: Modos clasificatorios
+  normal: Modos normales
+  current: Modo actual
+  q_420: Clasificatoria Solo/Dúo
+  q_430: Normal (Grieta)
+  q_440: Clasificatoria Flexible
+  q_450: ARAM
+  q_480: Partida Casual
+  q_490: Partida Rápida
+  q_900: ARURF
+  q_1700: Arena
+  q_1750: Arena
+  q_1900: URF
+  q_2300: Pelea
+
+tiers:
+  UNRANKED: SIN CLASIFICAR
+  IRON: HIERRO
+  BRONZE: BRONCE
+  SILVER: PLATA
+  GOLD: ORO
+  PLATINUM: PLATINO
+  EMERALD: ESMERALDA
+  DIAMOND: DIAMANTE
+  MASTER: MAESTRO
+  GRANDMASTER: GRAN MAESTRO
+  CHALLENGER: RETADOR
+
+shortTiers:
+  UNRANKED: N/D
+  IRON: HIER
+  BRONZE: BRON
+  SILVER: PLTA
+  GOLD: ORO
+  PLATINUM: PLAT
+  EMERALD: ESME
+  DIAMOND: DIAM
+  MASTER: MAES
+  GRANDMASTER: GM
+  CHALLENGER: RET
+
+sgpServers:
+  AKARI_CURRENT: Actual
+  TENCENT_HN10: Rosa Negra
+  TENCENT_HN1: Jonia
+  TENCENT_NJ100: Liga 1
+  TENCENT_GZ100: Liga 2
+  TENCENT_CQ100: Liga 3
+  TENCENT_TJ100: Liga 4
+  TENCENT_TJ101: Liga 5
+  TENCENT_BGP2: Cumbre
+  TENCENT_PBE: PBE de Tencent
+  TENCENT_PREPBE: PREPBE de Tencent
+  TW2: Taiwán
+  SG2: Singapur
+  PH2: Filipinas
+  VN2: Vietnam
+  PBE: PBE
+  NA1: Norteamérica
+  EUN: Europa Nórdica y del Este
+  EUW: Europa Occidental
+  KR: Corea
+  BR1: Brasil
+  LA1: Latinoamérica Norte
+  LA2: Latinoamérica Sur
+  OC1: Oceanía
+  TR1: Turquía
+  RU: Rusia
+  JP: Japón
+
+champions:
+  bravery: Valentía
+  dummy: Muñeco
+
+championAnalysis:
+  overviewTab: Resumen
+  positionTab: Posiciones
+  jungleTab: Jungla
+  masteryTab: Maestría
+  games_one: '{{count}} partida'
+  games_other: '{{count}} partidas'
+  winsLosses: '{{wins}}V {{losses}}D'
+  akariScore: Puntuación Akari
+  winRate: Tasa de victorias
+  winningStreak_one: '{{count}} victoria seguida'
+  winningStreak_other: '{{count}} victorias seguidas'
+  losingStreak_one: '{{count}} derrota seguida'
+  losingStreak_other: '{{count}} derrotas seguidas'
+  activeSession: Sesión actual {{wins}}V {{losses}}D
+  standardModes: Modos estándar
+  arena: Arena
+  arenaSummary_one: '{{count}} partida · Mitad superior {{topHalfRate}} · 1.º {{top1Rate}} · Prom. #{{placement}}'
+  arenaSummary_other: '{{count}} partidas · Mitad superior {{topHalfRate}} · 1.º {{top1Rate}} · Prom. #{{placement}}'
+  top1Rate: Tasa de 1.er lugar
+  topHalfRate: Tasa de mitad superior
+  averagePlacement: Posición promedio
+  performance: Desempeño
+  averageKda: KDA prom.
+  killParticipation: Participación en asesinatos
+  kdaVariation: Variación del KDA
+  killDamageEfficiency: Eficiencia asesinatos-daño
+  visionScore: Visión prom.
+  visionShare: Porcentaje de visión
+  soloKills: Asesinatos solo prom.
+  pings: Pings promedio
+  missingPings: Pings desaparecido
+  damage: Daño y resistencia
+  damagePerMinute: Daño a campeones / min
+  damageShare: '% daño del equipo'
+  damageToTeamMax: Daño vs. máx. equipo
+  damageToMatchMax: Daño vs. máx. partida
+  damageTakenShare: '% daño recibido equipo'
+  damageTakenToTeamMax: Recibido vs. máx. equipo
+  damageTakenToMatchMax: Recibido vs. máx. partida
+  damageGoldEfficiency: Eficiencia daño-oro
+  economy: Economía y recursos
+  goldShare: '% oro del equipo'
+  goldToTeamMax: Oro vs. máx. equipo
+  goldToMatchMax: Oro vs. máx. partida
+  csPerMinute: Súbditos / min
+  csShare: '% súbditos del equipo'
+  csToTeamMax: Súbd. vs. máx. equipo
+  csToMatchMax: Súbd. vs. máx. partida
+  towerDamageShare: '% daño a torretas equipo'
+  towerDamageToTeamMax: Torretas vs. máx. equipo
+  towerDamageToMatchMax: Torretas vs. máx. partida
+  gamesAnalyzed_one: '{{count}} muestra detallada'
+  gamesAnalyzed_other: '{{count}} muestras detalladas'
+  collectMatches: Recopilar partidas de {{champion}}
+  collectShort: Recopilar
+
+app:
+  singleton: Como Akari es única, solo puede haber UNA Akari abierta a la vez

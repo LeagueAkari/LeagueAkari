@@ -37,4 +37,14 @@ describe('updater command arguments', () => {
     expect(args).toContain(String.raw`C:\Users\Akari User\AppData\Roaming\league-akari`)
     expect(args.every((arg) => !arg.includes('"'))).toBe(true)
   })
+
+  test('passes English to the updater for locales it does not ship', () => {
+    const args = createApplyUpdaterArguments({
+      locale: 'es-MX',
+      archivePath: 'update.7z',
+      targetPath: 'C:\\League Akari'
+    })
+
+    expect(args.slice(0, 2)).toEqual(['--lang', 'en'])
+  })
 })

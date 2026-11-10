@@ -108,6 +108,10 @@ export class AppCommonMain implements IAkariShardInitDispose {
       return 'zh-CN'
     }
 
+    if (systemLocale.startsWith('es')) {
+      return 'es-MX'
+    }
+
     return 'en'
   }
 

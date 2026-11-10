@@ -46,9 +46,9 @@
 
                 <div class="text-[10px] text-black/60 dark:text-white/85">
                   {{
-                    sgps.leagueServers.serverNames[as.settings.locale]?.[
-                      sgps.availability.sgpServerId
-                    ] || sgps.availability.sgpServerId
+                    (sgps.leagueServers.serverNames[as.settings.locale] ??
+                      sgps.leagueServers.serverNames.en)?.[sgps.availability.sgpServerId] ||
+                    sgps.availability.sgpServerId
                   }}
                 </div>
               </StreamerModeMaskedText>
@@ -154,7 +154,8 @@
 
                 <div class="text-[10px] text-black/60 dark:text-white/85">
                   {{
-                    sgps.leagueServers.serverNames[as.settings.locale]?.[
+                    (sgps.leagueServers.serverNames[as.settings.locale] ??
+                      sgps.leagueServers.serverNames.en)?.[
                       getSgpServerId(cmd.region, cmd.rsoPlatformId)
                     ] || getSgpServerId(cmd.region, cmd.rsoPlatformId)
                   }}

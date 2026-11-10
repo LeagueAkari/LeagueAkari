@@ -1,5 +1,10 @@
 import { EXECUTABLE_NAME } from './context'
 
+// The updater executable only ships Chinese and English text.
+function toUpdaterLanguage(locale: string) {
+  return locale === 'zh-CN' ? 'zh-CN' : 'en'
+}
+
 export interface ApplyUpdaterArgumentsOptions {
   locale: string
   archivePath: string
@@ -9,7 +14,7 @@ export interface ApplyUpdaterArgumentsOptions {
 export function createApplyUpdaterArguments(options: ApplyUpdaterArgumentsOptions) {
   return [
     '--lang',
-    options.locale,
+    toUpdaterLanguage(options.locale),
     '--executable',
     EXECUTABLE_NAME,
     'apply',
@@ -32,7 +37,7 @@ export interface UninstallUpdaterArgumentsOptions {
 export function createUninstallUpdaterArguments(options: UninstallUpdaterArgumentsOptions) {
   return [
     '--lang',
-    options.locale,
+    toUpdaterLanguage(options.locale),
     '--executable',
     EXECUTABLE_NAME,
     'uninstall',

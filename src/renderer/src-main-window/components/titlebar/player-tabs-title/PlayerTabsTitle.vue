@@ -62,8 +62,8 @@ const tabItems = computed<PlayerTabStripItem[]>(() =>
       championId: ongoingGame.championSelections?.[tab.puuid] || null,
       profileIconId: summoner?.profileIconId,
       serverLabel: showSgpServer.value
-        ? sgp.leagueServers.serverNames[appCommon.settings.locale]?.[tab.sgpServerId] ||
-          tab.sgpServerId
+        ? (sgp.leagueServers.serverNames[appCommon.settings.locale] ??
+            sgp.leagueServers.serverNames.en)?.[tab.sgpServerId] || tab.sgpServerId
         : undefined,
       gameName: summoner
         ? masked

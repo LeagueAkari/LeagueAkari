@@ -1,0 +1,245 @@
+automation:
+  home:
+    title: Automatización
+    autoGameflow: Flujo de partida automático
+    autoSelect: Selección / bloqueo automático
+    autoMisc: Varios
+    autoChampConfig: Configuración automática
+  gameflow:
+    title: Flujo de partida
+    common:
+      enabled: Activar
+    sections:
+      readyCheck: Aceptar partida automáticamente
+      autoHonor: Honor automático
+      playAgain: Jugar de nuevo
+      autoMatchmaking: Búsqueda automática
+      autoReconnect: Reconexión
+      leader: Cesión del liderazgo
+      invitations: Invitaciones
+      aramTeamSide: Mensaje del lado del equipo
+    autoAcceptEnabled:
+      label: Aceptar partida automáticamente
+      description: Acepta la partida automáticamente cuando se encuentran jugadores.
+      footer: Algunos servidores o rangos clasificatorios ya pueden aceptar la partida automáticamente por política del servidor. Esto no tiene relación con League Akari.
+    autoAcceptDelaySeconds:
+      label: Espera antes de aceptar (s)
+      description: Segundos de espera antes de aceptar la partida una vez disponible.
+    autoHonorEnabled:
+      label: Honor automático
+      description: Entrega automáticamente todos los votos al final de la partida.
+    autoHonorStrategy:
+      label: Estrategia para honrar
+      description: Determina qué jugadores recibirán honor.
+      options:
+        prefer-lobby-member: Priorizar a los miembros de la sala. Si sobran votos, elegir a otros compañeros.
+        only-lobby-member: Solo a los miembros del grupo premade.
+        all-member: A todos los compañeros de equipo.
+        all-member-including-opponent: A todos los jugadores de la partida.
+        opt-out: No honrar a nadie.
+    playAgainEnabled:
+      label: Jugar de nuevo automáticamente
+      description:
+        full: Vuelve automáticamente a la sala después de una partida. Es posible que tengas que activar {autoHonor} para completar la fase de votación de honor.
+        part2: Honor automático
+    autoMatchmakingEnabled:
+      label: Búsqueda automática
+      description: Empieza a buscar partida automáticamente cuando es posible.
+    autoMatchmakingMinimumMembers:
+      label: Mínimo de miembros
+      description: Se necesitan al menos {{members}} miembros para empezar a buscar automáticamente.
+    autoMatchmakingDelaySeconds:
+      label: Espera antes de buscar (s)
+      description: Segundos de espera antes de empezar a buscar partida cuando es posible.
+    autoMatchmakingWaitForInvitees:
+      label: Esperar a los invitados
+      description: Espera a que todos los jugadores invitados respondan antes de empezar a buscar.
+    autoMatchmakingRematchStrategy:
+      label: Cuándo detener la búsqueda
+      description: Define cuándo detener la búsqueda automáticamente. Si la búsqueda automática está activada, se volverá a iniciar.
+      options:
+        never: Nunca
+        fixed-duration: Tras un tiempo fijo
+        estimated-duration: Al superar el tiempo estimado de cola
+    autoMatchmakingRematchFixedDuration:
+      label: Tiempo para salir de la búsqueda (s)
+      description:
+        fixed-duration: Detiene la búsqueda al superar este tiempo, en segundos.
+        no-fixed-duration: Esta opción solo se aplica si la forma de detener la búsqueda es "Tras un tiempo fijo".
+    autoReconnectEnabled:
+      label: Reconexión automática
+      description: Intenta reconectarse cuando es posible volver a la partida.
+    autoSkipLeaderEnabled:
+      label: Ceder el liderazgo automáticamente
+      description: Cuando eres el líder de la sala, cede el liderazgo a otro miembro de la sala
+    autoHandleInvitationsEnabled:
+      label: Gestionar invitaciones automáticamente
+      description: Gestiona las invitaciones a salas según la estrategia configurada.
+    invitationHandlingStrategies:
+      label: Estrategia para invitaciones a salas
+      description: Procesa las invitaciones a salas según el modo de cola.
+      options:
+        accept: Aceptar
+        decline: Rechazar
+        ignore: Ignorar
+      button: Configurar
+      queueTypes:
+        default: Predeterminado
+    rejectInvitationWhenAway:
+      label: Rechazar si estás ausente
+      description: Rechaza automáticamente las invitaciones a salas cuando tu estado es Ausente.
+    autoSendARAMTeamSideEnabled:
+      label: Enviar el lado del equipo
+      description: 'En modos como ARAM o ARAM: Caos, al entrar en la selección de campeones se avisará del lado actual del equipo (azul o rojo).'
+      tooltipBody: Envía el lado actual de tu equipo en la sala de chat.
+      tooltipImageAlt: Ejemplo del mensaje del lado del equipo en el chat
+    autoSendARAMTeamSideVisibleToTeam:
+      label: Enviar el lado del equipo visible para el equipo
+      checkboxLabel: Visible para el equipo
+      description: El mensaje de "Enviar el lado del equipo" será visible para tu equipo.
+  champSelect:
+    title: Selección y bloqueo automáticos
+    temporarilyDisabled:
+      label: Desactivado temporalmente
+      button: Volver a activar
+      description: La función se desactivó temporalmente en ESTA selección de campeones.
+    groupTitle: Modo activo
+    groupEmpty: Sin grupos
+    pick:
+      title: Selección automática
+      enabled:
+        label: Activar
+        description: Activa la selección automática para este modo.
+      expectedChampions:
+        label: Campeones preferidos
+        description: La selección automática elegirá estos campeones, dando prioridad a los primeros de la lista.
+        fragment1: Cuando te asignan la posición
+        fragment2: ''
+      showIntent:
+        label: Mostrar intención
+        description: Muestra el campeón objetivo antes de seleccionarlo.
+      ignoreIntent:
+        label: Ignorar intención
+        description: Ignora la intención de los compañeros de equipo.
+      strategy:
+        label: Estrategia de fijado
+        description: Ejecuta la selección automática según la estrategia elegida.
+        options:
+          just-show: Solo mostrar
+          show-and-lock-in: Mostrar y fijar
+          lock-in-immediately: Fijar inmediatamente
+      delaySeconds:
+        label: Espera (s)
+        description: La selección automática se planifica según esta espera, incluidos los pasos de mostrar, fijar o gestionar intercambios. Ninguna fase superará el límite del sistema.
+      benchMode:
+        title: Específico de modos con banca (si aplica)
+        tooltip: Para modos con banca, como ARAM o URF.
+      benchSwapAccumulatedDelaySeconds:
+        label: Tiempo mínimo acumulado (s)
+        description: Solo se intercambiará cuando el campeón objetivo lleve en la banca más tiempo que este valor.
+      benchSelectFirstAvailableChampion:
+        label: Elegir el primer campeón disponible
+        description: Cuando el campeón objetivo está en la banca, elige los primeros de la lista.
+      benchHandleTradeEnabled:
+        label: Gestionar solicitudes de intercambio
+        description: Al recibir una solicitud de intercambio, la acepta si cumple los campeones preferidos. Si no, la rechaza.
+    ban:
+      title: Bloqueo automático
+      enabled:
+        label: Activar
+        description: Activa el bloqueo automático para este modo.
+      expectedChampions:
+        label: Campeones preferidos
+        description: El bloqueo automático bloqueará estos campeones, dando prioridad a los primeros de la lista.
+        fragment1: Cuando te asignan la posición
+        fragment2: ''
+      strategy:
+        label: Estrategia de fijado
+        description: Ejecuta el bloqueo automático según la estrategia elegida.
+        options:
+          just-show: Solo mostrar
+          show-and-lock-in: Mostrar y fijar
+          lock-in-immediately: Fijar inmediatamente
+      delaySeconds:
+        label: Espera (s)
+        description: El bloqueo automático se planifica según esta espera, incluidos los pasos de mostrar, fijar o gestionar intercambios. Ninguna fase superará el límite del sistema.
+  misc:
+    autoReply:
+      updated: Actualizado
+      title: Respuesta automática
+      enabled:
+        label: Activar
+      enableOnAway:
+        label: Solo si estás ausente
+        description: La respuesta automática solo funciona cuando tu estado es Ausente.
+      text:
+        label: Texto de respuesta
+        description: El contenido que se usará como mensaje de respuesta automática.
+        save: Guardar
+    autoInvitation:
+      title: Invitar amigos a la sala
+      description: 'Vigilancia única: cuando los amigos elegidos estén disponibles, se les enviará una invitación a la sala.'
+      unavailable: No disponible por ahora
+      scheduleInvite: Programar invitación
+      cancelSchedule: Cancelar programación
+      noFriends: Sin amigos
+      notInLobby: No estás en una sala
+      searchPlaceholder: Buscar por nombre o etiqueta del amigo
+  orderedChampionList:
+    pickModalTitle: Campeones para seleccionar automáticamente
+    banModalTitle: Campeones para bloquear automáticamente
+    close: Cerrar
+    searchForChampion: Buscar campeón
+    edit: Editar
+    unselected: Sin seleccionar
+    moveUp: Subir
+    moveDown: Bajar
+    candidateTitle: Campeones disponibles
+    selectedTitle: Campeones seleccionados
+    positionFilter: Filtrar por {{position}}
+    clear: Borrar
+    clearConfirm: ¿Quitar todos los campeones seleccionados?
+    confirmClear: Quitar todos
+    cancel: Cancelar
+    loading: Cargando datos de campeones
+    emptyCandidates: No hay campeones disponibles
+    emptySelected: No hay campeones seleccionados
+    dragHandle: Arrastra para reordenar a “{{champion}}”
+    remove: Quitar a “{{champion}}”
+  champConfig:
+    championConfig:
+      targetMode: Modo objetivo
+      ranked: Clasificatoria
+      normal: Normal
+      aram: ARAM
+      urf: URF
+      nexusblitz: Frenesí en el Nexo
+      ultbook: Libro de Hechizos Definitivo
+      runes: Runas
+      configure: Configurar
+      spells: Hechizos
+      position: Posición
+      default: Predeterminado
+      runesConfigured: Runas configuradas
+      spellsConfigured: Hechizos configurados
+      runesUnconfigured: Runas sin configurar
+      spellsUnconfigured: Hechizos sin configurar
+      configureRunes: Configurar runas
+      configureSpells: Configurar hechizos
+      clear: Borrar
+      restore: Restaurar
+      save: Guardar
+      noChampionPlaceholder: Elige un campeón para ver su configuración
+      runesSaved: Configuración de runas guardada
+      runesRestored: Configuración de runas restaurada
+      spellsSaved: Configuración de hechizos guardada
+      spellsRestored: Configuración de hechizos restaurada
+      searchPlaceholder: Buscar campeones
+    runeEditor:
+      unsupported: La configuración de runas actual no es compatible
+    title: Configuración automática de campeones
+    enabled:
+      label: Activar
+      description: Configura automáticamente las runas o los hechizos de invocador según tus preajustes después de fijar un campeón en la selección de campeones
+    configure:
+      label: Configurar

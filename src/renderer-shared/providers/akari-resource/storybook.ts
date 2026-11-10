@@ -68,7 +68,9 @@ function mapById<T extends { id: number }>(items: T[]) {
 }
 
 function toCommunityDragonLocale(locale: string) {
-  return locale === 'zh-CN' ? 'zh_cn' : 'default'
+  if (locale === 'zh-CN') return 'zh_cn'
+  if (locale === 'es-MX') return 'es_mx'
+  return 'default'
 }
 
 async function fetchJson<T>(url: string): Promise<T> {

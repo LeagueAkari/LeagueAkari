@@ -1,0 +1,8 @@
+cdTimer:
+  window:
+    countdown: '{{championName}} {{spellName}} listo en {{minutes}} m {{seconds}} s'
+    countup: '{{championName}} {{spellName}} usado hace {{minutes}} m {{seconds}} s'
+    nativeInjectionUnsupported: Enviar al juego no es compatible con este entorno (requiere inyección de entrada nativa).
+    gameNotForeground: Vuelve a la ventana del juego (en primer plano) antes de enviar.
+    alreadySending: Ya se está enviando. Inténtalo de nuevo más tarde.
+    sendFailed: 'Error al enviar: {{reason}}'

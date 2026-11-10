@@ -1,0 +1,533 @@
+matchCard:
+  damageMetrics:
+    teamShare: Parte del total del equipo
+    shareOfOwnTotal: '% del total propio'
+    dealt:
+      total: Daño a campeones
+      teamTotal: 'Daño del equipo a campeones: {{total}}'
+      composition: Desglose del daño propio
+    taken:
+      total: Daño recibido
+      teamTotal: 'Daño recibido por el equipo: {{total}}'
+      composition: Desglose del daño recibido propio
+    physical: Físico
+    magic: Mágico
+    'true': Verdadero
+  common:
+    loading: Cargando...
+    noData: Sin datos
+    refresh: Actualizar
+  result:
+    abort: Cancelada
+    remake: Rehecha
+    win: Victoria
+    loss: Derrota
+    surrender: Rendición
+  frameEventType:
+    CHAMPION_KILL: Asesinato de campeón
+    CHAMPION_SPECIAL_KILL: Asesinato especial
+    BUILDING_KILL: Estructura destruida
+    WARD_PLACED: Centinela colocado
+    WARD_KILL: Centinela destruido
+    DRAGON_SOUL_GIVEN: Alma de dragón obtenida
+    OBJECTIVE_BOUNTY_PRESTART: Inicio de recompensa de objetivo
+    TURRET_PLATE_DESTROYED: Placa de torreta destruida
+  buildingType:
+    TOWER_BUILDING: Torreta
+    INHIBITOR_BUILDING: Inhibidor
+  towerType:
+    OUTER_TURRET: Torreta exterior
+    INNER_TURRET: Torreta interior
+    BASE_TURRET: Torreta de la base
+    NEXUS_TURRET: Torreta del Nexo
+  laneType:
+    MID_LANE: Carril central
+    TOP_LANE: Carril superior
+    BOT_LANE: Carril inferior
+  position:
+    TOP: Superior
+    JUNGLE: Jungla
+    MIDDLE: Central
+    BOTTOM: Inferior
+    UTILITY: Soporte
+  teamTable:
+    objectives:
+      tower: Torreta
+      inhibitor: Inhibidor
+      dragon: Dragón
+      baron: Barón Nashor
+      voidGrub: Larva del Vacío
+      riftHerald: Heraldo de la Grieta
+      atakhan: Atakhan
+    bans: Bloqueos
+    perMinuteSuffix: / min
+    cs: Súbditos
+  overview:
+    perfect: Perfecto
+    damage: Daño
+    cs: Súbditos
+    csPerMin: / min
+  radar:
+    damage: Daño ({{value}})
+    taken: Daño recibido ({{value}})
+    gold: Oro ({{value}})
+    cs: Súbditos ({{value}})
+    kda: KDA ({{value}})
+    kp: PA ({{value}}%)
+    heal: Curación ({{value}})
+    teamAvg: Promedio del equipo
+  tabs:
+    summary: Resumen
+    details: Tabla detallada
+    runes: Runas
+    events: Eventos
+    builds: Armados
+    timeline: Línea de tiempo
+  replay:
+    download: Descargar repetición
+    watch: Ver repetición
+    unavailable: Repetición no disponible
+    label: Repetición
+    downloading: Descargando {{progress}}%
+    checking: Comprobando
+  dryRun:
+    tooltip: Simular el análisis de partida en curso
+  buildsTab:
+    anvils_one: '{{count}} yunque'
+    anvils_other: '{{count}} yunques'
+    skillBuild: Orden de habilidades
+    noSkillUpgrades: Sin mejoras de habilidades
+    itemPurchases: Compras de objetos
+    noItemPurchases: Sin compras de objetos
+    evolved: Evolucionado
+  detailsTab:
+    gameId: ID de partida
+    gameVersion: Versión del juego
+    filterPlaceholder: Filtrar
+    noFilterResult: Ningún resultado coincide
+  timelineTab:
+    diffLineChart: Gráfico de diferencias
+    statsLine: Línea de estadísticas
+  diffLineChart:
+    dataType: Tipo de dato
+    gold: Oro
+    cs: Súbditos
+    exp: EXP
+    damageDealt: Daño infligido a campeones
+    damageTaken: Daño recibido
+    teamAverage: Promedio del equipo
+    players: Jugadores
+    selectAll: Seleccionar todo
+    teamAverageSuffix: 'Prom. {{name}}'
+    playerLabel: Jugador {{id}}
+    gameTime: Tiempo de partida
+    metric:
+      gold:
+        title: Crecimiento del oro del jugador
+        yAxis: Oro
+        unit: Oro
+      cs:
+        title: Crecimiento de súbditos del jugador
+        yAxis: Súbditos
+        unit: Súbditos
+      exp:
+        title: Crecimiento de la experiencia del jugador
+        yAxis: Experiencia
+        unit: EXP
+      damageDealt:
+        title: Daño infligido por el jugador
+        yAxis: Daño infligido a campeones
+        unit: Daño
+      damageTaken:
+        title: Daño recibido por el jugador
+        yAxis: Daño recibido
+        unit: Daño
+  statsLine:
+    participant: Participante
+    hint: Los datos los devuelve el servidor; algunos campos pueden ser incorrectos.
+    stats:
+      abilityHaste: Velocidad de habilidades
+      abilityPower: Poder de habilidad
+      armor: Armadura
+      armorPen: Penetración de armadura
+      armorPenPercent: Penetración de armadura %
+      attackDamage: Daño de ataque
+      attackSpeed: Velocidad de ataque %
+      bonusArmorPenPercent: Penetración de armadura adicional %
+      bonusMagicPenPercent: Penetración mágica adicional %
+      ccReduction: Tenacidad %
+      cooldownReduction: Reducción de enfriamiento %
+      health: Vida
+      healthRegen: Regeneración de vida
+      lifesteal: Robo de vida %
+      magicPen: Penetración mágica
+      magicPenPercent: Penetración mágica %
+      magicResist: Resistencia mágica
+      movementSpeed: Velocidad de movimiento
+      omnivamp: Omnivampirismo %
+      physicalVamp: Vampirismo físico %
+      power: Recurso
+      powerRegen: Regeneración de recurso
+      spellVamp: Vampirismo de hechizos %
+  eventsTab:
+    start: Inicio de la partida
+    end: Fin de la partida
+    viewPosition: Ver posición
+    kill: Asesinato
+    firstBlood: Primera Sangre
+    multiKill: '{{count}} asesinato(s)'
+    ace: Ace
+    destroyBuilding: Destruir estructura
+    destroyed: Destruida
+    destroyPlateTitle: Destruir placa de torreta
+    plateLane: 'Placa del {{lane}}'
+    plate: Placa de torreta
+    filters: Filtros
+    filterByChampion: Filtrar por campeón
+    plateStats: Estadísticas de placas
+    plateCount_one: '{{count}} placa'
+    plateCount_other: '{{count}} placas'
+    viewVictimDamageDetails: Detalles del daño
+    victimDamageDetails:
+      received: Recibido de
+      dealt: Infligido a
+      damageDealerNames:
+        champion: Campeón
+        tower: Torreta
+        minion: Súbdito
+        monster: Monstruo
+        other: Otro
+  tags:
+    times: '{{label}}×{{count}}'
+    multiKill:
+      penta: Pentakill
+      quadra: Cuádruple asesinato
+      triple: Triple asesinato
+      double: Doble asesinato
+    damage:
+      bestLabel: ★ Daño
+      teamLabel: Daño
+      bestContent: 'Más daño de la partida: {{value}}, {{rate}}% del equipo'
+      teamContent: 'Más daño del equipo: {{value}}, {{rate}}% del equipo'
+    taken:
+      bestLabel: ★ Daño recibido
+      teamLabel: Daño recibido
+      bestContent: 'Más daño recibido de la partida: {{value}}, {{rate}}% del equipo'
+      teamContent: 'Más daño recibido del equipo: {{value}}, {{rate}}% del equipo'
+    heal:
+      bestLabel: ★ Curación
+      teamLabel: Curación
+      bestContent: 'Más curación de la partida: {{value}}, {{rate}}% del equipo'
+      teamContent: 'Más curación del equipo: {{value}}, {{rate}}% del equipo'
+    tower:
+      bestLabel: ★ Daño a torretas
+      teamLabel: Daño a torretas
+      bestContent: 'Más daño a torretas de la partida: {{value}}, {{rate}}% del equipo'
+      teamContent: 'Más daño a torretas del equipo: {{value}}, {{rate}}% del equipo'
+    shield:
+      bestLabel: ★ Escudos
+      teamLabel: Escudos
+      bestContent: 'Más escudos de la partida: {{value}}, {{rate}}% del equipo'
+      teamContent: 'Más escudos del equipo: {{value}}, {{rate}}% del equipo'
+    solo:
+      label: Asesinato en solitario
+      content: Consiguió {{value}} asesinatos en solitario
+    gold:
+      bestLabel: ★ Oro
+      teamLabel: Oro
+      bestContent: 'Más oro de la partida: {{value}}, {{rate}}% del equipo'
+      teamContent: 'Más oro del equipo: {{value}}, {{rate}}% del equipo'
+    damageGoldEfficiency:
+      bestLabel: ★ Daño-oro
+      teamLabel: Daño-oro
+      bestContent: 'Mejor eficiencia daño-oro de la partida: {{rate}}%'
+      teamContent: 'Mejor eficiencia daño-oro del equipo: {{rate}}%'
+    cs:
+      bestLabel: ★ Súbditos
+      bestContent: 'Más súbditos: {{value}}'
+    csAdvantage:
+      label: Ventaja de súbditos
+      content: Mayor ventaja de súbditos en carril {{value}}
+    kills:
+      bestLabel: ★ Asesinatos
+      teamLabel: Asesinatos
+      bestContent: 'Más asesinatos de la partida: {{value}}'
+      teamContent: 'Más asesinatos del equipo: {{value}}'
+    kp:
+      bestLabel: ★ PA
+      teamLabel: PA
+      bestContent: 'Mayor participación en asesinatos de la partida: {{value}}%'
+      teamContent: 'Mayor participación en asesinatos del equipo: {{value}}%'
+    knockUp:
+      label: Derribos
+      content: Lanzó o atrajo enemigos hacia su equipo {{value}} veces
+    cc:
+      bestLabel: ★ CC
+      teamLabel: CC
+      bestContent: 'Más control de masas de la partida: {{value}} s'
+      teamContent: 'Más control de masas del equipo: {{value}} s'
+    towerKill:
+      diveLabel: Dives
+      underLabel: Bajo torreta
+      diveContent: Asesinatos bajo torreta enemiga {{value}} veces
+      underContent: Asesinatos bajo torreta propia {{value}} veces
+    none:
+      label: Nada destacable
+      content: Sin momentos destacados en esta partida
+  groups:
+    combat-stats: Estadísticas de combate
+    damage: Daño
+    cc: Control de masas
+    vision: Visión
+    buildings: Estructuras
+    economy: Economía
+    healing: Curación
+    pings: Pings
+    combat-advanced: Combate avanzado
+    objectives: Objetivos
+    statistics: Estadísticas
+    abilities: Habilidades
+    survival-skills: Supervivencia
+    teamfight: Pelea de equipo
+    misc: Varios
+    ignored: Ignorado
+    game-state: Estado de la partida
+  statKeys:
+    akariScore: Puntuación Akari
+    kills: Asesinatos
+    deaths: Muertes
+    assists: Asistencias
+    doubleKills: Dobles asesinatos
+    tripleKills: Triples asesinatos
+    quadraKills: Cuádruples asesinatos
+    pentaKills: Pentakills
+    unrealKills: Asesinatos irreales
+    killingSprees: Rachas de asesinatos
+    largestKillingSpree: Mayor racha de asesinatos
+    largestMultiKill: Mayor asesinato múltiple
+    longestTimeSpentLiving: Mayor tiempo con vida
+    largestCriticalStrike: Mayor golpe crítico
+    damageGoldEfficiency: Eficiencia daño-oro
+    totalDamageDealtToChampions: Daño total a campeones
+    physicalDamageDealtToChampions: Daño físico a campeones
+    magicDamageDealtToChampions: Daño mágico a campeones
+    trueDamageDealtToChampions: Daño verdadero a campeones
+    totalDamageDealt: Daño total infligido
+    physicalDamageDealt: Daño físico infligido
+    magicDamageDealt: Daño mágico infligido
+    trueDamageDealt: Daño verdadero infligido
+    damageDealtToObjectives: Daño a objetivos
+    damageDealtToTurrets: Daño a torretas
+    damageDealtToBuildings: Daño a estructuras
+    damageDealtToEpicMonsters: Daño a monstruos épicos
+    totalDamageTaken: Daño total recibido
+    physicalDamageTaken: Daño físico recibido
+    magicDamageTaken: Daño mágico recibido
+    magicalDamageTaken: Daño mágico recibido
+    trueDamageTaken: Daño verdadero recibido
+    damageSelfMitigated: Daño mitigado
+    totalDamageShieldedOnTeammates: Escudos totales a aliados
+    timeCCingOthers: Tiempo aplicando control de masas
+    totalTimeCCDealt: Tiempo total de CC infligido
+    totalTimeCrowdControlDealt: Tiempo total de control de masas
+    enemyChampionImmobilizations: Inmovilizaciones a campeones enemigos
+    immobilizeAndKillWithAlly: Inmovilizar y matar con un aliado
+    knockEnemyIntoTeamAndKill: Lanzar a un enemigo hacia el equipo y matarlo
+    survivedThreeImmobilizesInFight: Sobrevivió a tres inmovilizaciones
+    highestCrowdControlScore: Mayor puntuación de control de masas
+    visionScore: Puntuación de visión
+    wardsPlaced: Centinelas colocados
+    wardsKilled: Centinelas destruidos
+    sightWardsBoughtInGame: Centinelas de visión comprados
+    visionWardsBoughtInGame: Centinelas de control comprados
+    detectorWardsPlaced: Centinelas detectores colocados
+    visionScorePerMinute: Puntuación de visión por minuto
+    visionScoreAdvantageLaneOpponent: Ventaja de visión sobre el rival de carril
+    wardTakedowns: Centinelas eliminados
+    wardTakedownsBefore20M: Centinelas eliminados antes del minuto 20
+    wardsGuarded: Centinelas protegidos
+    twoWardsOneSweeperCount: Dos centinelas con un barrido
+    controlWardsPlaced: Centinelas de control colocados
+    stealthWardsPlaced: Centinelas invisibles colocados
+    controlWardTimeCoverageInRiverOrEnemyHalf: Cobertura de centinelas de control en el río o la mitad enemiga
+    turretKills: Torretas destruidas
+    turretTakedowns: Participación en torretas
+    soloTurretsLategame: Torretas en solitario al final de la partida
+    turretsLost: Torretas perdidas
+    firstTowerKill: Primera torreta destruida
+    firstTowerAssist: Asistencia en la primera torreta
+    firstTurretKilled: Primera torreta destruida
+    firstTurretKilledTime: Tiempo de la primera torreta
+    turretPlatesTaken: Placas de torreta obtenidas
+    kTurretsDestroyedBeforePlatesFall: Torretas destruidas antes de que caigan las placas
+    outerTurretExecutesBefore10Minutes: Torretas exteriores antes del minuto 10
+    quickFirstTurret: Primera torreta rápida
+    takedownOnFirstTurret: Participación en la primera torreta
+    turretsTakenWithRiftHerald: Torretas con el Heraldo de la Grieta
+    multiTurretRiftHeraldCount: Varias torretas con el Heraldo
+    inhibitorKills: Inhibidores destruidos
+    inhibitorTakedowns: Participación en inhibidores
+    inhibitorsLost: Inhibidores perdidos
+    firstInhibitorKill: Primer inhibidor destruido
+    firstInhibitorAssist: Asistencia en el primer inhibidor
+    lostAnInhibitor: Perdió un inhibidor
+    nexusKills: Nexos destruidos
+    nexusLost: Nexo perdido
+    nexusTakedowns: Participación en el Nexo
+    hadOpenNexus: Tuvo el Nexo expuesto
+    outnumberedNexusKill: Nexo destruido en inferioridad numérica
+    objectivesStolen: Objetivos robados
+    objectivesStolenAssists: Asistencias en objetivos robados
+    goldEarned: Oro obtenido
+    goldSpent: Oro gastado
+    totalMinionsKilled: Súbditos asesinados
+    neutralMinionsKilled: Monstruos neutrales asesinados
+    neutralMinionsKilledEnemyJungle: Monstruos de la jungla enemiga
+    neutralMinionsKilledTeamJungle: Monstruos de la jungla propia
+    totalAllyJungleMinionsKilled: Monstruos de la jungla aliada asesinados
+    totalEnemyJungleMinionsKilled: Monstruos de la jungla enemiga asesinados
+    consumablesPurchased: Consumibles comprados
+    itemsPurchased: Objetos comprados
+    earlyLaningPhaseGoldExpAdvantage: Ventaja de oro/EXP al inicio de la fase de líneas
+    laningPhaseGoldExpAdvantage: Ventaja de oro/EXP en la fase de líneas
+    maxCsAdvantageOnLaneOpponent: Máxima ventaja de súbditos sobre el rival de carril
+    totalHeal: Curación total
+    totalUnitsHealed: Unidades curadas
+    totalHealsOnTeammates: Curación total a aliados
+    allInPings: Pings de "todos adentro"
+    assistMePings: Pings de "ayúdame"
+    basicPings: Pings básicos
+    commandPings: Pings de orden
+    dangerPings: Pings de peligro
+    enemyMissingPings: Pings de enemigo desaparecido
+    enemyVisionPings: Pings de visión enemiga
+    getBackPings: Pings de "retrocedan"
+    holdPings: Pings de "esperen"
+    needVisionPings: Pings de "necesito visión"
+    onMyWayPings: Pings de "en camino"
+    pushPings: Pings de "empujen"
+    retreatPings: Pings de retirada
+    visionClearedPings: Pings de visión despejada
+    soloKills: Asesinatos en solitario
+    quickSoloKills: Asesinatos en solitario rápidos
+    takedowns: Participaciones en asesinatos
+    outnumberedKills: Asesinatos en inferioridad numérica
+    multikills: Asesinatos múltiples
+    multikillsAfterAggressiveFlash: Asesinatos múltiples tras un Destello agresivo
+    multiKillOneSpell: Asesinato múltiple con una habilidad
+    killAfterHiddenWithAlly: Asesinato tras emboscar con un aliado
+    pickKillWithAlly: Asesinato aislado con un aliado
+    killsWithHelpFromEpicMonster: Asesinatos con ayuda de un monstruo épico
+    takedownsBeforeJungleMinionSpawn: Asesinatos antes de que aparezca la jungla
+    takedownsFirstXMinutes: Asesinatos en los primeros minutos
+    takedownsAfterGainingLevelAdvantage: Asesinatos tras sacar ventaja de nivel
+    takedownsInAlcove: Asesinatos en el recoveco
+    takedownsInEnemyFountain: Asesinatos en la fuente enemiga
+    killsOnOtherLanesEarlyJungleAsLaner: Asesinatos tempranos en otros carriles
+    getTakedownsInAllLanesEarlyJungleAsLaner: Rotaciones tempranas por todos los carriles
+    killsOnRecentlyHealedByAramPack: Asesinatos tras recoger curación (ARAM)
+    fastestLegendary: Racha legendaria más rápida
+    baronTakedowns: Participación en barones
+    dragonTakedowns: Participación en dragones
+    riftHeraldTakedowns: Participación en heraldos
+    teamBaronKills: Barones del equipo
+    teamElderDragonKills: Dragones ancestrales del equipo
+    teamRiftHeraldKills: Heraldos del equipo
+    soloBaronKills: Barones en solitario
+    baronBuffGoldAdvantageOverThreshold: Ventaja de oro con el Barón
+    earliestBaron: Barón más temprano
+    earliestDragonTakedown: Dragón más temprano
+    elderDragonKillsWithOpposingSoul: Dragón ancestral contra el alma rival
+    elderDragonMultikills: Asesinatos múltiples con el Dragón ancestral
+    perfectDragonSoulsTaken: Almas de dragón perfectas
+    epicMonsterSteals: Monstruos épicos robados
+    epicMonsterStolenWithoutSmite: Monstruo épico robado sin Castigo
+    epicMonsterKillsNearEnemyJungler: Monstruos épicos cerca del jungla enemigo
+    epicMonsterKillsWithin30SecondsOfSpawn: Monstruos épicos a menos de 30 s de aparecer
+    junglerTakedownsNearDamagedEpicMonster: Asesinatos del jungla cerca de un monstruo épico dañado
+    voidMonsterKill: Monstruo del Vacío asesinado
+    alliedJungleMonsterKills: Monstruos de la jungla aliada
+    enemyJungleMonsterKills: Monstruos de la jungla enemiga
+    scuttleCrabKills: Cangrejos Escurridizos asesinados
+    buffsStolen: Mejoras robadas
+    jungleCsBefore10Minutes: Monstruos de jungla antes del minuto 10
+    initialBuffCount: Mejoras iniciales
+    initialCrabCount: Cangrejos iniciales
+    moreEnemyJungleThanOpponent: Más jungla enemiga que el rival
+    kda: KDA
+    killParticipation: Participación en asesinatos
+    damagePerMinute: Daño por minuto
+    goldPerMinute: Oro por minuto
+    damageTakenOnTeamPercentage: Daño recibido del equipo %
+    teamDamagePercentage: Daño del equipo %
+    abilityUses: Usos de habilidades
+    spell1Casts: Usos de la Q
+    spell2Casts: Usos de la W
+    spell3Casts: Usos de la E
+    spell4Casts: Usos de la R
+    summoner1Casts: Usos del hechizo de invocador 1
+    summoner2Casts: Usos del hechizo de invocador 2
+    deathsByEnemyChamps: Muertes a manos de campeones enemigos
+    survivedSingleDigitHpCount: Sobrevivió con menos de 10 de vida
+    tookLargeDamageSurvived: Recibió mucho daño y sobrevivió
+    killedChampTookFullTeamDamageSurvived: Mató a un campeón y sobrevivió al daño de todo el equipo
+    saveAllyFromDeath: Salvó a un aliado de la muerte
+    skillshotsDodged: Habilidades esquivadas
+    skillshotsHit: Habilidades acertadas
+    snowballsHit: Bolas de nieve acertadas
+    dodgeSkillShotsSmallWindow: Habilidades esquivadas por poco
+    landSkillShotsEarlyGame: Habilidades acertadas al inicio
+    blastConeOppositeOpponentCount: Empujes con Flor Explosiva
+    quickCleanse: Purificación rápida
+    dancedWithRiftHerald: Bailó con el Heraldo de la Grieta
+    fistBumpParticipation: Participación en choques de puños
+    flawlessAces: Aces impecables
+    doubleAces: Aces dobles
+    acesBefore15Minutes: Aces antes del minuto 15
+    fullTeamTakedown: Eliminación del equipo completo
+    shortestTimeToAceFromFirstTakedown: Ace más rápido
+    12AssistStreakCount: Racha de 12 asistencias
+    teleportTakedowns: Asesinatos tras Teleportación
+    champLevel: Nivel de campeón
+    champExperience: Experiencia de campeón
+    timePlayed: Tiempo jugado
+    totalTimeSpentDead: Tiempo muerto
+    firstBloodKill: Primera Sangre
+    firstBloodAssist: Asistencia en Primera Sangre
+    baronKills: Barones asesinados
+    dragonKills: Dragones asesinados
+    killsNearEnemyTurret: Asesinatos cerca de torreta enemiga
+    killsUnderOwnTurret: Asesinatos bajo torreta propia
+    unseenRecalls: Regresos sin ser visto
+    effectiveHealAndShielding: Curación y escudos efectivos
+    bountyGold: Oro de recompensas
+    laneMinionsFirst10Minutes: Súbditos de carril antes del minuto 10
+    twentyMinionsIn3SecondsCount: 20 súbditos en 3 segundos
+    legendaryCount: Rachas legendarias
+    perfectGame: Partida perfecta
+    maxKillDeficit: Máxima desventaja de asesinatos
+    maxLevelLeadLaneOpponent: Máxima ventaja de nivel sobre el rival de carril
+    completeSupportQuestInTime: Misión de soporte completada a tiempo
+    mejaisFullStackInTime: Mejai con todas las cargas a tiempo
+    HealFromMapSources: Curación de fuentes del mapa
+    gameLength: Duración de la partida
+    playedChampSelectPosition: Jugó la posición de la selección
+    positionAssignedByMatchmaking: Posición asignada por el emparejamiento
+    selectedRolePreferences: Preferencias de rol elegidas
+    hadAfkTeammate: Tuvo un compañero AFK
+    highestChampionDamage: Mayor daño a campeones
+    PlayerBehavior: Comportamiento del jugador
+    PlayerBehavior_IsHeroInCombat: Campeón en combate
+    gameEndedInEarlySurrender: Terminó en rendición temprana
+    gameEndedInIGNBSurrender: Terminó en rendición dentro de la partida
+    gameEndedInSurrender: Terminó en rendición
+    causedEarlySurrender: Provocó la rendición temprana
+    causedGameEndFromIGNBSurrender: Provocó el fin por rendición dentro de la partida
+    earlySurrenderAccomplice: Cómplice de la rendición temprana
+    teamEarlySurrendered: El equipo se rindió temprano
+    teamIGNBSurrendered: El equipo se rindió dentro de la partida
+    wasPremadeWithIGNBGameEndCauser: Premade de quien provocó la rendición
+    wasPremadeWithSevereTransgressor: Premade de un infractor grave
+    wasSevereTransgressor: Infractor grave
+    'true': Sí
+    'false': No
