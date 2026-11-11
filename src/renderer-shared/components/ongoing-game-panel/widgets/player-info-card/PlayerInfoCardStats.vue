@@ -118,14 +118,40 @@
       </div>
     </NPopover>
 
-    <NPopover v-if="positionInfo">
+    <NPopover :keep-alive-on-hover="false" :disabled="!analysis" :delay="50">
       <template #trigger>
         <div
-          class="flex flex-1 items-center justify-center gap-0.5 text-base"
+          v-if="analysis"
+          class="flex-1 text-center text-[13px] font-bold tabular-nums"
           :class="{
-            'ml-4': !positionInfo.isAutofilled
+            'text-purple-600 dark:text-purple-400': analysis.akariScore.extraordinary,
+            'text-green-700 dark:text-green-300':
+              analysis.akariScore.outstanding && !analysis.akariScore.extraordinary,
+            'text-black/80 dark:text-white/80':
+              !analysis.akariScore.outstanding && !analysis.akariScore.extraordinary
           }"
         >
+          <span class="mr-0.5 text-[9px] font-normal text-black/50 dark:text-white/50">Akari</span>
+          <span>{{ analysis.akariScore.total.toFixed(2) }}</span>
+        </div>
+        <div v-else class="flex flex-1 justify-center">
+          <span
+            class="inline-flex h-4 min-w-8 items-center justify-center rounded px-1.5 text-[13px] leading-none text-black/40 dark:text-white/40"
+            >N/A</span
+          >
+        </div>
+      </template>
+      <div class="w-64" v-if="analysis">
+        <AkariScorePopoverContent :score="analysis.akariScore" :total-precision="2" />
+        <div class="mt-2 text-xs leading-4 text-black/55 dark:text-white/55">
+          {{ t('ongoingGame.playerCard.akariScorePopoverDescription') }}
+        </div>
+      </div>
+    </NPopover>
+
+    <NPopover v-if="positionInfo">
+      <template #trigger>
+        <div class="flex flex-1 items-center justify-center gap-0.5 text-base">
           <div
             v-if="positionInfo.isAutofilled"
             class="rounded px-1 py-0.5 text-[11px] leading-2.75 whitespace-nowrap text-black dark:text-white"
@@ -221,6 +247,7 @@
 </template>
 
 <script setup lang="ts">
+import { AkariScorePopoverContent } from '@renderer-shared/components/akari-score'
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import { ParsedRole } from '@shared/utils/ranked'
 import { useTranslation } from 'i18next-vue'

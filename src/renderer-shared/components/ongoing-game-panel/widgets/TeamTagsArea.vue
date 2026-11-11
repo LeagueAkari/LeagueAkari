@@ -38,6 +38,24 @@
         (K {{ teamStats.kills.toLocaleString() }} / D {{ teamStats.deaths.toLocaleString() }} / A
         {{ teamStats.assists.toLocaleString() }})
       </NPopover>
+
+      <template v-if="Number.isFinite(teamStats.avgAkariScore)">
+        <div class="mx-2 box-border h-[0.9em] w-px self-center bg-black/15 dark:bg-white/15"></div>
+
+        <NPopover>
+          <template #trigger>
+            <div class="text-sm">
+              <span class="mr-1 text-xs text-black/60 dark:text-white/60">Akari</span>
+              <span class="font-bold">{{ teamStats.avgAkariScore.toFixed(2) }}</span>
+            </div>
+          </template>
+          {{
+            t('ongoingGame.teamTags.akariScore', {
+              score: teamStats.avgAkariScore.toFixed(2)
+            })
+          }}
+        </NPopover>
+      </template>
     </template>
 
     <!-- 左右两边都有时给个分界线 -->
