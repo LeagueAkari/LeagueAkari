@@ -1,3 +1,5 @@
+import { type AkariScore, computeSingleAkariScore } from '@shared/data-adapter/analysis/player'
+import { computeSingleSummary } from '@shared/data-adapter/analysis/player/single/summary'
 import { toFrames } from '@shared/data-adapter/match-history/frames'
 import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import { toParticipants } from '@shared/data-adapter/match-history/participants'
@@ -33,6 +35,8 @@ export type MatchCardContext = {
 
   participant: Ref<ReturnType<typeof toParticipants>[number] | null>
   team: Ref<ReturnType<typeof toTeams>['teamStatMap'][string] | null>
+
+  akariScoresByPuuid: Ref<Record<string, AkariScore>>
 
   // events
   navigateToSummonerByPuuid: (puuid: string, setCurrent?: boolean) => void
@@ -89,6 +93,26 @@ export function provideMatchCard(props: {
   const team = computed(() => {
     if (!participant.value) return null
     return teams.value.teamStatMap[participant.value.teamIdentifier] ?? null
+  })
+
+  const akariScoresByPuuid = computed(() => {
+    const scores: Record<string, AkariScore> = {}
+
+    for (const p of participants.value) {
+      const teamParticipants = participants.value.filter(
+        (tp) => tp.teamIdentifier === p.teamIdentifier
+      )
+      const summaryAnalysis = computeSingleSummary(
+        basicInfo.value,
+        p,
+        teamParticipants,
+        participants.value
+      )
+
+      scores[p.puuid] = computeSingleAkariScore(summaryAnalysis)
+    }
+
+    return scores
   })
 
   const draftOptions = computed<DraftOptions>(() => {
@@ -148,6 +172,8 @@ export function provideMatchCard(props: {
 
     participant,
     team,
+
+    akariScoresByPuuid,
 
     // events
     navigateToSummonerByPuuid: props.navigateToSummonerByPuuid,

@@ -285,11 +285,29 @@
               <div class="flex items-center gap-1 text-xs" v-if="!hidePrivacy">
                 <span class="font-bold">{{ player.gameName }}</span>
                 <span v-if="player.tagLine" class="text-white/80">#{{ player.tagLine }}</span>
+                <span v-if="akariScoresByPuuid[player.puuid]" class="text-white/70">
+                  ({{ akariScoresByPuuid[player.puuid].total.toFixed(2) }})
+                </span>
               </div>
               <div class="flex items-center gap-1 text-xs" v-else>
                 <span class="font-bold">{{ resources.champions.name(player.championId) }}</span>
+                <span v-if="akariScoresByPuuid[player.puuid]" class="text-white/70">
+                  ({{ akariScoresByPuuid[player.puuid].total.toFixed(2) }})
+                </span>
               </div>
             </NTooltip>
+
+            <AkariScorePopover
+              v-if="akariScoresByPuuid[player.puuid]"
+              :score="akariScoresByPuuid[player.puuid]"
+            >
+              <span
+                class="shrink-0 cursor-default text-[11px] font-normal text-black/50 tabular-nums hover:text-black dark:text-white/50 dark:hover:text-white"
+                :class="{ 'font-semibold': player.puuid === puuid }"
+              >
+                ({{ akariScoresByPuuid[player.puuid].total.toFixed(2) }})
+              </span>
+            </AkariScorePopover>
           </div>
 
           <!-- spacer -->
@@ -348,11 +366,29 @@
               <div class="flex items-center gap-1 text-xs" v-if="!hidePrivacy">
                 <span class="font-bold">{{ player.gameName }}</span>
                 <span v-if="player.tagLine" class="text-white/80">#{{ player.tagLine }}</span>
+                <span v-if="akariScoresByPuuid[player.puuid]" class="text-white/70">
+                  ({{ akariScoresByPuuid[player.puuid].total.toFixed(2) }})
+                </span>
               </div>
               <div class="flex items-center gap-1 text-xs" v-else>
                 <span class="font-bold">{{ resources.champions.name(player.championId) }}</span>
+                <span v-if="akariScoresByPuuid[player.puuid]" class="text-white/70">
+                  ({{ akariScoresByPuuid[player.puuid].total.toFixed(2) }})
+                </span>
               </div>
             </NTooltip>
+
+            <AkariScorePopover
+              v-if="akariScoresByPuuid[player.puuid]"
+              :score="akariScoresByPuuid[player.puuid]"
+            >
+              <span
+                class="shrink-0 cursor-default text-[11px] font-normal text-black/50 tabular-nums hover:text-black dark:text-white/50 dark:hover:text-white"
+                :class="{ 'font-semibold': player.puuid === puuid }"
+              >
+                ({{ akariScoresByPuuid[player.puuid].total.toFixed(2) }})
+              </span>
+            </AkariScorePopover>
           </div>
         </div>
       </div>
@@ -399,9 +435,15 @@
             <div class="flex items-center gap-1 text-xs" v-if="!hidePrivacy">
               <span class="font-bold">{{ player.gameName }}</span>
               <span v-if="player.tagLine" class="text-white/80">#{{ player.tagLine }}</span>
+              <span v-if="akariScoresByPuuid[player.puuid]" class="text-white/70">
+                ({{ akariScoresByPuuid[player.puuid].total.toFixed(2) }})
+              </span>
             </div>
             <div class="flex items-center gap-1 text-xs" v-else>
               <span class="font-bold">{{ resources.champions.name(player.championId) }}</span>
+              <span v-if="akariScoresByPuuid[player.puuid]" class="text-white/70">
+                ({{ akariScoresByPuuid[player.puuid].total.toFixed(2) }})
+              </span>
             </div>
           </NTooltip>
         </div>
@@ -435,6 +477,7 @@
 
 <script lang="ts" setup>
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
+import { AkariScorePopover } from '@renderer-shared/components/akari-score'
 import { useNumberFormatter } from '@renderer-shared/composables/useNumberFormatter'
 import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { EMPTY_PUUID } from '@shared/constants/common'
@@ -472,7 +515,8 @@ const {
   participants,
   isExpanded,
   hidePrivacy,
-  navigateToSummonerByPuuid
+  navigateToSummonerByPuuid,
+  akariScoresByPuuid
 } = useMatchCard()
 
 const { formatExtremeNumber } = useNumberFormatter()
