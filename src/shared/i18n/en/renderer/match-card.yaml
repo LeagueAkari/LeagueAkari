@@ -63,6 +63,7 @@ matchCard:
     perMinuteSuffix: / min
     cs: CS
     avgAkariScore: Team Avg Akari Score {{score}}
+    avgMultiGameAkariScore: Team Avg Multi-game Akari Score {{score}}
   overview:
     perfect: Perfect
     damage: Dmg.

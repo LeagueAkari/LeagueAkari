@@ -37,13 +37,22 @@
       <!-- team avg akari score -->
       <NPopover v-if="teamAvgAkariScore !== null">
         <template #trigger>
-          <div class="cursor-default text-xs text-black/80 dark:text-white/80">
-            <span class="mr-0.5 text-black/60 dark:text-white/60">Akari</span>
+          <div
+            class="flex cursor-default items-center gap-1 text-xs text-black/80 dark:text-white/80"
+          >
+            <span class="text-black/60 dark:text-white/60">Akari</span>
             <span class="font-bold">{{ teamAvgAkariScore.toFixed(2) }}</span>
+            <NSpin v-if="loadingMultiGameScores" :size="10" class="ml-0.5" />
           </div>
         </template>
         <div class="text-xs">
-          {{ t('matchCard.teamTable.avgAkariScore', { score: teamAvgAkariScore.toFixed(2) }) }}
+          {{
+            isMultiGameScoreActive
+              ? t('matchCard.teamTable.avgMultiGameAkariScore', {
+                  score: teamAvgAkariScore.toFixed(2)
+                })
+              : t('matchCard.teamTable.avgAkariScore', { score: teamAvgAkariScore.toFixed(2) })
+          }}
         </div>
       </NPopover>
 
@@ -351,7 +360,7 @@ import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resou
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { Robot } from '@vicons/fa'
 import { useTranslation } from 'i18next-vue'
-import { NIcon, NPopover, NTooltip } from 'naive-ui'
+import { NIcon, NPopover, NSpin, NTooltip } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useMatchCard } from '../context'
@@ -447,7 +456,9 @@ const {
   puuid,
   hidePrivacy,
   navigateToSummonerByPuuid,
-  akariScoresByPuuid
+  akariScoresByPuuid,
+  loadingMultiGameScores,
+  isMultiGameScoreActive
 } = useMatchCard()
 
 const team = computed(() => {

@@ -142,6 +142,9 @@ playerTabs:
     failedToDownloadReplay: 无法下载回放：{{reason}}
   matchHistory:
     pagination: 分页
+    akariScoreMode: 评分模式
+    multiGameScore: 多场评分
+    akariScoreModeTooltip: 开启后，展开对局卡片时将根据当前所选队列和分页场次异步拉取同局玩家的历史战绩并计算综合 Akari 评分。
     sidebar:
       open: 展开战绩侧栏
     filters:

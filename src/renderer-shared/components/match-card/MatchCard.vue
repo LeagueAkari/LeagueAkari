@@ -27,12 +27,20 @@ const {
   hidePrivacy = false,
   loadingDetails = false,
   replayState = null,
-  canDryRunOngoingGame = false
+  canDryRunOngoingGame = false,
+  multiGameScores = null,
+  loadingMultiGameScores = false,
+  showMultiGameScoreSwitch = false
 } = defineProps<MatchCardProps>()
 
 const emits = defineEmits<MatchCardEmits>()
 
 const isExpanded = defineModel<boolean>('isExpanded', {
+  required: false,
+  default: false
+})
+
+const isMultiGameScoreEnabled = defineModel<boolean>('isMultiGameScoreEnabled', {
   required: false,
   default: false
 })
@@ -46,6 +54,13 @@ provideMatchCard({
   loadingDetails: () => loadingDetails,
   replayState: () => replayState,
   canDryRunOngoingGame: () => canDryRunOngoingGame,
+  multiGameScores: () => multiGameScores,
+  loadingMultiGameScores: () => loadingMultiGameScores,
+  isMultiGameScoreEnabled: () => isMultiGameScoreEnabled.value,
+  showMultiGameScoreSwitch: () => showMultiGameScoreSwitch,
+  onToggleMultiGameScore: (val: boolean) => {
+    isMultiGameScoreEnabled.value = val
+  },
 
   navigateToSummonerByPuuid: (puuid: string, setCurrent?: boolean) => {
     emits('navigateToSummonerByPuuid', puuid, setCurrent)

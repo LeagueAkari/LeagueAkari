@@ -10,6 +10,8 @@
       <MatchCard
         v-if="renderState === 'materialized'"
         v-model:is-expanded="isExpanded"
+        v-model:is-multi-game-score-enabled="isMultiGameScoreEnabled"
+        :show-multi-game-score-switch="true"
         :summary="summary"
         :puuid="puuid"
         :details="details"
@@ -17,6 +19,8 @@
         :hide-privacy="hidePrivacy"
         :replay-state="replayState"
         :can-dry-run-ongoing-game="canDryRunOngoingGame"
+        :multi-game-scores="multiGameScores"
+        :loading-multi-game-scores="isLoadingMultiGameScores"
         @navigate-to-summoner-by-puuid="handleNavigateToSummonerByPuuid"
         @load-details="(gameId) => emit('loadDetails', gameId)"
         @download-replay="(gameId) => emit('downloadReplay', gameId)"
@@ -41,6 +45,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, wa
 import { MATCH_HISTORY_CARD_RECYCLE_DELAY_MS } from './constants'
 import type { MatchHistoryCardOptimizationMode } from './types'
 import { useMatchHistoryCardViewport } from './viewport'
+import { useCardMultiGameAkariScores } from '../../data/multi-game-akari-score'
 
 type MatchHistoryCardProps = MatchCardProps & {
   hidden?: boolean
@@ -67,6 +72,13 @@ const isExpanded = defineModel<boolean>('isExpanded', {
 
 const wrapperEl = useTemplateRef('wrapperEl')
 const viewport = useMatchHistoryCardViewport()
+
+const isMultiGameScoreEnabled = ref(false)
+
+const { multiGameScores, isLoadingMultiGameScores } = useCardMultiGameAkariScores({
+  summary: () => summary,
+  isEnabled: () => isMultiGameScoreEnabled.value
+})
 
 const renderState = ref<'placeholder' | 'materialized'>('placeholder')
 const isNearViewport = ref(false)
