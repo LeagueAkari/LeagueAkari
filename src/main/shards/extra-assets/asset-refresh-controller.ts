@@ -1,9 +1,5 @@
 import { TimeoutTask } from '@main/utils/timer'
-import {
-  parseGtimgClassicHeroes,
-  parseGtimgHeroList,
-  parseGtimgKiwiAugments
-} from '@shared/data-adapter/gtimg'
+import { parseGtimgHeroList } from '@shared/data-adapter/gtimg'
 import { parseGtimgGuideCatalog } from '@shared/data-adapter/gtimg/guide-resources'
 import { EXTRA_ASSETS_GTIMG_FEATURE_GATE } from '@shared/shards/feature-gating/keys'
 
@@ -88,7 +84,7 @@ export class ExtraAssetsRefreshController {
         ...(['items', 'perks', 'spells'] as const).map(async (kind) => {
           try {
             const response = await gtimgApi.getGuideCatalog(kind, signal)
-            const catalog = parseGtimgGuideCatalog(kind, response.data).data
+            const catalog = parseGtimgGuideCatalog(kind, response.data)
             if (!signal.aborted) {
               gtimg.setGuideCatalog(catalog)
             }
@@ -102,7 +98,7 @@ export class ExtraAssetsRefreshController {
           .getHeroList(signal)
           .then((heroes) => {
             if (!signal.aborted) {
-              gtimg.setHeroList(parseGtimgHeroList(heroes).data)
+              gtimg.setHeroList(parseGtimgHeroList(heroes))
             }
           })
           .catch((error) => {
@@ -114,7 +110,7 @@ export class ExtraAssetsRefreshController {
           .getClassicHeroes(signal)
           .then((heroes) => {
             if (!signal.aborted) {
-              gtimg.setClassicHeroes(parseGtimgClassicHeroes(heroes).data)
+              gtimg.setClassicHeroes(heroes.heroes)
             }
           })
           .catch((error) => {
@@ -150,7 +146,7 @@ export class ExtraAssetsRefreshController {
       const kiwiAugments = await gtimgApi.getKiwiAugments(signal)
 
       if (!signal.aborted) {
-        gtimg.setKiwiAugments(parseGtimgKiwiAugments(kiwiAugments).data)
+        gtimg.setKiwiAugments(kiwiAugments)
       }
     } catch (error) {
       if (signal.aborted) {

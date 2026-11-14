@@ -40,7 +40,6 @@ import {
 } from 'naive-ui'
 import { computed } from 'vue'
 
-import { useOpgg } from './context'
 import { useWinRateTheme } from '@champion-data-window/components/champion-statistics/theme'
 import StatisticPopover from './widgets/StatisticPopover.vue'
 import TierBadge from '@champion-data-window/components/champion-statistics/TierBadge.vue'
@@ -48,10 +47,15 @@ import TierBadge from '@champion-data-window/components/champion-statistics/Tier
 const { t } = useTranslation()
 const { getWinRateColor } = useWinRateTheme()
 
-defineProps<{ emptyDescription?: string }>()
+const { champions, isLoading } = defineProps<{
+  emptyDescription?: string
+  champions: OpggChampionDataRow[] | null
+  isLoading: boolean
+}>()
+
+const emit = defineEmits<{ champion: [id: number] }>()
 
 const resources = useAkariResourceProvider()
-const { champions, isLoading, setTab } = useOpgg()
 const { match } = useChampionNameMatch()
 const {
   inputValue: filterInput,
@@ -232,7 +236,7 @@ const combinedColumns = computed(() => {
 })
 
 const data = computed(() =>
-  (champions.value ?? []).filter(
+  (champions ?? []).filter(
     (row) =>
       !filterText.value ||
       match(filterText.value, resources.champions.name(row.championId), row.championId)
@@ -240,7 +244,7 @@ const data = computed(() =>
 )
 
 const rowProps: DataTableCreateRowProps<OpggChampionDataRow> = (row) => ({
-  onClick: () => setTab('champion', row.championId),
+  onClick: () => emit('champion', row.championId),
   class: 'cursor-pointer'
 })
 </script>

@@ -26,10 +26,10 @@ import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NTooltip } from 'naive-ui'
 import { computed } from 'vue'
 
-import { useOpgg } from '../../context'
+import { useOpggPage } from '../../context'
 import { useLoadout } from '../../utils/loadout'
 
-const { champion, applying, isLoading, isDataStale } = useOpgg()
+const { champion, applying, isLoading, isDataStale } = useOpggPage()
 const { writeItemSets } = useLoadout()
 const { t } = useTranslation()
 const lcs = useLeagueClientStore()

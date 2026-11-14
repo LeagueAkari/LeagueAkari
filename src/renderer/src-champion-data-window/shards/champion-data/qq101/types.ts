@@ -1,4 +1,4 @@
-import type { Qq101AkariData } from '@shared/data-adapter/qq101/akari-adapter'
+import type { Qq101AkariData } from '@shared/data-adapter/qq101/protocol'
 import type { Qq101PairQuery } from '@shared/http-api-axios-helper/qq101'
 import type { CurrentGamePage } from '@shared/shards/champion-data/automation'
 

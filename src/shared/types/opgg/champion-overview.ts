@@ -1,3 +1,4 @@
+/** OP.GG response contract. Last verified against live endpoints: 2026-11-15. */
 import type { OpggChampionPosition, OpggChampionRole, OpggChampionTierData } from './common'
 
 export interface OpggWinRateChampionStats {
@@ -9,12 +10,6 @@ export interface OpggWinRateChampionStats {
   tier: number
   rank: number
   tier_data: OpggChampionTierData
-  win?: never
-  total_place?: never
-  first_place?: never
-  kills?: never
-  assists?: never
-  deaths?: never
 }
 
 export interface OpggArenaChampionStats {
@@ -30,8 +25,6 @@ export interface OpggArenaChampionStats {
   tier: number
   rank: number
   tier_data: OpggChampionTierData
-  win_rate?: never
-  kda?: never
 }
 
 interface OpggChampionOverviewBase {
@@ -72,8 +65,6 @@ export interface OpggDoomChampionOverview extends OpggChampionOverviewBase {
 
 export interface OpggArenaChampionOverview extends OpggChampionOverviewBase {
   average_stats: OpggArenaChampionStats | null
-  positions?: never
-  roles?: never
 }
 
 export type OpggChampionOverview =

@@ -40,13 +40,11 @@
         />
       </template>
     </TabBar>
-    <OpggQueryFilters />
   </div>
 </template>
 
 <script setup lang="tsx">
 import { useCurrentGameTabMenu } from '@champion-data-window/components/current-game/use-current-game-tab-menu'
-import OpggQueryFilters from './filters/OpggQueryFilters.vue'
 import QuerySummary, {
   type QuerySummaryField
 } from '@champion-data-window/components/query-filter/QuerySummary.vue'
@@ -62,7 +60,17 @@ import { useTranslation } from 'i18next-vue'
 import { NDropdown, NIcon } from 'naive-ui'
 import { computed, markRaw, reactive, watch } from 'vue'
 
-import { useOpgg } from './context'
+import type { OpggChampionDataSnapshot } from '@shared/types/champion-data/opgg'
+
+const props = defineProps<{ snapshot: OpggChampionDataSnapshot }>()
+
+const emit = defineEmits<{
+  activate: [id: number | null]
+  close: [id: number]
+  closeOthers: [id: number | null]
+  reorder: [ids: number[]]
+  refresh: [id: number | null]
+}>()
 
 const { t } = useTranslation()
 const resources = useAkariResourceProvider()
@@ -72,15 +80,9 @@ const contextMenuOffsetY =
     getComputedStyle(document.documentElement).getPropertyValue('--la-titlebar-height') || '0'
   ) || 0
 
-const {
-  snapshot,
-  activePage,
-  openedPages,
-  activatePage,
-  closeChampion,
-  reorderChampions,
-  refreshPage
-} = useOpgg()
+const snapshot = computed(() => props.snapshot)
+const activePage = computed(() => snapshot.value.activePage)
+const openedPages = computed(() => snapshot.value.openedPages)
 
 const { regionOptions } = useRegionOptions()
 const { tierOptions } = useTierOptions()
@@ -89,14 +91,14 @@ const activeTabId = computed({
   get: () => (activePage.value === null ? 'champions' : String(activePage.value)),
   set: (id: string) => {
     contextMenu.show = false
-    void activatePage(id === 'champions' ? null : Number(id))
+    emit('activate', id === 'champions' ? null : Number(id))
   }
 })
 
 const tabOrder = computed({
   get: () => ['champions', ...openedPages.value.map(String)],
   set: (ids: string[]) => {
-    void reorderChampions(ids.filter((id) => id !== 'champions').map(Number))
+    emit('reorder', ids.filter((id) => id !== 'champions').map(Number))
   }
 })
 
@@ -112,7 +114,7 @@ const tabItems = computed<TabBarItems>(() => ({
         label: t('opgg.filters.refresh'),
         loading: snapshot.value.overviewState.status === 'loading',
         onClick: () => {
-          void refreshPage(null)
+          emit('refresh', null)
         }
       }
     ]
@@ -133,7 +135,7 @@ const tabItems = computed<TabBarItems>(() => ({
             label: t('opgg.filters.refresh'),
             loading: page.status === 'loading',
             onClick: () => {
-              void refreshPage(Number(id))
+              emit('refresh', Number(id))
             }
           },
           ...(page.currentGame
@@ -145,7 +147,7 @@ const tabItems = computed<TabBarItems>(() => ({
                   icon: markRaw(Close),
                   label: t('opgg.tabs.close'),
                   onClick: () => {
-                    void closeChampion(Number(id))
+                    emit('close', Number(id))
                   }
                 }
               ])
@@ -259,7 +261,7 @@ const handleContextMenuClickOutside = (event: MouseEvent) => {
   contextMenu.show = false
 }
 
-const handleContextMenuSelect = async (key: string | number) => {
+const handleContextMenuSelect = (key: string | number) => {
   const selected = contextTab.value
   contextMenu.show = false
   if (!selected) {
@@ -275,13 +277,10 @@ const handleContextMenuSelect = async (key: string | number) => {
     return
   }
 
-  const targets =
-    key === 'close' ? [selected.id] : tabOrder.value.filter((id) => id !== selected.id)
-
-  for (const id of targets) {
-    if (canCloseTab(tabItems.value[id])) {
-      await closeChampion(Number(id))
-    }
+  if (key === 'close') {
+    emit('close', Number(selected.id))
+  } else {
+    emit('closeOthers', selected.id === 'champions' ? null : Number(selected.id))
   }
 }
 

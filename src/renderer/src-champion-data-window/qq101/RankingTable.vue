@@ -27,7 +27,7 @@ import ChampionLink from '@champion-data-window/components/champion-statistics/C
 import PositionLabels from './PositionLabels.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import AugmentDisplay from '@renderer-shared/components/widgets/AugmentDisplay.vue'
-import type { Qq101AkariData } from '@shared/data-adapter/qq101/akari-adapter'
+import type { Qq101AkariData } from '@shared/data-adapter/qq101/protocol'
 import { useCompositionAwareInput } from '@renderer-shared/composables/useCompositionAwareInput'
 import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { useElementSize } from '@vueuse/core'

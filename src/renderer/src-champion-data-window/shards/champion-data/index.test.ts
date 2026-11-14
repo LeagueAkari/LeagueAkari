@@ -37,7 +37,7 @@ describe('champion data window initialization', () => {
       data: {
         code: 0,
         data: {
-          _fieldValues: { R17960: JSON.stringify({ dtstatdate: '20260916', datadetails: '' }) }
+          result: JSON.stringify({ dtstatdate: '20260916', datadetails: '' })
         }
       }
     })
@@ -54,9 +54,10 @@ describe('champion data window initialization', () => {
     })
     const setupInAppScope = new SetupInAppScopeRenderer()
     const scope = effectScope()
+    const call = vi.fn().mockResolvedValue(undefined)
 
     const shard = new ChampionDataRenderer(
-      { call: vi.fn() } as unknown as ConstructorParameters<typeof ChampionDataRenderer>[0],
+      { call } as unknown as ConstructorParameters<typeof ChampionDataRenderer>[0],
       { sync } as unknown as ConstructorParameters<typeof ChampionDataRenderer>[1],
       {} as ConstructorParameters<typeof ChampionDataRenderer>[2],
       { warn: vi.fn() } as unknown as ConstructorParameters<typeof ChampionDataRenderer>[3],
@@ -80,6 +81,13 @@ describe('champion data window initialization', () => {
       expect(store.qq101.overview).toEqual({ mode: 'ranked', data: overview })
       expect(api.getTierList).toHaveBeenCalledOnce()
       expect(sync).toHaveBeenCalledWith(CHAMPION_DATA_MAIN_NAMESPACE, 'settings', store.settings)
+
+      const loadedOverview = store.qq101.overview
+      await shard.setFlashPosition('f')
+
+      expect(call).toHaveBeenCalledWith(CHAMPION_DATA_MAIN_NAMESPACE, 'setOpggFlashPosition', 'f')
+      expect(store.qq101.overview).toBe(loadedOverview)
+      expect(api.getTierList).toHaveBeenCalledOnce()
 
       scope.stop()
 

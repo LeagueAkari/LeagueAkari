@@ -1,4 +1,7 @@
+export * from './champion-analysis'
 export * from './champion-details'
 export * from './champion-overview'
 export * from './common'
 export * from './content'
+export * from './desktop'
+export * from './metadata'

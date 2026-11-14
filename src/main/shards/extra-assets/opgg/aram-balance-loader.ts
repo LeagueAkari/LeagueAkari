@@ -1,5 +1,5 @@
 import { TimeoutTask } from '@main/utils/timer'
-import { parseOpggAramBalance } from '@shared/data-adapter/opgg'
+import { toOpggChampionBalance } from '@shared/data-adapter/opgg/akari-adapter'
 import type { OpggHttpApiAxiosHelper } from '@shared/http-api-axios-helper/opgg'
 
 import type { AkariLogger } from '../../logger-factory'
@@ -38,7 +38,7 @@ export class OpggAramBalanceLoader {
         return
       }
 
-      const { data: balance } = parseOpggAramBalance(data)
+      const balance = data.data.map(toOpggChampionBalance)
       this._state.setAramBalance(balance)
       this._logger.info(`OP.GG: updated ARAM balance data (${balance.length} items)`)
     } catch (error) {

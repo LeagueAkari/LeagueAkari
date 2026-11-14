@@ -7,7 +7,7 @@
         :value="view.mode"
         :modes="['ranked', 'aram_mayhem'] as const"
         :loading="modeChange.status === 'loading'"
-        @update:value="emit('mode', $event)"
+        @update:value="changeMode($event)"
       />
       <template v-if="view.mode === 'ranked'">
         <Qq101PatchSelect
@@ -15,13 +15,13 @@
           class="min-w-24 flex-1"
           :value="view.patch"
           :patches="patches"
-          @update:value="emit('preferences', { patch: $event })"
+          @update:value="changePreferences({ patch: $event })"
         />
         <Qq101TierSelect
           :disabled="readOnly"
           class="min-w-28 flex-1"
           :value="view.tier"
-          @update:value="emit('preferences', { tier: $event })"
+          @update:value="changePreferences({ tier: $event })"
         />
         <Qq101PositionSelect
           class="min-w-28 flex-1"
@@ -30,7 +30,7 @@
           :disabled="readOnly || positions.length === 0"
           :loading="view.sections.positions.status === 'loading'"
           :placeholder="t('qq101.position')"
-          @update:value="emit('position', $event)"
+          @update:value="changePosition($event)"
         />
       </template>
     </div>
@@ -70,13 +70,11 @@
       </ChampionTabHeader>
       <div v-if="view.mode === 'aram_mayhem' && view.summary.status === 'error'" class="text-xs">
         {{ t('qq101.details.sectionFailed') }}
-        <NButton text size="tiny" @click="emit('retry', 'summary')">{{ t('qq101.retry') }}</NButton>
+        <NButton text size="tiny" @click="retry('summary')">{{ t('qq101.retry') }}</NButton>
       </div>
       <NAlert v-if="modeChange.status === 'error'" type="warning"
         >{{ modeChange.message.split('\n')[0] }}
-        <NButton size="tiny" @click="emit('mode', 'ranked')">{{
-          t('qq101.retry')
-        }}</NButton></NAlert
+        <NButton size="tiny" @click="changeMode('ranked')">{{ t('qq101.retry') }}</NButton></NAlert
       >
       <NScrollbar
         v-if="positionGate"
@@ -101,10 +99,10 @@
               v-if="positionGate === 'empty' && previousPatch && !readOnly"
               size="tiny"
               secondary
-              @click="emit('preferences', { patch: previousPatch })"
+              @click="changePreferences({ patch: previousPatch })"
               >{{ t('qq101.details.tryPatch', { patch: previousPatch }) }}</NButton
             >
-            <NButton size="tiny" quaternary @click="emit('retry', 'positions')">{{
+            <NButton size="tiny" quaternary @click="retry('positions')">{{
               t('qq101.retry')
             }}</NButton>
           </template>
@@ -134,7 +132,7 @@
                   v-if="panel.state.status === 'error' || panel.state.status === 'empty'"
                   #actions
                 >
-                  <NButton size="tiny" quaternary @click="emit('retry', panel.key)">{{
+                  <NButton size="tiny" quaternary @click="retry(panel.key)">{{
                     t('qq101.retry')
                   }}</NButton>
                 </template>
@@ -176,7 +174,7 @@
                         secondary
                         :disabled="applying || !page.primaryStyleId || !page.secondaryStyleId"
                         :loading="applying"
-                        @click="emit('applyRunes', index)"
+                        @click="applyRunes(index)"
                         >{{ t('opgg.champion.apply') }}</NButton
                       >
                     </template>
@@ -227,7 +225,7 @@
                       expandedSections.has(section.title) ? Infinity : collapsedRowCount(section)
                     )
                   "
-                  @champion="emit('champion', $event)"
+                  @champion="openChampion($event)"
                 />
               </SettingsSection>
               <template
@@ -308,12 +306,8 @@ import ChampionTabHeader from '@champion-data-window/components/champion-tab/Cha
 import ChampionTabPlaceholder from '@champion-data-window/components/champion-tab/ChampionTabPlaceholder.vue'
 import ChampionTabHeaderStat from '@champion-data-window/components/champion-tab/ChampionTabHeaderStat.vue'
 import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
-import type {
-  Qq101DetailView,
-  Qq101DetailSectionKey,
-  Qq101Page
-} from '@champion-data-window/shards/champion-data/qq101/types'
-import type { Qq101ChampionDataPreferences } from '@shared/types/champion-data'
+import type { Qq101Page } from '@champion-data-window/shards/champion-data/qq101/types'
+import { useQq101Page } from '../context'
 import { useTranslation } from 'i18next-vue'
 import { NAlert, NButton, NInput, NScrollbar } from 'naive-ui'
 import { computed, ref } from 'vue'
@@ -329,48 +323,46 @@ import { formatCount } from '../format'
 import { detailPanels, type DetailTable } from './presentation'
 
 const {
-  view,
+  pageState,
   patches,
-  modeChange,
-  readOnly = false,
-  applying = false
-} = defineProps<{
-  readOnly?: boolean
-  applying?: boolean
-  view: Qq101DetailView
-  patches: string[]
-  modeChange: Extract<Qq101Page, { kind: 'champion' }>['modeChange']
-}>()
-
-const emit = defineEmits<{
-  applyRunes: [index: number]
-  mode: [mode: 'ranked' | 'aram_mayhem']
-  champion: [id: number]
-  position: [position: string]
-  retry: [key: Qq101DetailSectionKey]
-  preferences: [update: Partial<Qq101ChampionDataPreferences>]
-}>()
+  applying,
+  changeMode,
+  changePreferences,
+  changePosition,
+  retry,
+  applyRunes,
+  openChampion
+} = useQq101Page()
 
 const resources = useAkariResourceProvider()
 const { t } = useTranslation()
 const { getWinRateColor } = useWinRateTheme()
 
-const summary = computed(() =>
-  view.mode === 'ranked'
-    ? view.sections.positions.status === 'ready'
-      ? view.sections.positions.data.positions.find((p) => p.position === view.position)
+const page = computed(() => pageState.value as Extract<Qq101Page, { kind: 'champion' }>)
+const view = computed(() => page.value.view!)
+const modeChange = computed(() => page.value.modeChange)
+const readOnly = computed(() => Boolean(page.value.currentGame))
+
+const summary = computed(() => {
+  const data = view.value
+
+  if (data.mode === 'ranked') {
+    const positions = data.sections.positions
+
+    return positions.status === 'ready'
+      ? positions.data.positions.find((position) => position.position === data.position)
       : null
-    : view.summary.status === 'ready'
-      ? view.summary.data.champions[0]
-      : null
-)
+  }
+
+  return data.summary.status === 'ready' ? data.summary.data.champions[0] : null
+})
 
 const positionGate = computed(() => {
-  if (view.mode !== 'ranked' || view.position) {
+  if (view.value.mode !== 'ranked' || view.value.position) {
     return null
   }
 
-  const status = view.sections.positions.status
+  const status = view.value.sections.positions.status
   if (status === 'idle' || status === 'loading') {
     return 'loading'
   }
@@ -379,13 +371,13 @@ const positionGate = computed(() => {
 })
 
 const previousPatch = computed(() => {
-  if (view.mode !== 'ranked') {
+  if (view.value.mode !== 'ranked') {
     return null
   }
 
-  const index = patches.indexOf(view.patch)
+  const index = patches.value.indexOf(view.value.patch)
 
-  return index >= 0 ? (patches[index + 1] ?? null) : null
+  return index >= 0 ? (patches.value[index + 1] ?? null) : null
 })
 
 const scrollbar = ref<ScrollbarInst | null>(null)
@@ -423,11 +415,11 @@ const toggleSection = (key: string, expanded: boolean) => {
   expandedSections.value = next
 }
 
-const panels = computed(() => detailPanels(view, rarity.value))
+const panels = computed(() => detailPanels(view.value, rarity.value))
 
 const positions = computed(() =>
-  view.mode === 'ranked' && view.sections.positions.status === 'ready'
-    ? view.sections.positions.data.positions.map((p) => p.position)
+  view.value.mode === 'ranked' && view.value.sections.positions.status === 'ready'
+    ? view.value.sections.positions.data.positions.map((p) => p.position)
     : []
 )
 
@@ -459,8 +451,8 @@ const team = ref(100)
 const camp = ref('all')
 
 const groups = computed(() =>
-  view.mode === 'ranked' && view.sections.jungle.status === 'ready'
-    ? view.sections.jungle.data.groups.filter((g) => g.teamId === team.value)
+  view.value.mode === 'ranked' && view.value.sections.jungle.status === 'ready'
+    ? view.value.sections.jungle.data.groups.filter((g) => g.teamId === team.value)
     : []
 )
 

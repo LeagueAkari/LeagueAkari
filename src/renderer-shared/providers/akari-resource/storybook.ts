@@ -1,8 +1,8 @@
 import braveryIcon from '@renderer-shared/assets/champions/bravery-circle.png?inline'
 import { i18next } from '@renderer-shared/i18n'
 import { championBaseSplashUri } from '@renderer-shared/shards/league-client/game-data-assets'
-import { parseGtimgClassicHeroes } from '@shared/data-adapter/gtimg'
 import type { GtimgClassicHero } from '@shared/data-sources/gtimg'
+import type { GtimgClassicHeroesResponse } from '@shared/data-sources/gtimg/responses'
 import type {
   Augment,
   ChampionSimple,
@@ -196,11 +196,11 @@ export function createStorybookAkariResourceProvider(
 ): AkariResourceProviderValue {
   const state = shallowRef(createEmptyState())
   const classicHeroes = shallowRef(new Map<number, GtimgClassicHero>())
-  void fetchJson<unknown>('https://game.gtimg.cn/images/lol/act/img/jade/js/heroes_index.js')
+  void fetchJson<GtimgClassicHeroesResponse>(
+    'https://game.gtimg.cn/images/lol/act/img/jade/js/heroes_index.js'
+  )
     .then((catalog) => {
-      classicHeroes.value = new Map(
-        (parseGtimgClassicHeroes(catalog).data ?? []).map((hero) => [hero.heroId, hero])
-      )
+      classicHeroes.value = new Map(catalog.heroes.map((hero) => [hero.heroId, hero]))
     })
     .catch(() => {
       // Optional catalog; ordinary Storybook resources load independently.

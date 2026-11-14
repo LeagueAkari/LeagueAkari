@@ -71,14 +71,17 @@ export type OpggRoleCode =
   | 'MAGE'
   | 'MARKSMAN'
   | 'MARKSMAN|ASSASSIN'
+  | 'MARKSMAN|SLAYER'
   | 'SLAYER'
   | 'SLAYER|ASSASSIN'
   | 'SLAYER|SLAYER'
   | 'TANK'
   | 'TANK|SLAYER'
 
+/** Verified 2026-11-15: Kha'Zix skill orders contain R-Q/R-W/R-E/R-R evolution steps. */
 export type OpggSkillCode = 'Q' | 'W' | 'E' | 'R' | 'R-Q' | 'R-W' | 'R-E' | 'R-R'
 
+/** Shared response fields. Last verified against live OP.GG endpoints: 2026-11-15. */
 export interface OpggChampionTierData {
   tier: number
   rank: number
@@ -112,8 +115,6 @@ export interface OpggChampionPositionStats {
   ban_rate: number
   kda: number
   tier_data: OpggChampionTierData
-  total_place?: never
-  first_place?: never
 }
 
 export interface OpggChampionPosition {

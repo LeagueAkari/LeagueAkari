@@ -5,7 +5,6 @@ import { isAbortError } from '@shared/utils/queue-keeper'
 import isEqual from 'lodash/isEqual'
 
 import type { ChampionDataRendererContext } from '../context'
-import { isValidRunePage } from '../source-contract'
 import { useChampionDataStore } from '../store'
 import type { Qq101ChampionDataLoader } from './data-loader'
 import { Qq101DetailsController } from './details-controller'
@@ -349,9 +348,7 @@ export class Qq101PagesController {
       return undefined
     }
 
-    return section.data.pages
-      .map((_rune, index) => this.getRuneSelection(page.id, index)!.runes)
-      .find(isValidRunePage)
+    return this.getRuneSelection(page.id, 0)?.runes
   }
 
   getRuneSelection(id: string, index: number) {
@@ -373,8 +370,8 @@ export class Qq101PagesController {
     return {
       championId: view.championId,
       runes: {
-        primaryStyleId: rune.primaryStyleId ?? 0,
-        subStyleId: rune.secondaryStyleId ?? 0,
+        primaryStyleId: rune.primaryStyleId,
+        subStyleId: rune.secondaryStyleId,
         selectedPerkIds: [...rune.primaryRuneIds, ...rune.secondaryRuneIds, ...rune.statShardIds]
       }
     }

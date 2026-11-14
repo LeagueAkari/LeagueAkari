@@ -116,7 +116,7 @@ import { useTranslation } from 'i18next-vue'
 import { NScrollbar } from 'naive-ui'
 import { computed } from 'vue'
 
-import { useOpgg } from '../context'
+import { useOpggPage } from '../context'
 import { useWinRateTheme } from '@champion-data-window/components/champion-statistics/theme'
 import ChampionAugments from '../widgets/ChampionAugments.vue'
 import ChampionBalance from '../widgets/ChampionBalance.vue'
@@ -129,7 +129,7 @@ import ChampionItems from '../widgets/champion-items/ChampionItems.vue'
 import ChampionSynergies from '../widgets/ChampionSynergies.vue'
 import StatisticPopover from '../widgets/StatisticPopover.vue'
 
-const { championId, champion, position, mode, isLoading, isDataStale, error } = useOpgg()
+const { championId, champion, position, mode, isLoading, isDataStale, error } = useOpggPage()
 
 const { t } = useTranslation()
 const { getWinRateColor } = useWinRateTheme()

@@ -1,4 +1,4 @@
-import type { Qq101AkariData } from '@shared/data-adapter/qq101/akari-adapter'
+import type { Qq101AkariData } from '@shared/data-adapter/qq101/protocol'
 import { createOpggSnapshot } from '@shared/shards/champion-data'
 import { createChampionDataAutomationSettings } from '@shared/shards/champion-data/automation'
 import { createChampionDataSourcePreferences } from '@shared/shards/champion-data/source-preferences'

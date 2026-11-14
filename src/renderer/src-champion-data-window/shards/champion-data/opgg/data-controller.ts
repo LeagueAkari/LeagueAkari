@@ -11,7 +11,6 @@ import type {
   OpggChampionDataQueryUpdate,
   OpggChampionDataSnapshot
 } from '@shared/types/champion-data/opgg'
-import type { OpggFlashPosition } from '@shared/types/champion-data/opgg'
 import type { OpggRankedPosition } from '@shared/types/opgg'
 import { formatError } from '@shared/utils/errors'
 import { QueueKeeper, isAbortError } from '@shared/utils/queue-keeper'
@@ -19,7 +18,6 @@ import isEqual from 'lodash/isEqual'
 import { onScopeDispose, watch } from 'vue'
 
 import type { LoadoutExecutor } from '../loadout-executor'
-import { isValidRunePage } from '../source-contract'
 import type { OpggApplySelection, OpggRendererContext } from './context'
 import type { OpggChampionDataLoader } from './data-loader'
 import { OpggLoadoutExecutor } from './loadout-executor'
@@ -161,19 +159,17 @@ export class OpggChampionDataController {
       return undefined
     }
 
-    return page.champion.runes
-      .filter(
-        (rune) =>
-          rune.primaryRuneIds.length === 4 &&
-          rune.secondaryRuneIds.length === 2 &&
-          rune.statShardIds.length === 3
-      )
-      .map((rune) => ({
-        primaryStyleId: rune.primaryStyleId,
-        subStyleId: rune.secondaryStyleId,
-        selectedPerkIds: [...rune.primaryRuneIds, ...rune.secondaryRuneIds, ...rune.statShardIds]
-      }))
-      .find(isValidRunePage)
+    const rune = page.champion.runes[0]
+
+    if (!rune) {
+      return undefined
+    }
+
+    return {
+      primaryStyleId: rune.primaryStyleId,
+      subStyleId: rune.secondaryStyleId,
+      selectedPerkIds: [...rune.primaryRuneIds, ...rune.secondaryRuneIds, ...rune.statShardIds]
+    }
   }
 
   removeCurrentGamePage() {
@@ -185,10 +181,6 @@ export class OpggChampionDataController {
 
   update(query: OpggChampionDataQueryUpdate, pageId?: number | null) {
     return this.updateQuery(query, false, pageId)
-  }
-
-  setFlashPosition(value: OpggFlashPosition): Promise<void> {
-    return this._context.ipc.call('champion-data-main', 'setOpggFlashPosition', value)
   }
 
   apply(request: OpggApplySelection) {

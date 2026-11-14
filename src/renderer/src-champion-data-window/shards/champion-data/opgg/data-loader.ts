@@ -1,14 +1,3 @@
-import {
-  parseOpggArenaDetails,
-  parseOpggArenaOverview,
-  parseOpggMayhemAugments,
-  parseOpggMayhemTiers,
-  parseOpggRankedDetails,
-  parseOpggRankedOverview,
-  parseOpggVersions,
-  parseOpggWinRateDetails,
-  parseOpggWinRateOverview
-} from '@shared/data-adapter/opgg'
 import type {
   OpggLoadedChampion,
   OpggLoadedOverview,
@@ -44,7 +33,7 @@ export class OpggChampionDataLoader {
       const response = await this._api.getChampionVersions(query.region, query.mode, { signal })
       signal.throwIfAborted()
 
-      const versions = parseOpggVersions(response.data).data.data
+      const versions = response.data.data
 
       if (versions.length === 0) {
         throw new Error(`OP.GG has no version for ${query.mode}`)
@@ -88,7 +77,8 @@ export class OpggChampionDataLoader {
 
         return {
           ...target,
-          response: parseOpggMayhemTiers(response.data).data
+          mode: target.mode,
+          response: response.data
         }
       }
 
@@ -100,7 +90,8 @@ export class OpggChampionDataLoader {
 
         return {
           ...target,
-          response: parseOpggArenaOverview(response.data).data
+          mode: target.mode,
+          response: response.data
         }
       }
 
@@ -115,7 +106,8 @@ export class OpggChampionDataLoader {
 
         return {
           ...target,
-          response: parseOpggRankedOverview(response.data).data
+          mode: target.mode,
+          response: response.data
         }
       }
 
@@ -129,7 +121,7 @@ export class OpggChampionDataLoader {
         return {
           ...target,
           mode: 'aram',
-          response: parseOpggWinRateOverview(response.data).data
+          response: response.data
         }
       }
 
@@ -143,7 +135,7 @@ export class OpggChampionDataLoader {
         return {
           ...target,
           mode: 'nexus_blitz',
-          response: parseOpggWinRateOverview(response.data).data
+          response: response.data
         }
       }
 
@@ -157,7 +149,7 @@ export class OpggChampionDataLoader {
         return {
           ...target,
           mode: 'urf',
-          response: parseOpggWinRateOverview(response.data).data
+          response: response.data
         }
       }
     }
@@ -181,7 +173,7 @@ export class OpggChampionDataLoader {
       return {
         mode: 'aram_mayhem',
         summary,
-        response: parseOpggMayhemAugments(response.data).data
+        response: response.data
       }
     }
 
@@ -202,7 +194,7 @@ export class OpggChampionDataLoader {
 
         return {
           mode: overview.mode,
-          response: parseOpggRankedDetails(response.data, championId).data
+          response: response.data
         }
       }
 
@@ -215,7 +207,7 @@ export class OpggChampionDataLoader {
 
         return {
           mode: 'aram',
-          response: parseOpggWinRateDetails(response.data, championId).data
+          response: response.data
         }
       }
 
@@ -227,7 +219,7 @@ export class OpggChampionDataLoader {
 
         return {
           mode: 'arena',
-          response: parseOpggArenaDetails(response.data, championId).data
+          response: response.data
         }
       }
 
@@ -240,7 +232,7 @@ export class OpggChampionDataLoader {
 
         return {
           mode: 'nexus_blitz',
-          response: parseOpggWinRateDetails(response.data, championId).data
+          response: response.data
         }
       }
 
@@ -253,7 +245,7 @@ export class OpggChampionDataLoader {
 
         return {
           mode: 'urf',
-          response: parseOpggWinRateDetails(response.data, championId).data
+          response: response.data
         }
       }
     }

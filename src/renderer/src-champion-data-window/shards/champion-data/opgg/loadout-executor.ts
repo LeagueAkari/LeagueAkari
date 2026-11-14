@@ -6,7 +6,6 @@ import type {
   OpggStandardDetails
 } from '@shared/types/champion-data/opgg'
 import { toRaw } from 'vue'
-import { z } from 'zod'
 
 import type { LoadoutExecutor } from '../loadout-executor'
 import type { OpggApplySelection, OpggRendererContext } from './context'
@@ -61,14 +60,6 @@ export class OpggLoadoutExecutor {
         throw new Error('Rune recommendation does not exist')
       }
 
-      const positiveId = z.number().int().positive()
-      z.object({
-        primaryStyleId: positiveId,
-        secondaryStyleId: positiveId,
-        primaryRuneIds: z.array(positiveId).length(4),
-        secondaryRuneIds: z.array(positiveId).length(2),
-        statShardIds: z.array(positiveId).length(3)
-      }).parse(runes)
       await this._applyRunes(snapshot, runes)
     } else if (request.kind === 'spells') {
       if (details.kind === 'arena') {
@@ -89,9 +80,6 @@ export class OpggLoadoutExecutor {
         throw new Error('Item set recommendation does not exist')
       }
 
-      z.array(z.object({ items: z.array(z.number().int().positive()).min(1) }))
-        .min(1)
-        .parse(details.itemSet.groups)
       await this._commands.apply('items', (signal) => this._applyItems(snapshot, details, signal))
     }
   }

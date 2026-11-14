@@ -19,7 +19,7 @@
         ring
         :ring-color="itemRingColor"
         round
-        @click="setTab('champion', c)"
+        @click="emit('champion', c)"
       />
     </div>
   </NPopover>
@@ -32,8 +32,6 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
 
-import { useOpgg } from '../context'
-
 const lcs = useLeagueClientStore()
 const as = useAppCommonStore()
 
@@ -45,7 +43,7 @@ const itemRingColor = computed(() => {
   return as.colorTheme === 'dark' ? '#fff4' : 'rgba(0, 0, 0, 0.15)'
 })
 
-const { setTab } = useOpgg()
+const emit = defineEmits<{ champion: [id: number] }>()
 
 const champions = computed(() => {
   const s1 = lcs.gameflow.session

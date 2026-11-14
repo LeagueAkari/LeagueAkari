@@ -1,4 +1,13 @@
-import type { OpggDecodedResponse } from '@shared/data-adapter/opgg/schemas'
+import type {
+  OpggAramChampionDetailsResponse,
+  OpggAramChampionsResponse,
+  OpggAramMayhemChampionAugmentsResponse,
+  OpggAramMayhemTiersResponse,
+  OpggArenaChampionDetailsResponse,
+  OpggArenaChampionsResponse,
+  OpggRankedChampionDetailsResponse,
+  OpggRankedChampionsResponse
+} from '@shared/types/opgg'
 import type { OpggRegion, OpggTierFilter } from '@shared/types/opgg'
 
 interface OpggVersionedOverviewTarget {
@@ -24,52 +33,52 @@ export interface OpggResolvedTarget {
 export type OpggLoadedOverview =
   | (OpggTieredOverviewTarget & {
       mode: 'ranked' | 'flex'
-      response: OpggDecodedResponse<'rankedOverview'>
+      response: OpggRankedChampionsResponse
     })
   | (OpggTieredOverviewTarget & {
       mode: 'aram'
-      response: OpggDecodedResponse<'winRateOverview'>
+      response: OpggAramChampionsResponse
     })
   | (OpggTieredOverviewTarget & {
       mode: 'nexus_blitz'
-      response: OpggDecodedResponse<'winRateOverview'>
+      response: OpggAramChampionsResponse
     })
   | (OpggTieredOverviewTarget & {
       mode: 'urf'
-      response: OpggDecodedResponse<'winRateOverview'>
+      response: OpggAramChampionsResponse
     })
   | (OpggVersionedOverviewTarget & {
       mode: 'arena'
-      response: OpggDecodedResponse<'arenaOverview'>
+      response: OpggArenaChampionsResponse
     })
   | {
       mode: 'aram_mayhem'
-      response: OpggDecodedResponse<'mayhemTiers'>
+      response: OpggAramMayhemTiersResponse
     }
 
 export type OpggLoadedChampion =
   | {
       mode: 'ranked' | 'flex'
-      response: OpggDecodedResponse<'rankedDetails'>
+      response: OpggRankedChampionDetailsResponse
     }
   | {
       mode: 'aram'
-      response: OpggDecodedResponse<'winRateDetails'>
+      response: OpggAramChampionDetailsResponse
     }
   | {
       mode: 'nexus_blitz'
-      response: OpggDecodedResponse<'winRateDetails'>
+      response: OpggAramChampionDetailsResponse
     }
   | {
       mode: 'urf'
-      response: OpggDecodedResponse<'winRateDetails'>
+      response: OpggAramChampionDetailsResponse
     }
   | {
       mode: 'arena'
-      response: OpggDecodedResponse<'arenaDetails'>
+      response: OpggArenaChampionDetailsResponse
     }
   | {
       mode: 'aram_mayhem'
-      summary: OpggDecodedResponse<'mayhemTiers'>['data'][number]
-      response: OpggDecodedResponse<'mayhemAugments'>
+      summary: OpggAramMayhemTiersResponse['data'][number]
+      response: OpggAramMayhemChampionAugmentsResponse
     }

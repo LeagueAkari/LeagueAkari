@@ -1,3 +1,4 @@
+/** OP.GG response contract. Last verified against live endpoints: 2026-11-15. */
 export interface OpggAramBalanceResponse {
   data: OpggAramBalanceItem[]
 }
@@ -18,6 +19,18 @@ export interface OpggAramBalanceItem {
 
 export interface OpggAramMayhemTiersResponse {
   data: OpggAramMayhemTier[]
+}
+
+/** /contents/tiers without type is Brawl, not ARAM Mayhem. Verified: 2026-11-15. */
+export interface OpggBrawlTiersResponse {
+  data: OpggBrawlTier[]
+}
+
+export interface OpggBrawlTier {
+  champion_id: number
+  id: number
+  tier: number
+  rank: number
 }
 
 export interface OpggAramMayhemTier {

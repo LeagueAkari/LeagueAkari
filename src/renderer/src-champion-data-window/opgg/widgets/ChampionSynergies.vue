@@ -13,7 +13,7 @@
         :key="s.championId"
         :rank="i + 1"
       >
-        <ChampionLink :champion-id="s.championId" @select="setTab('champion', $event)" />
+        <ChampionLink :champion-id="s.championId" @select="openChampion($event)" />
 
         <template #metrics>
           <StatisticPopover
@@ -54,12 +54,12 @@ import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useTranslation } from 'i18next-vue'
 import { ref, watchEffect } from 'vue'
 
-import { useOpgg } from '../context'
+import { useOpggPage } from '../context'
 import ExpandButton from '@champion-data-window/components/champion-statistics/ExpandButton.vue'
 import StatisticPopover from './StatisticPopover.vue'
 import RecommendationStats from './RecommendationStats.vue'
 
-const { champion, setTab } = useOpgg()
+const { champion, openChampion } = useOpggPage()
 const { t } = useTranslation()
 
 const isSynergiesExpanded = ref(false)

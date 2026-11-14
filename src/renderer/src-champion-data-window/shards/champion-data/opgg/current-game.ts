@@ -115,8 +115,8 @@ export function useOpggCurrentGame(
 
     const details = page.champion
     const spells =
-      details && 'summonerSpells' in details
-        ? details.summonerSpells.map((row) => toSummonerSpellsConfig(row.spellIds)).find(Boolean)
+      details && 'summonerSpells' in details && details.summonerSpells.length > 0
+        ? toSummonerSpellsConfig(details.summonerSpells[0].spellIds)
         : undefined
 
     return {

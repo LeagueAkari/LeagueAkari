@@ -105,11 +105,11 @@ import { useTranslation } from 'i18next-vue'
 import { NCheckbox, NFlex, NIcon, NRadio, NRadioGroup, NSelect, SelectOption } from 'naive-ui'
 import { computed, ref, watch, watchEffect } from 'vue'
 
-import { useOpgg } from '../context'
+import { useOpggPage } from '../context'
 import ExpandButton from '@champion-data-window/components/champion-statistics/ExpandButton.vue'
 import StatisticPopover from './StatisticPopover.vue'
 
-const { champion } = useOpgg()
+const { champion } = useOpggPage()
 const { t } = useTranslation()
 
 const augmentRarity = ref<OpggKiwiAugmentRarity>()

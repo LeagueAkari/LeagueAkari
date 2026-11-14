@@ -32,11 +32,11 @@ import SkillOrderDisplay from '@champion-data-window/components/champion-statist
 import { useTranslation } from 'i18next-vue'
 import { ref, watchEffect } from 'vue'
 
-import { useOpgg } from '../context'
+import { useOpggPage } from '../context'
 import ExpandButton from '@champion-data-window/components/champion-statistics/ExpandButton.vue'
 import RecommendationStats from './RecommendationStats.vue'
 
-const { champion } = useOpgg()
+const { champion } = useOpggPage()
 const { t } = useTranslation()
 
 const isSkillMasteriesExpanded = ref(false)

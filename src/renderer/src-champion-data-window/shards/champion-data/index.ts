@@ -10,6 +10,7 @@ import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { Qq101DataSource } from '@shared/data-sources/qq101'
 import type { ChampionDataAutomationSettings } from '@shared/shards/champion-data/automation'
 import type { ChampionDataSourcePreferences } from '@shared/types/champion-data'
+import type { OpggFlashPosition } from '@shared/types/champion-data/opgg'
 import { onScopeDispose } from 'vue'
 
 import {
@@ -123,6 +124,10 @@ export class ChampionDataRenderer implements IAkariShardInitDispose {
 
   setAutomation(settings: ChampionDataAutomationSettings): Promise<void> {
     return this._context.ipc.call(CHAMPION_DATA_MAIN_NAMESPACE, 'setAutomation', settings)
+  }
+
+  setFlashPosition(value: OpggFlashPosition): Promise<void> {
+    return this._context.ipc.call(CHAMPION_DATA_MAIN_NAMESPACE, 'setOpggFlashPosition', value)
   }
 
   setSourcePreferences(preferences: ChampionDataSourcePreferences): Promise<void> {

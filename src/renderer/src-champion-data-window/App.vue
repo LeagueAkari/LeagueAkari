@@ -26,11 +26,8 @@ import type { ChampionDataSourceId } from '@shared/types/champion-data'
 import { computed, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
-import { provideOpgg } from './opgg/context'
 import ChampionDataWindowTitlebar from './components/ChampionDataWindowTitlebar.vue'
 import { useChampionDataSources } from './sources/use-champion-data-sources'
-
-provideOpgg()
 
 const router = useRouter()
 const route = useRoute()

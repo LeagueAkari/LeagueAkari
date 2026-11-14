@@ -4,9 +4,9 @@
 
 <script setup lang="ts">
 import OpggChampionDetails from './OpggChampionDetails.vue'
-import { provideOpggChampion } from '../context'
+import { provideOpggPage } from '../context'
 
 const props = defineProps<{ pageId: number }>()
 
-provideOpggChampion(() => props.pageId)
+provideOpggPage(() => props.pageId)
 </script>

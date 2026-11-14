@@ -14,12 +14,10 @@ describe('QQ101 guide catalogs', () => {
         }
       }
     })
-    expect(catalog.data.entries[5008].description).toBe(
-      '+9 适应之力<br><attention>伤害</attention>'
-    )
+    expect(catalog.entries[5008].description).toBe('+9 适应之力<br><attention>伤害</attention>')
   })
 
-  it('keeps mode-specific item IDs and isolates malformed catalog entries', () => {
+  it('keeps mode-specific item IDs and converts prices', () => {
     const catalog = parseGtimgGuideCatalog('items', {
       items: [
         {
@@ -27,20 +25,17 @@ describe('QQ101 guide catalogs', () => {
           name: 'Mode item',
           iconPath: 'https://example.com/item.png',
           description: '',
-          price: 'NC',
+          price: '1000',
           total: '3000',
           from: [],
-          into: [],
-          unused: true
-        },
-        { itemId: 'broken' }
+          into: []
+        }
       ]
     })
-    expect(catalog.data.kind).toBe('items')
-    expect(Object.keys(catalog.data.entries)).toEqual(['228002'])
-    expect(catalog.data.entries[228002]).toMatchObject({ id: 228002, price: 0, totalPrice: 3000 })
-    expect(catalog.data.entries[228002]).not.toHaveProperty('unused')
-    expect(catalog.issues.length).toBeGreaterThan(0)
+    expect(catalog.kind).toBe('items')
+    expect(Object.keys(catalog.entries)).toEqual(['228002'])
+    expect(catalog.entries[228002]).toMatchObject({ id: 228002, price: 1000, totalPrice: 3000 })
+    expect(catalog.entries[228002]).not.toHaveProperty('unused')
   })
 
   it('loads rune styles, nested runes and stat shards for browsing without LCU', () => {
@@ -61,7 +56,7 @@ describe('QQ101 guide catalogs', () => {
         }
       }
     })
-    expect(Object.keys(catalog.data.entries)).toEqual(['5008', '8200', '8992'])
-    expect(catalog.data.entries[8992].description).toBe('Description')
+    expect(Object.keys(catalog.entries)).toEqual(['5008', '8200', '8992'])
+    expect(catalog.entries[8992].description).toBe('Description')
   })
 })

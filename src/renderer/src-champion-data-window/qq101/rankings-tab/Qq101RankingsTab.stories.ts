@@ -13,10 +13,10 @@ const base = heroes.map((championId, index) => ({
   winRate: 0.56 - index * 0.007,
   pickRate: 0.12 - index * 0.004,
   bestPartners: [],
-  averageDeathTimeSeconds: null,
-  killParticipationRate: null,
-  damageShare: null,
-  damageTakenShare: null
+  averageDeathTimeSeconds: 30,
+  killParticipationRate: 0.6,
+  damageShare: 0.2,
+  damageTakenShare: 0.2
 }))
 const overviews: Record<Qq101ChampionDataPreferences['mode'], Qq101ChampionDataOverview> = {
   ranked: {

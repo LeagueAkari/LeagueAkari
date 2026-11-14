@@ -25,9 +25,9 @@
           role="button"
           tabindex="0"
           :aria-label="resources.champions.name(c.championId)"
-          @click="setTab('champion', c.championId)"
-          @keydown.enter="setTab('champion', c.championId)"
-          @keydown.space.prevent="setTab('champion', c.championId)"
+          @click="openChampion(c.championId)"
+          @keydown.enter="openChampion(c.championId)"
+          @keydown.space.prevent="openChampion(c.championId)"
         >
           <NTooltip>
             <template #trigger>
@@ -78,11 +78,11 @@ import { useTranslation } from 'i18next-vue'
 import { NFlex, NRadio, NRadioGroup, NTooltip } from 'naive-ui'
 import { computed, ref, watchEffect } from 'vue'
 
-import { useOpgg } from '../context'
+import { useOpggPage } from '../context'
 import { useWinRateTheme } from '@champion-data-window/components/champion-statistics/theme'
 import StatisticPopover from './StatisticPopover.vue'
 
-const { champion, setTab } = useOpgg()
+const { champion, openChampion } = useOpggPage()
 const resources = useAkariResourceProvider()
 const { t } = useTranslation()
 const { getWinRateColor, formatWinRate } = useWinRateTheme()

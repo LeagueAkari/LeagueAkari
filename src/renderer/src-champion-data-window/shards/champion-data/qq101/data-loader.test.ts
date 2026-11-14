@@ -46,7 +46,7 @@ describe('QQ101 champion data loader', () => {
     })
   })
 
-  it('uses China calendar dates and only falls back for an empty daily snapshot', async () => {
+  it('uses China calendar dates and keeps an empty daily snapshot', async () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-09-26T17:00:00Z'))
     onTestFinished(() => {
@@ -59,15 +59,15 @@ describe('QQ101 champion data loader', () => {
     const { loader } = createLoader({ getAramChampions })
     const preferences = { mode: 'aram', position: 'all', patch: null, tier: 255 } as const
     const result = await loader.loadOverview(preferences, signal)
-    expect(getAramChampions.mock.calls.map(([date]) => date)).toEqual(['20260926', '20260925'])
-    expect(result.overview.data.date).toBe('20260925')
+    expect(getAramChampions.mock.calls.map(([date]) => date)).toEqual(['20260926'])
+    expect(result.overview.data.date).toBe('20260926')
 
     getAramChampions.mockReset().mockRejectedValue(new Error('invalid schema'))
     await expect(loader.loadOverview(preferences, signal)).rejects.toThrow('invalid schema')
     expect(getAramChampions).toHaveBeenCalledTimes(1)
   })
 
-  it('stops date fallback immediately when cancelled', async () => {
+  it('discards a daily snapshot when cancelled', async () => {
     const abort = new AbortController()
     const getAramChampions = vi.fn(async () => {
       abort.abort()
@@ -216,7 +216,7 @@ describe('QQ101 champion data loader', () => {
     }
   )
 
-  it('falls back to the previous ranked patch without converting the response', async () => {
+  it('keeps the latest ranked patch when its data is empty', async () => {
     const previous = {
       date: '20260830',
       patch: '16.16',
@@ -239,10 +239,14 @@ describe('QQ101 champion data loader', () => {
       signal
     )
 
-    expect(result.patch).toBe('16.16')
-    expect(result.overview).toEqual({ mode: 'ranked', data: previous })
+    expect(result.patch).toBe('16.17')
+    expect(getTierList).toHaveBeenCalledTimes(1)
+    expect(result.overview).toEqual({
+      mode: 'ranked',
+      data: { date: '20260831', patch: '16.17', champions: [] }
+    })
     expect(getTierList).toHaveBeenLastCalledWith(
-      { patch: '16.16', tier: 26, position: 'MIDDLE' },
+      { patch: '16.17', tier: 26, position: 'MIDDLE' },
       { signal }
     )
   })

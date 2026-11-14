@@ -1,6 +1,13 @@
 import type { AxiosInstance } from 'axios'
 import { AxiosRetry } from 'axios-retry'
 
+import type {
+  GtimgClassicHeroesResponse,
+  GtimgGuideResponses,
+  GtimgHeroListResponse,
+  GtimgKiwiAugmentsResponse
+} from './responses'
+
 const axiosRetry = require('axios-retry').default as AxiosRetry
 
 export * from './types'
@@ -8,13 +15,15 @@ export * from './types'
 export class GtimgApi {
   static BASE_URL = 'https://game.gtimg.cn/'
 
-  getGuideCatalog(kind: 'items' | 'perks' | 'spells', signal?: AbortSignal) {
+  getGuideCatalog<K extends keyof GtimgGuideResponses>(kind: K, signal?: AbortSignal) {
     const paths = {
       items: 'items/items',
       perks: 'runeList/rune_list2',
       spells: 'summonerskillList/summonerskill_list'
     }
-    return this._http.get<unknown>(`/images/lol/act/img/js/${paths[kind]}.js`, { signal })
+    return this._http.get<GtimgGuideResponses[K]>(`/images/lol/act/img/js/${paths[kind]}.js`, {
+      signal
+    })
   }
 
   static USER_AGENT =
@@ -31,14 +40,17 @@ export class GtimgApi {
   }
 
   async getHeroList(signal?: AbortSignal) {
-    const { data } = await this._http.get<unknown>('/images/lol/act/img/js/heroList/hero_list.js', {
-      signal
-    })
+    const { data } = await this._http.get<GtimgHeroListResponse>(
+      '/images/lol/act/img/js/heroList/hero_list.js',
+      {
+        signal
+      }
+    )
     return data
   }
 
   async getKiwiAugments(signal?: AbortSignal) {
-    const { data } = await this._http.get<unknown>(
+    const { data } = await this._http.get<GtimgKiwiAugmentsResponse>(
       'https://game.gtimg.cn/images/lol/act/img/js/kiwi/kiwi_augments.json',
       { signal }
     )
@@ -46,9 +58,12 @@ export class GtimgApi {
   }
 
   async getClassicHeroes(signal?: AbortSignal) {
-    const { data } = await this._http.get<unknown>('/images/lol/act/img/jade/js/heroes_index.js', {
-      signal
-    })
+    const { data } = await this._http.get<GtimgClassicHeroesResponse>(
+      '/images/lol/act/img/jade/js/heroes_index.js',
+      {
+        signal
+      }
+    )
     return data
   }
 }

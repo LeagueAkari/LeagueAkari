@@ -1,12 +1,4 @@
 import { getOpggAramBalanceAdjustments } from '@shared/data-adapter/opgg-aram-balance'
-import type {
-  OpggDecodedDetails as OpggAramChampionDetails,
-  OpggDecodedArenaChampion as OpggArenaChampionOverview,
-  OpggDecodedCounter as OpggChampionCounter,
-  OpggDecodedResponse,
-  OpggDecodedItem as OpggItemBuild,
-  OpggDecodedRankedChampion as OpggRankedChampionOverview
-} from '@shared/data-adapter/opgg/schemas'
 import type { OpggChampionBalance } from '@shared/types/champion-data/opgg'
 import type {
   OpggArenaDetails,
@@ -22,6 +14,14 @@ import type {
   OpggRecommendation,
   OpggStandardDetails
 } from '@shared/types/champion-data/opgg'
+import type {
+  OpggAramChampionDetails,
+  OpggAramMayhemChampionAugmentsResponse,
+  OpggArenaChampionOverview,
+  OpggChampionCounter,
+  OpggItemBuild,
+  OpggRankedChampionOverview
+} from '@shared/types/opgg'
 import type { OpggRankedPosition } from '@shared/types/opgg'
 
 import type { OpggLoadedChampion, OpggLoadedOverview } from './types'
@@ -40,7 +40,7 @@ export function ratio(value: number | null, total: number): number | null {
 }
 
 function winRate(win: number | null, play: number): number | null {
-  if (win === null || win > play) {
+  if (win === null) {
     return null
   }
 
@@ -48,7 +48,7 @@ function winRate(win: number | null, play: number): number | null {
 }
 
 function losses(win: number | null, play: number): number | null {
-  if (win === null || win > play) {
+  if (win === null) {
     return null
   }
 
@@ -214,12 +214,6 @@ export function projectOverview(
 
   rows.sort((a, b) => (a.rank ?? Infinity) - (b.rank ?? Infinity))
 
-  for (const [index, row] of rows.entries()) {
-    if (row.rank === null) {
-      row.rank = index + 1
-    }
-  }
-
   return rows
 }
 
@@ -257,7 +251,7 @@ function arenaRecommendations<
 }
 
 function kiwiGroups(
-  response: OpggDecodedResponse<'mayhemAugments'>,
+  response: OpggAramMayhemChampionAugmentsResponse,
   resources: OpggProjectionResources
 ): OpggMayhemDetails['kiwiAugmentGroups'] {
   const items: OpggChampionDataKiwiAugment[] = response.data.map((item) => {
@@ -432,18 +426,20 @@ export function projectDetails(
 
       fillWinRateDetails(result, data)
 
-      result.itemBuildsByOrder.single = data.single_items.map((group) => ({
-        order: group.depth,
-        builds: recommendations(group.items, `single:${group.depth}`, (item) => ({
-          itemIds: item.ids
+      if ('single_items' in data) {
+        result.itemBuildsByOrder.single = data.single_items.map((group) => ({
+          order: group.depth,
+          builds: recommendations(group.items, `single:${group.depth}`, (item) => ({
+            itemIds: item.ids
+          }))
         }))
-      }))
-      result.itemBuildsByOrder.combined = data.combination_items.map((group) => ({
-        order: group.depth + 1,
-        builds: recommendations(group.items, `combined:${group.depth}`, (item) => ({
-          itemIds: item.ids
+        result.itemBuildsByOrder.combined = data.combination_items.map((group) => ({
+          order: group.depth + 1,
+          builds: recommendations(group.items, `combined:${group.depth}`, (item) => ({
+            itemIds: item.ids
+          }))
         }))
-      }))
+      }
 
       if (selected) {
         result.counters.recommended = counters(selected.counters)

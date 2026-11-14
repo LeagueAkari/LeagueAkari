@@ -50,11 +50,11 @@ import { useTranslation } from 'i18next-vue'
 import { NFlex, NRadio, NRadioGroup } from 'naive-ui'
 import { computed, ref, watchEffect } from 'vue'
 
-import { useOpgg } from '../context'
+import { useOpggPage } from '../context'
 import ExpandButton from '@champion-data-window/components/champion-statistics/ExpandButton.vue'
 import RecommendationStats from './RecommendationStats.vue'
 
-const { champion } = useOpgg()
+const { champion } = useOpggPage()
 const { t } = useTranslation()
 
 const augmentRarity = ref<1 | 4 | 8>()

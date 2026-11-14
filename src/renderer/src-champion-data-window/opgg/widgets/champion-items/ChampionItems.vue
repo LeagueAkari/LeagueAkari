@@ -14,11 +14,11 @@
 import { useTranslation } from 'i18next-vue'
 import { computed } from 'vue'
 
-import { useOpgg } from '../../context'
+import { useOpggPage } from '../../context'
 import ItemRecommendations from './ItemRecommendations.vue'
 import ChampionItemProgression from './ChampionItemProgression.vue'
 
-const { champion } = useOpgg()
+const { champion } = useOpggPage()
 const { t } = useTranslation()
 
 const groups = computed(() => {

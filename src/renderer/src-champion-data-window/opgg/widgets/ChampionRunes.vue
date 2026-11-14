@@ -52,12 +52,12 @@ import { useTranslation } from 'i18next-vue'
 import { NButton } from 'naive-ui'
 import { ref, watchEffect } from 'vue'
 
-import { useOpgg } from '../context'
+import { useOpggPage } from '../context'
 import { useLoadout } from '../utils/loadout'
 import ExpandButton from '@champion-data-window/components/champion-statistics/ExpandButton.vue'
 import RecommendationStats from './RecommendationStats.vue'
 
-const { champion, applying, isLoading } = useOpgg()
+const { champion, applying, isLoading } = useOpggPage()
 const { setRunes } = useLoadout()
 const { t } = useTranslation()
 const lcs = useLeagueClientStore()

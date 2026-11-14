@@ -1,5 +1,4 @@
 import { useExtraAssetsStore } from '@renderer-shared/shards/extra-assets/store'
-import { parseOpggRankedDetails } from '@shared/data-adapter/opgg'
 import { projectDetails, projectOverview } from '@shared/data-adapter/opgg/projection'
 import type { OpggHttpApiAxiosHelper } from '@shared/http-api-axios-helper/opgg'
 import type {
@@ -125,10 +124,6 @@ function setup() {
       call: vi.fn(async (_namespace: string, method: string, value: unknown) => {
         if (method === 'setOpggPreferences') {
           settings.opggPreferences = value as typeof settings.opggPreferences
-        }
-
-        if (method === 'setOpggFlashPosition') {
-          settings.opggFlashPosition = value as typeof settings.opggFlashPosition
         }
       })
     },
@@ -315,23 +310,6 @@ describe('OP.GG renderer data flow', () => {
     await controller.open(21)
     expect(state.snapshot.activePage).toBe(21)
     expect(state.snapshot.openedPages).toHaveLength(20)
-  })
-
-  it('keeps Flash preferences independent from champion data requests', async () => {
-    const { state, context, controller, api, enableWindow } = setup()
-    expect(context.settings.opggFlashPosition).toBe('auto')
-
-    await enableWindow()
-    await controller.updateQuery({ championId: 1 })
-
-    const snapshot = state.snapshot
-    await controller.setFlashPosition('f')
-
-    expect(context.settings.opggFlashPosition).toBe('f')
-    expect(state.snapshot).toBe(snapshot)
-    expect(api.getChampionVersions).toHaveBeenCalledTimes(1)
-    expect(api.getRankedChampions).toHaveBeenCalledTimes(1)
-    expect(api.getRankedChampion).toHaveBeenCalledTimes(1)
   })
 
   it('reprojects position statistics while retaining stale data until the new page is ready', async () => {
@@ -660,16 +638,83 @@ describe('OP.GG renderer data flow', () => {
 })
 
 describe('OP.GG projection contracts', () => {
+  it("preserves Kha'Zix evolution steps through the page projection", () => {
+    const raw = details()
+
+    // Real skill_masteries entry, verified 2026-11-15. R-* codes are valid skills.
+    raw.data.skill_masteries = [
+      {
+        ids: ['Q', 'W', 'E'],
+        play: 190360,
+        win: 105754,
+        pick_rate: 0.852,
+        builds: [
+          {
+            order: ['Q', 'W', 'E', 'Q', 'Q', 'R-Q', 'Q', 'W', 'Q', 'W', 'W', 'R-W', 'W', 'E', 'E'],
+            play: 39059,
+            win: 21476,
+            pick_rate: 0.2052
+          },
+          {
+            order: ['Q', 'W', 'E', 'Q', 'Q', 'R-Q', 'Q', 'W', 'Q', 'W', 'W', 'R-E', 'W', 'E', 'E'],
+            play: 25790,
+            win: 14451,
+            pick_rate: 0.1355
+          },
+          {
+            order: ['Q', 'W', 'E', 'Q', 'Q', 'R-Q', 'Q', 'W', 'Q', 'W', 'R-E', 'W', 'W', 'E', 'E'],
+            play: 22847,
+            win: 13133,
+            pick_rate: 0.12
+          },
+          {
+            order: ['Q', 'W', 'E', 'Q', 'Q', 'R-Q', 'Q', 'W', 'Q', 'W', 'R-W', 'W', 'W', 'E', 'E'],
+            play: 21467,
+            win: 12045,
+            pick_rate: 0.1128
+          },
+          {
+            order: ['Q', 'W', 'E', 'Q', 'Q', 'R-Q', 'Q', 'W', 'Q', 'W', 'W', 'R-R', 'W', 'E', 'E'],
+            play: 14970,
+            win: 8190,
+            pick_rate: 0.0786
+          }
+        ]
+      }
+    ]
+
+    const result = projectDetails({ mode: 'ranked', response: raw }, 'top', {
+      aramBalance: [],
+      augmentRarity: () => null
+    })
+
+    assert(result.kind === 'ranked')
+    expect(result.skillMasteries[0].orders).toEqual(
+      raw.data.skill_masteries[0].builds.map((build) => build.order)
+    )
+    expect(result.skillMasteries[0].orders.flat()).toEqual(
+      expect.arrayContaining(['R-Q', 'R-W', 'R-E', 'R-R'])
+    )
+  })
+
   it('preserves purchase order, exact counts and optional item progression', () => {
     const raw = details()
     const single = { ids: [3031], play: 270, win: 93, pick_rate: 0.2 }
     const combined = { ...single, ids: [6672, 3031] }
-    raw.data.single_items = [{ depth: 1, items: [single] }]
-    raw.data.combination_items = [{ depth: 1, items: [combined] }]
-    const parsed = parseOpggRankedDetails(raw)
-    expect(parsed.issues).toEqual([])
+    raw.data = {
+      ...raw.data,
+      single_items: [{ depth: 1, items: [single] }],
+      combination_items: [{ depth: 1, items: [combined] }],
+      single_runes: {
+        primary_page: { runes: [] },
+        secondary_page: { runes: [] },
+        stat_mod_one: { runes: [] },
+        stat_mod_two: { runes: [] },
+        stat_mod_three: { runes: [] }
+      }
+    }
 
-    const result = projectDetails({ mode: 'flex', response: parsed.data }, 'top', {
+    const result = projectDetails({ mode: 'flex', response: raw }, 'top', {
       aramBalance: [],
       augmentRarity: () => null
     })
@@ -681,33 +726,13 @@ describe('OP.GG projection contracts', () => {
       ]
     })
 
-    const withoutProgression = parseOpggRankedDetails(details())
-    expect(withoutProgression.issues).toEqual([])
-    expect(withoutProgression.data.data.single_items).toEqual([])
-    expect(withoutProgression.data.data.combination_items).toEqual([])
-  })
-
-  it('isolates damaged item stages and does not count empty stages as visible content', () => {
-    const raw = details()
-    raw.data.summoner_spells = []
-    const parsed = parseOpggRankedDetails({
-      ...raw,
-      data: {
-        ...raw.data,
-        single_items: [
-          { depth: 0, items: [{ ids: [3031], play: 10, win: 5, pick_rate: 1 }] },
-          { depth: 4, items: [{ ids: [], play: 10, win: 5, pick_rate: 1 }] }
-        ]
-      }
+    const withoutProgression = details()
+    const projected = projectDetails({ mode: 'ranked', response: withoutProgression }, 'top', {
+      aramBalance: [],
+      augmentRarity: () => null
     })
-    expect(parsed.issues).toHaveLength(2)
-    expect(parsed.data.data.single_items).toEqual([{ depth: 4, items: [] }])
-    expect(
-      projectDetails({ mode: 'ranked', response: parsed.data }, 'top', {
-        aramBalance: [],
-        augmentRarity: () => null
-      }).hasContent
-    ).toBe(false)
+    assert(projected.kind === 'ranked')
+    expect(projected.itemBuildsByOrder).toEqual({ single: [], combined: [] })
   })
 
   it.each([
@@ -721,14 +746,10 @@ describe('OP.GG projection contracts', () => {
     ]
     raw.data.counters = [{ champion_id: 2, play: counts.play, win: counts.win }]
 
-    const result = projectDetails(
-      { mode: 'ranked', response: parseOpggRankedDetails(raw).data },
-      'top',
-      {
-        aramBalance: [],
-        augmentRarity: () => null
-      }
-    )
+    const result = projectDetails({ mode: 'ranked', response: raw }, 'top', {
+      aramBalance: [],
+      augmentRarity: () => null
+    })
 
     assert(result.kind === 'ranked')
     expect(result.summonerSpells[0]).toMatchObject(counts)

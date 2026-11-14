@@ -3,7 +3,6 @@ import { SUMMONER_SPELL_FLASH_ID } from '@shared/constants/summoner-spells'
 import type { ChampionRunesConfig, SummonerSpellsConfig } from '@shared/shards/auto-champ-config'
 
 import type { ChampionDataCommands } from './source-contract'
-import { runeSchema, toSummonerSpellsConfig } from './source-contract'
 import { type LoadoutKind, useChampionDataStore } from './store'
 
 export interface RuneWriteProgress {
@@ -61,10 +60,6 @@ export class LoadoutExecutor implements ChampionDataCommands {
   }
 
   async setSummonerSpells(config: SummonerSpellsConfig) {
-    if (!toSummonerSpellsConfig([config.spell1Id, config.spell2Id])) {
-      throw new Error('Invalid summoner spell pair')
-    }
-
     const store = useChampionDataStore()
     const flashPosition = store.settings.opggFlashPosition
 
@@ -95,7 +90,7 @@ export class LoadoutExecutor implements ChampionDataCommands {
     progress: RuneWriteProgress = {},
     isCurrent?: () => boolean
   ) {
-    const runes = runeSchema.parse(config)
+    const runes = config
     const { currentGame } = useChampionDataStore()
 
     if (!isCurrent && currentGame.active) {

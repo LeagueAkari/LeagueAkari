@@ -127,9 +127,9 @@ export function useQq101CurrentGame(
       queryKey: JSON.stringify(desired),
       runes: sectionRecommendation(sections.runes, () => pages.getRecommendedRunes()),
       summonerSpells: sectionRecommendation(sections.summonerSpells, (data) =>
-        data.recommendations
-          .map((row) => toSummonerSpellsConfig(row.summonerSpellIds))
-          .find(Boolean)
+        data.recommendations.length > 0
+          ? toSummonerSpellsConfig(data.recommendations[0].summonerSpellIds)
+          : undefined
       )
     }
   }

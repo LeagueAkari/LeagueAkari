@@ -9,10 +9,17 @@ import { describe, expect, it } from 'vitest'
 
 import { projectRankings } from './rankings'
 
-const response = (id: number, payload: object) => ({
-  code: 0,
-  data: { _fieldValues: { [`R${id}`]: JSON.stringify(payload) } }
-})
+function response(payload: object) {
+  return {
+    code: 0,
+    msg: '',
+    errMsg: '',
+    err_msg: '',
+    result: 0,
+    message: '',
+    data: { _fieldValues: {}, result: JSON.stringify({ dtstatdate: '20261113', ...payload }) }
+  }
+}
 const resources = {
   champions: { roles: (id: number) => (id <= 10 ? ['mage'] : ['tank']) },
   augments: { display: () => null }
@@ -21,14 +28,17 @@ const resources = {
 describe('QQ101 rankings projection', () => {
   it('keeps each Rift lane and the original Classic resource identity', () => {
     const data = parseQq101TierList(
-      response(17960, { datadetails: '1_103_T1_MIDDLE_52_10_1__0#2_103_T3_TOP_48_1_1__-1' }),
+      response({
+        datadetails: '1_103_T1_MIDDLE_52_10_1__0_0_0#2_103_T3_TOP_48_1_1__-1_0_0'
+      }),
       '16.19'
-    ).data
+    )
     const rows = projectRankings({ mode: 'ranked', data }, 'champions', 'all', resources)
     expect(new Set(rows.map((row) => row.key)).size).toBe(2)
     const classic = parseQq101ClassicTierList(
-      response(18009, { tierscore_top_hero_list: '1|60103|52|10|1|T1|0' })
-    ).data
+      response({ tierscore_top_hero_list: '1|60103|52|10|1|T1|0' }),
+      'all'
+    )
     expect(
       projectRankings({ mode: 'classic', data: classic }, 'champions', 'all', resources)[0].ids
     ).toEqual([60103])
@@ -36,14 +46,14 @@ describe('QQ101 rankings projection', () => {
 
   it('calculates profession tiers before filtering without rewriting upstream ranks', () => {
     const data = parseQq101MayhemChampions(
-      response(15380, {
+      response({
         listcollect: Array.from(
           { length: 20 },
-          (_, i) => `${i + 1}_${i + 1}_持平_0.52_0.1__0_0_0_0_`
+          (_, i) => `${i + 1}_${i + 1}_未变化_0.52_0.1__0_0_0_0_`
         ).join('#')
       }),
       '20260926'
-    ).data
+    )
     const overview = {
       mode: 'aram_mayhem' as const,
       data: {
@@ -73,8 +83,8 @@ describe('QQ101 rankings projection', () => {
 
   it('retains missing augment resources and both ranking metrics', () => {
     const { augments } = parseQq101MayhemAugments(
-      response(15381, { augmentlist: '1379_255_0.12_2_-3_0.55_1_2_' })
-    ).data
+      response({ augmentlist: '1379_255_0.12_2_-3_0.55_1_2_' })
+    )
     const rows = projectRankings(
       {
         mode: 'aram_mayhem',

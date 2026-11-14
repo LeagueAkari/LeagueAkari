@@ -1,3 +1,4 @@
+import type { Qq101EncodedResponse, Qq101PatchesResponse } from '@shared/types/qq101'
 import type { AxiosInstance } from 'axios'
 
 export type Qq101ClassicPosition = 'all' | 'top' | 'jungle' | 'middle' | 'bottom' | 'support'
@@ -33,12 +34,12 @@ export class Qq101HttpApiAxiosHelper {
     }
   }
 
-  private async _get(
+  private async _get<T = Qq101EncodedResponse>(
     path: string,
     params: Record<string, string | number>,
     options: Qq101RequestOptions
   ) {
-    return this._http.get<unknown>(path, { params, signal: options.signal })
+    return this._http.get<T>(path, { params, signal: options.signal })
   }
 
   private _riftParams(query: Qq101RiftQuery, championId?: number) {
@@ -51,7 +52,11 @@ export class Qq101HttpApiAxiosHelper {
   }
 
   async getPatches(options: Qq101RequestOptions = {}) {
-    return this._get('/go/database/versionlist', { zone: 'lol', from: 'h5' }, options)
+    return this._get<Qq101PatchesResponse>(
+      '/go/database/versionlist',
+      { zone: 'lol', from: 'h5' },
+      options
+    )
   }
 
   async getClassicLanes(options: Qq101RequestOptions = {}) {

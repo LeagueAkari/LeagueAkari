@@ -30,9 +30,9 @@ import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useTranslation } from 'i18next-vue'
 import { computed } from 'vue'
 
-import { useOpgg } from '../context'
+import { useOpggPage } from '../context'
 
-const { champion } = useOpgg()
+const { champion } = useOpggPage()
 
 const { t } = useTranslation()
 

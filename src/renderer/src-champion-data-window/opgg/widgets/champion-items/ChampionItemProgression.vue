@@ -62,11 +62,11 @@ import { useTranslation } from 'i18next-vue'
 import { NButton, NEllipsis, NFlex, NRadio, NRadioGroup } from 'naive-ui'
 import { computed, ref, watch, watchEffect } from 'vue'
 
-import { useOpgg } from '../../context'
+import { useOpggPage } from '../../context'
 import RecommendationStats from '../RecommendationStats.vue'
 import AddItemSetButton from './AddItemSetButton.vue'
 
-const { champion } = useOpgg()
+const { champion } = useOpggPage()
 const { t } = useTranslation()
 const resources = useAkariResourceProvider()
 const kind = ref<'single' | 'combined'>('single')

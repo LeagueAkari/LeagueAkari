@@ -1,6 +1,23 @@
 <template>
   <div class="relative flex flex-col px-2 pt-1 pb-2">
-    <OpggTabToolbar class="mb-1" />
+    <div class="mb-1">
+      <OpggTabToolbar
+        :snapshot="snapshot"
+        @activate="activatePage"
+        @close="closePage"
+        @close-others="closeOtherPages"
+        @reorder="reorderPages"
+        @refresh="refreshPage"
+      />
+      <OpggQueryFilters
+        v-if="!managedPage?.currentGame?.unavailableReason"
+        :query="pageState.query"
+        :version="pageState.version"
+        :versions="pageState.versions"
+        :read-only="Boolean(managedPage)"
+        @change="changeQuery"
+      />
+    </div>
 
     <NEmpty
       v-if="managedPage?.currentGame?.unavailableReason"
@@ -13,7 +30,13 @@
       :description="t('opgg.view.dataUnavailable')"
     />
     <div v-else class="relative min-h-0 flex-1" :aria-busy="isLoading">
-      <OpggRankingsTab v-show="currentTab === 'champions' && champions !== null" class="h-full" />
+      <OpggRankingsTab
+        v-show="currentTab === 'champions' && champions !== null"
+        :champions="champions"
+        :is-loading="snapshot.overviewState.status === 'loading'"
+        class="h-full"
+        @champion="openChampion"
+      />
       <OpggChampionTab
         v-for="id in contentPageIds"
         :key="id"
@@ -68,39 +91,55 @@
       </Transition>
     </div>
 
-    <SessionChampions />
+    <SessionChampions @champion="openChampion" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useTranslation } from 'i18next-vue'
 import ChampionTabPlaceholder from '@champion-data-window/components/champion-tab/ChampionTabPlaceholder.vue'
-import { NButton, NEmpty, NSpin } from 'naive-ui'
+import { NButton, NEmpty, NSpin, useMessage } from 'naive-ui'
 import { computed } from 'vue'
 
 import OpggChampionTab from './champion-tab/OpggChampionTab.vue'
 import OpggRankingsTab from './OpggRankingsTab.vue'
 import OpggTabToolbar from './OpggTabToolbar.vue'
-import { useOpgg } from './context'
+import { ChampionDataRenderer } from '@champion-data-window/shards/champion-data'
+import { useChampionDataStore } from '@champion-data-window/shards/champion-data/store'
+import { useInstance } from '@renderer-shared/shards'
+import type { OpggChampionDataQueryUpdate } from '@shared/types/champion-data/opgg'
+import OpggQueryFilters from './filters/OpggQueryFilters.vue'
 import SessionChampions from './widgets/SessionChampions.vue'
 
+const store = useChampionDataStore()
+const controller = useInstance(ChampionDataRenderer).opgg
 const { t } = useTranslation()
+const message = useMessage()
 
-const {
-  managedPage,
-  currentTab,
-  championId,
-  champion,
-  champions,
-  isDataUnavailable,
-  isLoading,
-  isDataStale,
-  error,
-  openedPages,
-  activePage,
-  cancel,
-  refresh
-} = useOpgg()
+const snapshot = computed(() => store.opgg.snapshot)
+const activePage = computed(() => snapshot.value.activePage)
+const openedPages = computed(() => snapshot.value.openedPages)
+const currentTab = computed(() => (activePage.value === null ? 'champions' : 'champion'))
+
+const pageState = computed(() =>
+  activePage.value === null ? snapshot.value.overviewState : snapshot.value.pages[activePage.value]
+)
+const managedPage = computed(() => {
+  const page = activePage.value === null ? null : snapshot.value.pages[activePage.value]
+
+  return page?.currentGame ? page : null
+})
+
+const championId = computed(() => pageState.value.query.championId)
+const champion = computed(() =>
+  activePage.value === null ? null : snapshot.value.pages[activePage.value].champion
+)
+const champions = computed(() => snapshot.value.overview)
+
+const isLoading = computed(() => pageState.value.status === 'loading')
+const isDataStale = computed(() => pageState.value.stale)
+const error = computed(() => pageState.value.error)
+const isDataUnavailable = computed(() => !store.opgg.enabled)
 
 // Keep mounted content stable: tab sorting must not reinsert page DOM.
 const contentPageIds = computed(() => openedPages.value.toSorted((first, second) => first - second))
@@ -112,6 +151,40 @@ const hasData = computed(() => {
 
   return champions.value !== null
 })
+
+const run = async (request: () => Promise<unknown>) => {
+  try {
+    await request()
+  } catch (error) {
+    message.error(String(error))
+  }
+}
+
+const activatePage = (id: number | null) => run(() => controller.activate(id))
+
+const closePage = (id: number) => run(() => controller.close(id))
+
+const closeOtherPages = (id: number | null) =>
+  run(async () => {
+    for (const pageId of openedPages.value) {
+      if (pageId !== id && !snapshot.value.pages[pageId].currentGame) {
+        await controller.close(pageId)
+      }
+    }
+  })
+
+const reorderPages = (ids: number[]) => run(() => controller.reorder(ids))
+
+const refreshPage = (id: number | null) => run(() => controller.refresh(id))
+
+const refresh = () => refreshPage(activePage.value)
+
+const cancel = () => controller.cancel(activePage.value)
+
+const openChampion = (id: number) => run(() => controller.open(id, activePage.value))
+
+const changeQuery = (query: OpggChampionDataQueryUpdate) =>
+  run(() => controller.update(query, activePage.value))
 </script>
 
 <style scoped>

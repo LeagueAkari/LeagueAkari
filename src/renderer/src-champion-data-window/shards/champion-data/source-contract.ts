@@ -1,6 +1,5 @@
 import type { ChampionRunesConfig, SummonerSpellsConfig } from '@shared/shards/auto-champ-config'
 import type { ComputedRef } from 'vue'
-import { z } from 'zod'
 
 /** LCU values shared by every source. Null closes the managed page. */
 export interface CurrentGameInput {
@@ -48,27 +47,6 @@ export function recommended<T>(value: T | undefined): Recommendation<T> {
   return value ? { status: 'ready', value } : { status: 'empty' }
 }
 
-const id = z.number().int().positive()
-
-export const runeSchema = z.object({
-  primaryStyleId: id,
-  subStyleId: id,
-  selectedPerkIds: z.array(id).length(9)
-})
-
-export function isValidRunePage(value: ChampionRunesConfig): boolean {
-  return runeSchema.safeParse(value).success
-}
-
-export function toSummonerSpellsConfig(ids: readonly number[]): SummonerSpellsConfig | undefined {
-  const [spell1Id, spell2Id] = ids
-  if (
-    ids.length === 2 &&
-    spell1Id !== spell2Id &&
-    ids.every((id) => Number.isInteger(id) && id > 0)
-  ) {
-    return { spell1Id, spell2Id }
-  }
-
-  return undefined
+export function toSummonerSpellsConfig(ids: readonly number[]): SummonerSpellsConfig {
+  return { spell1Id: ids[0], spell2Id: ids[1] }
 }

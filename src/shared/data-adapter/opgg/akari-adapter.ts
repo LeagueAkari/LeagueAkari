@@ -1,8 +1,7 @@
 import type { OpggChampionBalance } from '@shared/types/champion-data/opgg'
+import type { OpggAramBalanceItem } from '@shared/types/opgg'
 
-import type { OpggDecodedBalance } from './schemas'
-
-export function toOpggChampionBalance(row: OpggDecodedBalance): OpggChampionBalance {
+export function toOpggChampionBalance(row: OpggAramBalanceItem): OpggChampionBalance {
   return {
     championId: row.champion_id,
     attackSpeed: row.attack_speed,

@@ -281,30 +281,6 @@ describe('current game pages and rune automation', () => {
     expect(f.perks.putPage).toHaveBeenCalledOnce()
   })
 
-  it('can apply a healthy default source after a different source returns invalid runes', async () => {
-    const f = setup({
-      opgg: () => () => ({
-        queryKey: 'invalid',
-        runes: {
-          status: 'ready',
-          value: { primaryStyleId: 8000, subStyleId: 8100, selectedPerkIds: [] }
-        },
-        summonerSpells: { status: 'empty' }
-      })
-    })
-    f.select(1)
-    f.openWindow()
-    await vi.waitFor(() => expect(f.store.currentGame.status).toBe('applyError'))
-    expect(f.perks.getPerkInventory).not.toHaveBeenCalled()
-
-    f.store.settings.sourcePreferences = {
-      ...f.store.settings.sourcePreferences,
-      defaultSource: 'qq101'
-    }
-    await vi.waitFor(() => expect(f.store.currentGame.status).toBe('applied'))
-    expect(f.perks.putCurrentPage).toHaveBeenCalledOnce()
-  })
-
   it('shares loaded page data, waits for lock, uses only the default source and preserves ordinary pages', async () => {
     const f = setup()
     f.select(1, false)

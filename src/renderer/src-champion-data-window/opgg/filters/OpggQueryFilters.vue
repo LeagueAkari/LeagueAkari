@@ -1,56 +1,57 @@
 <template>
-  <div v-if="!managedPage?.currentGame?.unavailableReason" class="query-filter-row">
-    <OpggModeSelect :value="mode" :disabled="Boolean(managedPage)" @update:value="changeMode" />
+  <div class="query-filter-row">
+    <OpggModeSelect
+      :value="query.mode"
+      :disabled="readOnly"
+      @update:value="emit('change', { mode: $event })"
+    />
     <OpggRegionSelect
-      v-if="mode !== 'aram_mayhem'"
-      :value="region"
-      :disabled="Boolean(managedPage)"
-      @update:value="changeRegion"
+      v-if="query.mode !== 'aram_mayhem'"
+      :value="query.region"
+      :disabled="readOnly"
+      @update:value="emit('change', { region: $event })"
     />
     <OpggTierSelect
-      v-if="mode !== 'aram_mayhem' && mode !== 'arena'"
-      :value="tier"
-      :disabled="Boolean(managedPage)"
-      @update:value="changeTier"
+      v-if="query.mode !== 'aram_mayhem' && query.mode !== 'arena'"
+      :value="query.tier"
+      :disabled="readOnly"
+      @update:value="emit('change', { tier: $event })"
     />
     <OpggPositionSelect
-      v-if="mode === 'ranked' || mode === 'flex'"
-      :value="position"
-      :disabled="Boolean(managedPage)"
-      @update:value="changePosition"
+      v-if="query.mode === 'ranked' || query.mode === 'flex'"
+      :value="query.position"
+      :disabled="readOnly"
+      @update:value="emit('change', { position: $event })"
     />
     <OpggVersionSelect
-      v-if="mode !== 'aram_mayhem'"
+      v-if="query.mode !== 'aram_mayhem'"
       :value="version"
       :versions="versions"
-      :disabled="Boolean(managedPage) || versions.length === 0"
+      :disabled="readOnly || versions.length === 0"
       class="version-filter"
-      @update:value="changeVersion"
+      @update:value="emit('change', { version: $event })"
     />
   </div>
 </template>
 
 <script setup lang="ts">
 import '@champion-data-window/components/query-filter/filter-row.css'
-import { useOpgg } from '../context'
+import type {
+  OpggChampionDataQuery,
+  OpggChampionDataQueryUpdate
+} from '@shared/types/champion-data/opgg'
 import OpggModeSelect from './OpggModeSelect.vue'
 import OpggRegionSelect from './OpggRegionSelect.vue'
 import OpggTierSelect from './OpggTierSelect.vue'
 import OpggPositionSelect from './OpggPositionSelect.vue'
 import OpggVersionSelect from './OpggVersionSelect.vue'
 
-const {
-  mode,
-  region,
-  tier,
-  position,
-  version,
-  versions,
-  managedPage,
-  changeMode,
-  changeRegion,
-  changeTier,
-  changePosition,
-  changeVersion
-} = useOpgg()
+defineProps<{
+  query: OpggChampionDataQuery
+  version: string | null
+  versions: string[]
+  readOnly: boolean
+}>()
+
+const emit = defineEmits<{ change: [query: OpggChampionDataQueryUpdate] }>()
 </script>

@@ -1,4 +1,3 @@
-import { parseOpggRankedDetails } from '@shared/data-adapter/opgg'
 import { projectDetails } from '@shared/data-adapter/opgg/projection'
 import type { OpggRankedChampionDetailsResponse } from '@shared/types/opgg'
 import { createPinia, setActivePinia } from 'pinia'
@@ -51,14 +50,10 @@ function setup() {
     version: '16.18',
     query: { ...state.snapshot.query, championId: 1 }
   }
-  state.snapshot.champion = projectDetails(
-    { mode: 'ranked', response: parseOpggRankedDetails(raw).data },
-    'top',
-    {
-      aramBalance: [],
-      augmentRarity: () => null
-    }
-  )
+  state.snapshot.champion = projectDetails({ mode: 'ranked', response: raw }, 'top', {
+    aramBalance: [],
+    augmentRarity: () => null
+  })
   state.snapshot.activePage = 1
   state.snapshot.openedPages = [1]
   state.snapshot.pages = {
@@ -115,22 +110,12 @@ function setup() {
 const pageIdentity = { pageId: 1 }
 
 describe('OP.GG recommendation application', () => {
-  it('rejects disconnected clients and invalid rune pages before any client write', async () => {
-    const { executor, context, state, perks } = setup()
+  it('rejects disconnected clients before any client write', async () => {
+    const { executor, context, perks } = setup()
     Object.assign(context.leagueClient, { isConnected: false })
     await expect(
       executor.apply({ pageId: 1, kind: 'runes', recommendationId: 'runes:0' })
     ).rejects.toThrow('disconnected')
-    Object.assign(context.leagueClient, { isConnected: true })
-    const details = state.snapshot.pages[1].champion!
-    if (details.kind !== 'ranked') {
-      throw new Error('Expected ranked fixture')
-    }
-
-    details.runes[0].primaryRuneIds = [0]
-    await expect(
-      executor.apply({ pageId: 1, kind: 'runes', recommendationId: 'runes:0' })
-    ).rejects.toThrow()
     expect(perks.getPerkInventory).not.toHaveBeenCalled()
     expect(useChampionDataStore().applying.runes).toBe(false)
   })

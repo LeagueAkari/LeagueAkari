@@ -1,3 +1,4 @@
+/** OP.GG response contract. Last verified against live endpoints: 2026-11-15. */
 import type {
   OpggAramChampionOverview,
   OpggArenaChampionOverview,
@@ -76,6 +77,18 @@ export interface OpggRunePage extends OpggPickStats {
   builds: OpggRuneBuild[]
 }
 
+export interface OpggSingleRuneStats extends OpggPickStats {
+  id: number
+}
+
+export interface OpggSingleRunes {
+  primary_page: { runes: OpggSingleRuneStats[] }
+  secondary_page: { runes: OpggSingleRuneStats[] }
+  stat_mod_one: { runes: OpggSingleRuneStats[] }
+  stat_mod_two: { runes: OpggSingleRuneStats[] }
+  stat_mod_three: { runes: OpggSingleRuneStats[] }
+}
+
 export interface OpggGameLengthStats {
   game_length: number
   rate: number | null
@@ -132,17 +145,21 @@ interface OpggWinRateChampionDetailsFields {
   trends: OpggChampionTrends
   game_lengths: OpggGameLengthStats[]
   counters: OpggChampionCounter[]
-  prism_items?: never
-  augment_group?: never
-  synergies?: never
 }
 
-export interface OpggRankedChampionDetails extends OpggWinRateChampionDetailsFields {
+export interface OpggRankedChampionBasicDetails extends OpggWinRateChampionDetailsFields {
   summary: OpggRankedChampionOverview
-  // Returned with is_more; omitted by the default detail request.
-  single_items?: OpggItemBuildGroup[]
-  combination_items?: OpggItemBuildGroup[]
 }
+
+/** Verified 2026-11-15: is_more=true adds item progression and individual rune statistics together. */
+export interface OpggRankedChampionExtendedDetails extends OpggRankedChampionBasicDetails {
+  single_items: OpggItemBuildGroup[]
+  combination_items: OpggItemBuildGroup[]
+  single_runes: OpggSingleRunes
+}
+
+export type OpggRankedChampionDetails =
+  OpggRankedChampionBasicDetails | OpggRankedChampionExtendedDetails
 
 export interface OpggAramChampionDetails extends OpggWinRateChampionDetailsFields {
   summary: OpggAramChampionOverview
@@ -156,8 +173,10 @@ export interface OpggUrfChampionDetails extends OpggWinRateChampionDetailsFields
   summary: OpggUrfChampionOverview
 }
 
-export interface OpggDoomChampionDetails extends OpggWinRateChampionDetailsFields {
+/** Verified 2026-11-15: Doom has no trend series; the wire value is null. */
+export interface OpggDoomChampionDetails extends Omit<OpggWinRateChampionDetailsFields, 'trends'> {
   summary: OpggDoomChampionOverview
+  trends: null
 }
 
 export interface OpggArenaChampionDetails {
@@ -172,13 +191,6 @@ export interface OpggArenaChampionDetails {
   skill_evolves: OpggSkillEvolution[]
   augment_group: OpggArenaAugmentGroup[]
   synergies: OpggArenaSynergy[]
-  summoner_spells?: never
-  mythic_items?: never
-  rune_pages?: never
-  runes?: never
-  trends?: never
-  game_lengths?: never
-  counters?: never
 }
 
 export interface OpggChampionDetailsMeta {
@@ -189,6 +201,10 @@ export interface OpggChampionDetailsMeta {
 export interface OpggRankedChampionDetailsResponse {
   data: OpggRankedChampionDetails
   meta: OpggChampionDetailsMeta
+}
+
+export interface OpggRankedChampionExtendedDetailsResponse extends OpggRankedChampionDetailsResponse {
+  data: OpggRankedChampionExtendedDetails
 }
 
 export interface OpggRankedChampionCountersResponse {

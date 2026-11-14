@@ -139,13 +139,8 @@ export class Qq101ChampionDataLoader {
       throw new Error('QQ101 patch list is empty')
     }
 
-    let patch = requestedPatch
-    let data = await this._api.getTierList(this._riftQuery(preferences, patch), { signal })
-
-    if (data.champions.length === 0 && preferences.patch === null && patchNames[1]) {
-      patch = patchNames[1]
-      data = await this._api.getTierList(this._riftQuery(preferences, patch), { signal })
-    }
+    const patch = requestedPatch
+    const data = await this._api.getTierList(this._riftQuery(preferences, patch), { signal })
 
     return { patches: patchNames, patch, overview: { mode: 'ranked', data } }
   }
@@ -162,15 +157,12 @@ export class Qq101ChampionDataLoader {
     load: (date: string) => Promise<T>,
     signal: AbortSignal
   ) {
-    for (let days = 1; ; days++) {
-      signal.throwIfAborted()
-      const date = this._dateBefore(days)
-      const result = await load(date)
-      signal.throwIfAborted()
-      if (result.champions.length || days === 3) {
-        return result
-      }
-    }
+    signal.throwIfAborted()
+
+    const data = await load(this._dateBefore(1))
+    signal.throwIfAborted()
+
+    return data
   }
 
   private _riftQuery(preferences: Qq101ChampionDataPreferences, patch: string): Qq101RiftQuery {

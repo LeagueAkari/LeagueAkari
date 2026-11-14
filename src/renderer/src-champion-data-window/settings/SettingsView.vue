@@ -66,7 +66,6 @@
 </template>
 
 <script setup lang="ts">
-import { useOpgg } from '@champion-data-window/opgg/context'
 import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
 import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
@@ -75,6 +74,7 @@ import { useChampionDataStore } from '@champion-data-window/shards/champion-data
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useChampionDataWindowStore } from '@renderer-shared/shards/window-manager/store'
 import type { ChampionDataAutomationSettings } from '@shared/shards/champion-data/automation'
+import type { OpggFlashPosition } from '@shared/types/champion-data/opgg'
 import { useTranslation } from 'i18next-vue'
 import { NRadio, NRadioGroup, NScrollbar, NSwitch, useMessage } from 'naive-ui'
 import { computed, ref } from 'vue'
@@ -84,12 +84,22 @@ import SourceSettings from './SourceSettings.vue'
 const { t } = useTranslation()
 const championDataWindowStore = useChampionDataWindowStore()
 const wm = useInstance(WindowManagerRenderer)
-const { flashPosition, setFlashPosition } = useOpgg()
 const controller = useInstance(ChampionDataRenderer)
 const store = useChampionDataStore()
-const automation = computed(() => store.settings.automation)
-const savingAutomation = ref(false)
 const message = useMessage()
+
+const flashPosition = computed(() => store.settings.opggFlashPosition)
+const automation = computed(() => store.settings.automation)
+
+const savingAutomation = ref(false)
+
+const setFlashPosition = async (value: OpggFlashPosition) => {
+  try {
+    await controller.setFlashPosition(value)
+  } catch (error) {
+    message.error(String(error))
+  }
+}
 
 const saveAutomation = async (value: ChampionDataAutomationSettings) => {
   savingAutomation.value = true
