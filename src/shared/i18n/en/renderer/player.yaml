@@ -143,6 +143,9 @@ playerTabs:
     failedToDownloadReplay: 'Failed to download replay: {{reason}}'
   matchHistory:
     pagination: Pagination
+    akariScoreMode: Score Mode
+    multiGameScore: Multi-game
+    akariScoreModeTooltip: When enabled, expanding a match card will fetch participants' match histories matching the current queue and page size to compute their aggregate Akari Score.
     sidebar:
       open: Open match history sidebar
     filters:

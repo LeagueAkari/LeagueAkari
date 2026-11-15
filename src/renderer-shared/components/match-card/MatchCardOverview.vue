@@ -217,7 +217,7 @@
         </div>
 
         <!-- info line -->
-        <div class="flex">
+        <div class="flex items-center">
           <!-- queue name -->
           <div class="text-xs text-black dark:text-white/80">
             {{ resources.queues.name(basicInfo.queueId) }}
@@ -236,8 +236,25 @@
             {{ formattedRelativeTime }}
           </div>
           <div class="mx-1 text-xs text-black/60 dark:text-white/40">·</div>
-          <div class="flex-1 truncate text-xs text-black/80 dark:text-white/60">
+          <div class="truncate text-xs text-black/80 dark:text-white/60">
             {{ mapName }}
+          </div>
+
+          <!-- per-item multi-game akari score switch -->
+          <div v-if="showMultiGameScoreSwitch" class="ml-3 flex items-center gap-1.5" @click.stop>
+            <NSwitch
+              size="small"
+              :value="isMultiGameScoreEnabled"
+              @update:value="toggleMultiGameScore"
+            />
+            <span
+              class="cursor-pointer text-[11px] text-black/60 select-none hover:text-black dark:text-white/60 dark:hover:text-white"
+              :title="t('playerTabs.matchHistory.akariScoreModeTooltip')"
+              @click="toggleMultiGameScore(!isMultiGameScoreEnabled)"
+            >
+              {{ t('playerTabs.matchHistory.multiGameScore') }}
+            </span>
+            <NSpin v-if="loadingMultiGameScores" :size="10" class="ml-0.5" />
           </div>
         </div>
       </div>
@@ -285,11 +302,29 @@
               <div class="flex items-center gap-1 text-xs" v-if="!hidePrivacy">
                 <span class="font-bold">{{ player.gameName }}</span>
                 <span v-if="player.tagLine" class="text-white/80">#{{ player.tagLine }}</span>
+                <span v-if="akariScoresByPuuid[player.puuid]" class="text-white/70">
+                  ({{ akariScoresByPuuid[player.puuid].total.toFixed(2) }})
+                </span>
               </div>
               <div class="flex items-center gap-1 text-xs" v-else>
                 <span class="font-bold">{{ resources.champions.name(player.championId) }}</span>
+                <span v-if="akariScoresByPuuid[player.puuid]" class="text-white/70">
+                  ({{ akariScoresByPuuid[player.puuid].total.toFixed(2) }})
+                </span>
               </div>
             </NTooltip>
+
+            <AkariScorePopover
+              v-if="akariScoresByPuuid[player.puuid]"
+              :score="akariScoresByPuuid[player.puuid]"
+            >
+              <span
+                class="shrink-0 cursor-default text-[11px] font-normal text-black/50 tabular-nums hover:text-black dark:text-white/50 dark:hover:text-white"
+                :class="{ 'font-semibold': player.puuid === puuid }"
+              >
+                ({{ akariScoresByPuuid[player.puuid].total.toFixed(2) }})
+              </span>
+            </AkariScorePopover>
           </div>
 
           <!-- spacer -->
@@ -348,11 +383,29 @@
               <div class="flex items-center gap-1 text-xs" v-if="!hidePrivacy">
                 <span class="font-bold">{{ player.gameName }}</span>
                 <span v-if="player.tagLine" class="text-white/80">#{{ player.tagLine }}</span>
+                <span v-if="akariScoresByPuuid[player.puuid]" class="text-white/70">
+                  ({{ akariScoresByPuuid[player.puuid].total.toFixed(2) }})
+                </span>
               </div>
               <div class="flex items-center gap-1 text-xs" v-else>
                 <span class="font-bold">{{ resources.champions.name(player.championId) }}</span>
+                <span v-if="akariScoresByPuuid[player.puuid]" class="text-white/70">
+                  ({{ akariScoresByPuuid[player.puuid].total.toFixed(2) }})
+                </span>
               </div>
             </NTooltip>
+
+            <AkariScorePopover
+              v-if="akariScoresByPuuid[player.puuid]"
+              :score="akariScoresByPuuid[player.puuid]"
+            >
+              <span
+                class="shrink-0 cursor-default text-[11px] font-normal text-black/50 tabular-nums hover:text-black dark:text-white/50 dark:hover:text-white"
+                :class="{ 'font-semibold': player.puuid === puuid }"
+              >
+                ({{ akariScoresByPuuid[player.puuid].total.toFixed(2) }})
+              </span>
+            </AkariScorePopover>
           </div>
         </div>
       </div>
@@ -399,9 +452,15 @@
             <div class="flex items-center gap-1 text-xs" v-if="!hidePrivacy">
               <span class="font-bold">{{ player.gameName }}</span>
               <span v-if="player.tagLine" class="text-white/80">#{{ player.tagLine }}</span>
+              <span v-if="akariScoresByPuuid[player.puuid]" class="text-white/70">
+                ({{ akariScoresByPuuid[player.puuid].total.toFixed(2) }})
+              </span>
             </div>
             <div class="flex items-center gap-1 text-xs" v-else>
               <span class="font-bold">{{ resources.champions.name(player.championId) }}</span>
+              <span v-if="akariScoresByPuuid[player.puuid]" class="text-white/70">
+                ({{ akariScoresByPuuid[player.puuid].total.toFixed(2) }})
+              </span>
             </div>
           </NTooltip>
         </div>
@@ -435,6 +494,7 @@
 
 <script lang="ts" setup>
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
+import { AkariScorePopover } from '@renderer-shared/components/akari-score'
 import { useNumberFormatter } from '@renderer-shared/composables/useNumberFormatter'
 import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resource'
 import { EMPTY_PUUID } from '@shared/constants/common'
@@ -444,7 +504,7 @@ import { ArrowBackIosFilled } from '@vicons/material'
 import { useIntervalFn } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
-import { NIcon, NPopover, NTooltip } from 'naive-ui'
+import { NIcon, NPopover, NSpin, NSwitch, NTooltip } from 'naive-ui'
 import { computed, ref } from 'vue'
 
 import AugmentDisplay from '../widgets/AugmentDisplay.vue'
@@ -472,7 +532,12 @@ const {
   participants,
   isExpanded,
   hidePrivacy,
-  navigateToSummonerByPuuid
+  navigateToSummonerByPuuid,
+  akariScoresByPuuid,
+  isMultiGameScoreEnabled,
+  showMultiGameScoreSwitch,
+  toggleMultiGameScore,
+  loadingMultiGameScores
 } = useMatchCard()
 
 const { formatExtremeNumber } = useNumberFormatter()

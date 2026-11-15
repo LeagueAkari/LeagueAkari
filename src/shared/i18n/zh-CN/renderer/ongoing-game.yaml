@@ -258,6 +258,7 @@ ongoingGame:
     premade: '{{size}} 黑'
     winRate: 胜率 {{rate}}%
     kda: KDA {{kda}}
+    akariScore: 队伍平均 Akari Score {{score}}
   panel:
     disconnected: 未连接到客户端
     waitingForSpectate: 等待观战延迟

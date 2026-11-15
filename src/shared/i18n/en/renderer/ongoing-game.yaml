@@ -283,6 +283,7 @@ ongoingGame:
     premade: Premade {{size}}
     winRate: Win Rate {{rate}}%
     kda: KDA {{kda}}
+    akariScore: Team Avg Akari Score {{score}}
   panel:
     disconnected: Not connected to the client
     waitingForSpectate: Waiting for spectate delay

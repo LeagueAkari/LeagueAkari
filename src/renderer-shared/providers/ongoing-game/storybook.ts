@@ -1,4 +1,5 @@
 import { analyzeGames } from '@shared/data-adapter/analysis/player'
+import { type AggregatedTeamAnalysis, analyzePlayers } from '@shared/data-adapter/analysis/team'
 import type { LcuOrSgpGameSummary } from '@shared/data-adapter/wrapper'
 import type {
   OngoingGameAnalysis,
@@ -210,13 +211,25 @@ function createSummoners() {
 }
 
 function createAnalysis(): OngoingGameAnalysis {
+  const players = storyCurrentPlayerAnalysis
+    ? {
+        [currentSummonerPuuid]: storyCurrentPlayerAnalysis
+      }
+    : {}
+
+  const teams: Record<string, AggregatedTeamAnalysis> = {}
+  const allTeams = createTeams()
+  for (const [teamIdentifier, puuids] of Object.entries(allTeams)) {
+    const teamPlayerAnalyses = puuids.map((p) => players[p]).filter(Boolean)
+    const teamAnalysis = analyzePlayers(teamPlayerAnalyses)
+    if (teamAnalysis) {
+      teams[teamIdentifier] = teamAnalysis
+    }
+  }
+
   return {
-    players: storyCurrentPlayerAnalysis
-      ? {
-          [currentSummonerPuuid]: storyCurrentPlayerAnalysis
-        }
-      : {},
-    teams: {}
+    players,
+    teams
   }
 }
 

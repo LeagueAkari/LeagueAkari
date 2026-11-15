@@ -1,3 +1,5 @@
+import { type AkariScore, computeSingleAkariScore } from '@shared/data-adapter/analysis/player'
+import { computeSingleSummary } from '@shared/data-adapter/analysis/player/single/summary'
 import { toFrames } from '@shared/data-adapter/match-history/frames'
 import { toBasicInfo } from '@shared/data-adapter/match-history/match-basic'
 import { toParticipants } from '@shared/data-adapter/match-history/participants'
@@ -34,6 +36,13 @@ export type MatchCardContext = {
   participant: Ref<ReturnType<typeof toParticipants>[number] | null>
   team: Ref<ReturnType<typeof toTeams>['teamStatMap'][string] | null>
 
+  akariScoresByPuuid: Ref<Record<string, AkariScore>>
+  loadingMultiGameScores: Ref<boolean>
+  isMultiGameScoreActive: Ref<boolean>
+  isMultiGameScoreEnabled: Ref<boolean>
+  showMultiGameScoreSwitch: Ref<boolean>
+  toggleMultiGameScore: (enabled?: boolean) => void
+
   // events
   navigateToSummonerByPuuid: (puuid: string, setCurrent?: boolean) => void
   loadReplay: (gameId: number) => void
@@ -63,6 +72,11 @@ export function provideMatchCard(props: {
   loadingDetails: MaybeRefOrGetter<boolean>
   replayState: MaybeRefOrGetter<ReplayDownloadProgress | null>
   canDryRunOngoingGame: MaybeRefOrGetter<boolean>
+  multiGameScores?: MaybeRefOrGetter<Record<string, AkariScore> | null | undefined>
+  loadingMultiGameScores?: MaybeRefOrGetter<boolean | undefined>
+  isMultiGameScoreEnabled?: MaybeRefOrGetter<boolean | undefined>
+  showMultiGameScoreSwitch?: MaybeRefOrGetter<boolean | undefined>
+  onToggleMultiGameScore?: (enabled: boolean) => void
 
   navigateToSummonerByPuuid: (puuid: string, setCurrent?: boolean) => void
   loadReplay: (gameId: number) => void
@@ -89,6 +103,46 @@ export function provideMatchCard(props: {
   const team = computed(() => {
     if (!participant.value) return null
     return teams.value.teamStatMap[participant.value.teamIdentifier] ?? null
+  })
+
+  const loadingMultiGameScores = computed(() => Boolean(toValue(props.loadingMultiGameScores)))
+  const isMultiGameScoreEnabled = computed(() => Boolean(toValue(props.isMultiGameScoreEnabled)))
+  const showMultiGameScoreSwitch = computed(() => Boolean(toValue(props.showMultiGameScoreSwitch)))
+
+  const isMultiGameScoreActive = computed(() => {
+    const s = toValue(props.multiGameScores)
+    return Boolean(s && Object.keys(s).length > 0)
+  })
+
+  const toggleMultiGameScore = (enabled?: boolean) => {
+    const nextVal = enabled !== undefined ? enabled : !isMultiGameScoreEnabled.value
+    props.onToggleMultiGameScore?.(nextVal)
+  }
+
+  const akariScoresByPuuid = computed(() => {
+    const scores: Record<string, AkariScore> = {}
+    const multiScores = toValue(props.multiGameScores)
+
+    for (const p of participants.value) {
+      if (multiScores && multiScores[p.puuid]) {
+        scores[p.puuid] = multiScores[p.puuid]
+        continue
+      }
+
+      const teamParticipants = participants.value.filter(
+        (tp) => tp.teamIdentifier === p.teamIdentifier
+      )
+      const summaryAnalysis = computeSingleSummary(
+        basicInfo.value,
+        p,
+        teamParticipants,
+        participants.value
+      )
+
+      scores[p.puuid] = computeSingleAkariScore(summaryAnalysis)
+    }
+
+    return scores
   })
 
   const draftOptions = computed<DraftOptions>(() => {
@@ -148,6 +202,13 @@ export function provideMatchCard(props: {
 
     participant,
     team,
+
+    akariScoresByPuuid,
+    loadingMultiGameScores,
+    isMultiGameScoreActive,
+    isMultiGameScoreEnabled,
+    showMultiGameScoreSwitch,
+    toggleMultiGameScore,
 
     // events
     navigateToSummonerByPuuid: props.navigateToSummonerByPuuid,

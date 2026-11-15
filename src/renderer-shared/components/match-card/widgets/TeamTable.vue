@@ -34,6 +34,28 @@
         {{ team.totalGoldEarned.toLocaleString() }}
       </div>
 
+      <!-- team avg akari score -->
+      <NPopover v-if="teamAvgAkariScore !== null">
+        <template #trigger>
+          <div
+            class="flex cursor-default items-center gap-1 text-xs text-black/80 dark:text-white/80"
+          >
+            <span class="text-black/60 dark:text-white/60">Akari</span>
+            <span class="font-bold">{{ teamAvgAkariScore.toFixed(2) }}</span>
+            <NSpin v-if="loadingMultiGameScores" :size="10" class="ml-0.5" />
+          </div>
+        </template>
+        <div class="text-xs">
+          {{
+            isMultiGameScoreActive
+              ? t('matchCard.teamTable.avgMultiGameAkariScore', {
+                  score: teamAvgAkariScore.toFixed(2)
+                })
+              : t('matchCard.teamTable.avgAkariScore', { score: teamAvgAkariScore.toFixed(2) })
+          }}
+        </div>
+      </NPopover>
+
       <!-- objective -->
       <div v-if="team.teamInfo" class="flex gap-2">
         <div
@@ -170,43 +192,65 @@
 
         <!-- name & position -->
         <div class="flex min-w-0 flex-1 flex-col">
-          <NTooltip>
-            <template #trigger>
-              <div
-                class="flex cursor-pointer items-center gap-1 text-xs"
-                @click="navigateToSummonerByPuuid(participant.puuid)"
-                @mousedown="handleMouseDown"
-                @mouseup="handleMouseUp($event, participant.puuid)"
-                :class="{ 'font-bold text-black dark:text-white': participant.puuid === puuid }"
-              >
-                <NIcon
-                  class="text-black/80 dark:text-white/80"
-                  v-if="!participant.puuid || participant.puuid === EMPTY_PUUID"
+          <div class="flex min-w-0 items-center gap-1">
+            <NTooltip>
+              <template #trigger>
+                <div
+                  class="flex min-w-0 cursor-pointer items-center gap-1 text-xs"
+                  @click="navigateToSummonerByPuuid(participant.puuid)"
+                  @mousedown="handleMouseDown"
+                  @mouseup="handleMouseUp($event, participant.puuid)"
+                  :class="{ 'font-bold text-black dark:text-white': participant.puuid === puuid }"
                 >
-                  <Robot />
-                </NIcon>
+                  <NIcon
+                    class="shrink-0 text-black/80 dark:text-white/80"
+                    v-if="!participant.puuid || participant.puuid === EMPTY_PUUID"
+                  >
+                    <Robot />
+                  </NIcon>
 
-                <div class="truncate">
-                  <template v-if="hidePrivacy">
-                    {{ resources.champions.name(participant.championId) }}
-                  </template>
-                  <template v-else>
-                    {{ participant.gameName }}
-                    <template v-if="participant.tagLine">#{{ participant.tagLine }}</template>
-                  </template>
+                  <div class="truncate">
+                    <template v-if="hidePrivacy">
+                      {{ resources.champions.name(participant.championId) }}
+                    </template>
+                    <template v-else>
+                      {{ participant.gameName }}
+                      <template v-if="participant.tagLine">#{{ participant.tagLine }}</template>
+                    </template>
+                  </div>
                 </div>
+              </template>
+              <div class="flex items-center gap-1 text-xs" v-if="!hidePrivacy">
+                <span class="font-bold">{{ participant.gameName }}</span>
+                <span v-if="participant.tagLine" class="text-white/80"
+                  >#{{ participant.tagLine }}</span
+                >
+                <span v-if="akariScoresByPuuid[participant.puuid]" class="text-white/70">
+                  ({{ akariScoresByPuuid[participant.puuid].total.toFixed(2) }})
+                </span>
               </div>
-            </template>
-            <div class="flex items-center gap-1 text-xs" v-if="!hidePrivacy">
-              <span class="font-bold">{{ participant.gameName }}</span>
-              <span v-if="participant.tagLine" class="text-white/80"
-                >#{{ participant.tagLine }}</span
+              <div class="flex items-center gap-1 text-xs" v-else>
+                <span class="font-bold">{{
+                  resources.champions.name(participant.championId)
+                }}</span>
+                <span v-if="akariScoresByPuuid[participant.puuid]" class="text-white/70">
+                  ({{ akariScoresByPuuid[participant.puuid].total.toFixed(2) }})
+                </span>
+              </div>
+            </NTooltip>
+
+            <AkariScorePopover
+              v-if="akariScoresByPuuid[participant.puuid]"
+              :score="akariScoresByPuuid[participant.puuid]"
+            >
+              <span
+                class="shrink-0 cursor-default text-xs font-normal text-black/60 tabular-nums hover:text-black dark:text-white/60 dark:hover:text-white"
+                :class="{ 'font-bold': participant.puuid === puuid }"
               >
-            </div>
-            <div class="flex items-center gap-1 text-xs" v-else>
-              <span class="font-bold">{{ resources.champions.name(participant.championId) }}</span>
-            </div>
-          </NTooltip>
+                ({{ akariScoresByPuuid[participant.puuid].total.toFixed(2) }})
+              </span>
+            </AkariScorePopover>
+          </div>
           <div
             v-if="participant.position && participant.position.toLowerCase() !== 'invalid'"
             class="flex items-center gap-1 text-[11px] text-black/60 dark:text-white/60"
@@ -305,6 +349,7 @@
 </template>
 
 <script setup lang="ts">
+import { AkariScorePopover } from '@renderer-shared/components/akari-score'
 import AugmentDisplay from '@renderer-shared/components/widgets/AugmentDisplay.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
@@ -315,7 +360,7 @@ import { useAkariResourceProvider } from '@renderer-shared/providers/akari-resou
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { Robot } from '@vicons/fa'
 import { useTranslation } from 'i18next-vue'
-import { NIcon, NPopover, NTooltip } from 'naive-ui'
+import { NIcon, NPopover, NSpin, NTooltip } from 'naive-ui'
 import { computed } from 'vue'
 
 import { useMatchCard } from '../context'
@@ -404,8 +449,17 @@ const { teamIdentifier } = defineProps<{
   teamIdentifier: string
 }>()
 
-const { basicInfo, teams, participants, puuid, hidePrivacy, navigateToSummonerByPuuid } =
-  useMatchCard()
+const {
+  basicInfo,
+  teams,
+  participants,
+  puuid,
+  hidePrivacy,
+  navigateToSummonerByPuuid,
+  akariScoresByPuuid,
+  loadingMultiGameScores,
+  isMultiGameScoreActive
+} = useMatchCard()
 
 const team = computed(() => {
   return teams.value.teamStatMap[teamIdentifier]
@@ -420,6 +474,24 @@ const someTeamHasAtakhan = computed(() => {
 
 const teamParticipants = computed(() => {
   return participants.value.filter((p) => p.teamIdentifier === teamIdentifier)
+})
+
+const teamAvgAkariScore = computed(() => {
+  if (teamParticipants.value.length === 0) {
+    return null
+  }
+
+  let sum = 0
+  let count = 0
+  for (const p of teamParticipants.value) {
+    const score = akariScoresByPuuid.value[p.puuid]
+    if (score && Number.isFinite(score.total)) {
+      sum += score.total
+      count++
+    }
+  }
+
+  return count > 0 ? sum / count : null
 })
 
 const handleMouseDown = (event: MouseEvent) => {

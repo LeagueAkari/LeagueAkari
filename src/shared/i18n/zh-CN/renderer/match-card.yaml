@@ -62,6 +62,8 @@ matchCard:
     bans: 禁用
     perMinuteSuffix: / 分钟
     cs: 补兵
+    avgAkariScore: 队伍平均 Akari Score {{score}}
+    avgMultiGameAkariScore: 队伍多场平均 Akari Score {{score}}
   overview:
     perfect: 完美
     damage: 伤害
