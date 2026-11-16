@@ -1,5 +1,5 @@
 import type { HextechAugmentSnapshot } from '@shared/types/hextech-augment'
-import { screen } from 'electron'
+import { type Rectangle, screen } from 'electron'
 
 import { BaseAkariWindow } from '../base-akari-window'
 import type { WindowManagerMainContext } from '../context'
@@ -9,6 +9,8 @@ export class AkariHextechAugmentWindow extends BaseAkariWindow<
   HextechAugmentWindowState,
   HextechAugmentWindowSettings
 > {
+  private _gameBounds: Rectangle | null = null
+
   constructor(context: WindowManagerMainContext) {
     super(
       context,
@@ -16,8 +18,8 @@ export class AkariHextechAugmentWindow extends BaseAkariWindow<
       new HextechAugmentWindowState(),
       new HextechAugmentWindowSettings(),
       {
-        baseWidth: 800,
-        baseHeight: 600,
+        baseWidth: 600,
+        baseHeight: 120,
         minWidth: 1,
         minHeight: 1,
         htmlEntry: 'hextech-augment-window.html',
@@ -46,7 +48,10 @@ export class AkariHextechAugmentWindow extends BaseAkariWindow<
       this.hide()
       return
     }
-    if (!this._window || this._window.isDestroyed()) this.createWindow()
+    if (!this._window || this._window.isDestroyed()) {
+      this._gameBounds = null
+      this.createWindow()
+    }
     if (!this._window || !this.state.ready) return
     // OCR returns physical pixels; Electron windows use device independent coordinates.
     const bounds = screen.screenToDipRect(null, {
@@ -55,10 +60,26 @@ export class AkariHextechAugmentWindow extends BaseAkariWindow<
       width: Math.round(snapshot.window.width),
       height: Math.round(snapshot.window.height)
     })
+    const previous = this._gameBounds
+    if (
+      !previous ||
+      (['x', 'y', 'width', 'height'] as const).some((key) => previous[key] !== bounds[key])
+    ) {
+      const current = this._window.getBounds()
+      const width = Math.min(600, bounds.width)
+      const height = Math.min(120, bounds.height)
+      const x = previous ? current.x + bounds.x - previous.x : bounds.x + (bounds.width - width) / 2
+      const y = previous ? current.y + bounds.y - previous.y : bounds.y + 24
+      this._window.setBounds({
+        x: Math.round(Math.max(bounds.x, Math.min(x, bounds.x + bounds.width - width))),
+        y: Math.round(Math.max(bounds.y, Math.min(y, bounds.y + bounds.height - height))),
+        width,
+        height
+      })
+      this._gameBounds = bounds
+    }
     this._window.setContentProtection(true)
-    this._window.setIgnoreMouseEvents(true)
     this._window.setAlwaysOnTop(true, 'screen-saver', 1)
-    this._window.setBounds(bounds)
     this.showOrRestore(true)
   }
 }

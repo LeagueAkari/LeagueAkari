@@ -1,6 +1,10 @@
 hextechAugment:
+  title: Augment recommendations
   showRatings: Show augment ratings
   helpLabel: About augment ratings
-  displayHelp: Choose Borderless or Windowed in the game video settings. When enabled, the three offers are recognized automatically and ratings for your champion appear below each card. Exclusive fullscreen may hide the overlay. You can turn this off at any time.
+  displayHelp: Choose Borderless or Windowed in the game video settings. When enabled, the three offers are recognized automatically and champion-specific tiers appear in a three-column strip. Drag the strip title to move it. You can turn this off at any time.
   noData: No rating
-  performance: 'Performance {{value}}'
+  positions:
+    '0': Left
+    '1': Middle
+    '2': Right

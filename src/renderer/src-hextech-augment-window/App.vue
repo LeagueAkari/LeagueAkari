@@ -1,20 +1,16 @@
 <template>
   <SetupInAppScope />
-  <div v-if="snapshot" class="augment-overlay" aria-live="polite">
-    <div
-      v-for="(label, slot) in snapshot.labels"
-      :key="`${slot}-${label.id}`"
-      class="augment-label"
-      :aria-label="label.name"
-      :style="position(label)"
-    >
-      <div class="augment-tier" :data-tier="label.tier">{{ label.tier ?? '—' }}</div>
-      <div class="augment-performance">
-        {{
-          label.performance === null
-            ? t('hextechAugment.noData')
-            : t('hextechAugment.performance', { value: label.performance })
-        }}
+  <div v-if="snapshot" class="augment-strip" aria-live="polite">
+    <div class="augment-header">{{ t('hextechAugment.title') }}</div>
+    <div class="augment-options">
+      <div v-for="(label, slot) in snapshot.labels" :key="slot" class="augment-option">
+        <div class="augment-details">
+          <div class="augment-position">{{ t(`hextechAugment.positions.${slot}`) }}</div>
+          <div class="augment-name" :title="label.name">{{ label.name }}</div>
+        </div>
+        <div class="augment-tier" :data-tier="label.tier">
+          {{ label.tier ?? t('hextechAugment.noData') }}
+        </div>
       </div>
     </div>
   </div>
@@ -25,9 +21,8 @@ import { useColorThemeAttr } from '@renderer-shared/composables/useColorThemeAtt
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useHextechAugmentStore } from '@renderer-shared/shards/hextech-augment/store'
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/setup-in-app-scope-component'
-import type { HextechAugmentLabel } from '@shared/types/hextech-augment'
-import { useTranslation } from 'i18next-vue'
 import { useNow } from '@vueuse/core'
+import { useTranslation } from 'i18next-vue'
 import { computed } from 'vue'
 
 const store = useHextechAugmentStore()
@@ -35,21 +30,12 @@ const appCommon = useAppCommonStore()
 const { t } = useTranslation()
 const now = useNow({ interval: 100 })
 const snapshot = computed(() =>
-  store.snapshot && now.value.getTime() - store.snapshot.capturedAt <= 1200 ? store.snapshot : null
+  store.snapshot && now.value.getTime() < store.snapshot.expiresAt ? store.snapshot : null
 )
 useColorThemeAttr(
   () => appCommon.colorTheme,
   () => appCommon.themeId
 )
-function position(label: HextechAugmentLabel) {
-  if (!snapshot.value) return {}
-  return {
-    left: `${(100 * (label.x + label.width / 2)) / snapshot.value.window.width}%`,
-    // The picker scales with the client height. Its lower blank area is below
-    // the title and description, and above the card's bottom edge/reroll button.
-    top: `${(100 * (label.y + label.height)) / snapshot.value.window.height + 18}%`
-  }
-}
 </script>
 
 <style>
@@ -61,49 +47,61 @@ body,
   margin: 0;
   overflow: hidden;
   background: transparent !important;
-  pointer-events: none;
 }
-.augment-overlay {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
+.augment-strip {
+  box-sizing: border-box;
+  height: 100%;
+  padding: 10px 12px;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 8px;
+  background: rgb(17 20 26 / 94%);
   font-family: 'Microsoft YaHei', sans-serif;
   color: #f4f5f8;
+  user-select: none;
 }
-.augment-label {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  width: clamp(110px, 14vw, 340px);
-  padding: 0;
-  background: radial-gradient(ellipse, rgb(8 15 20 / 80%), transparent 72%);
-  text-shadow: 0 2px 4px #000;
-  text-align: center;
+.augment-header {
+  -webkit-app-region: drag;
+  padding-bottom: 8px;
+  font-size: 12px;
+  color: #b2bac8;
 }
-.augment-performance {
-  margin-top: 0.6vh;
-  font-size: clamp(12px, 1.6vh, 34px);
+.augment-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.augment-option {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+.augment-details {
+  min-width: 0;
+  flex: 1;
+}
+.augment-position {
+  margin-bottom: 4px;
+  font-size: 11px;
+  color: #939dab;
+}
+.augment-name {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  font-size: 13px;
   line-height: 1.4;
-  font-weight: 600;
-  white-space: nowrap;
 }
 .augment-tier {
-  font-size: clamp(30px, 4.5vh, 96px);
+  flex-shrink: 0;
+  font-size: 32px;
   font-weight: 800;
-  line-height: 1;
   color: #c7cbd4;
 }
-.augment-tier::before,
-.augment-tier::after {
-  display: inline-block;
-  margin: 0 0.4em;
-  font-size: 0.55em;
-  vertical-align: 0.12em;
-}
-.augment-tier::before {
-  content: '«';
-}
-.augment-tier::after {
-  content: '»';
+.augment-tier:not([data-tier]) {
+  max-width: 4em;
+  font-size: 11px;
 }
 .augment-tier[data-tier='S'] {
   color: #ffdb79;

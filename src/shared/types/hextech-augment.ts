@@ -22,11 +22,11 @@ export interface RecognizedAugment {
 }
 export interface HextechAugmentLabel extends RecognizedAugment {
   tier: string | null
-  performance: number | null
 }
 export interface HextechAugmentSnapshot {
   championId: number
   capturedAt: number
+  expiresAt: number
   labels: HextechAugmentLabel[]
   window: OcrFrame['window']
 }

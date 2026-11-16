@@ -13,7 +13,9 @@ import {
 } from './recognition-worker-controller'
 import type { HextechAugmentSettings, HextechAugmentState } from './state'
 
-const MAX_FRAME_AGE_MS = 1200
+const MAX_FRAME_AGE_MS = 3000
+const DISPLAY_TIMEOUT_MS = 4000
+const MAX_MISSED_FRAMES = 3
 const RATINGS_TTL_MS = 10 * 60 * 1000
 const TIER_NAMES = ['S', 'A', 'B', 'C', 'D', 'E', 'F']
 
@@ -27,13 +29,14 @@ export class HextechAugmentOverlayController {
   private _generation = 0
   private _details: ChampionDataDetails | null = null
   private _fetchedAt: number | null = null
-  private _latest: { frame: OcrFrame; cards: RecognizedAugment[] } | null = null
+  private _latest: { frame: OcrFrame; cards: RecognizedAugment[]; expiresAt: number } | null = null
   private _failed = false
   private _workerReady = false
   private _retryRatingsAt = 0
   private _stableFrames = 0
   private _skipStableCapture = false
   private _focusedCapture = false
+  private _missedFrames = 0
 
   constructor(
     private readonly _leagueClient: LeagueClientMain,
@@ -104,21 +107,22 @@ export class HextechAugmentOverlayController {
             else {
               this._skipStableCapture = false
               const latest = this._latest
-              const regions = latest
-                ? latest.cards.map((card) => {
-                    // Include longer replacement titles while excluding animated card borders.
-                    const width = Math.max(
-                      latest.frame.window.width * 0.18,
-                      card.width + latest.frame.window.width * 0.02
-                    )
-                    return {
-                      x: card.x + card.width / 2 - width / 2,
-                      y: card.y - latest.frame.window.height * 0.01,
-                      width,
-                      height: card.height + latest.frame.window.height * 0.02
-                    }
-                  })
-                : []
+              const regions =
+                latest && this._missedFrames === 0
+                  ? latest.cards.map((card) => {
+                      // Include longer replacement titles while excluding animated card borders.
+                      const width = Math.max(
+                        latest.frame.window.width * 0.18,
+                        card.width + latest.frame.window.width * 0.02
+                      )
+                      return {
+                        x: card.x + card.width / 2 - width / 2,
+                        y: card.y - latest.frame.window.height * 0.01,
+                        width,
+                        height: card.height + latest.frame.window.height * 0.02
+                      }
+                    })
+                  : []
               this._worker.capture(this._focusedCapture, regions)
             }
           }
@@ -173,10 +177,7 @@ export class HextechAugmentOverlayController {
       })
       return
     }
-    if (Date.now() - message.capturedAt > MAX_FRAME_AGE_MS) {
-      this._clear()
-      return
-    }
+    if (Date.now() - message.capturedAt > MAX_FRAME_AGE_MS) return
     const cards = recognizeAugmentCards(
       message,
       Object.values(this._leagueClient.data.gameData.augments).map((augment) => ({
@@ -187,12 +188,13 @@ export class HextechAugmentOverlayController {
     )
     if (cards.length !== 3) {
       const focused = this._focusedCapture
-      this._clear()
-      // Alternate a title-region probe with full reads during acquisition. A
-      // difficult full frame must not prevent the first focused read forever.
+      this._missedFrames += 1
+      this._stableFrames = 0
+      this._skipStableCapture = false
+      if (this._missedFrames >= MAX_MISSED_FRAMES) this._clear()
       this._focusedCapture = !focused
       runInAction(() => {
-        this._state.status = 'unrecognized'
+        this._state.status = this._latest ? 'scanning' : 'unrecognized'
       })
       return
     }
@@ -205,15 +207,14 @@ export class HextechAugmentOverlayController {
       ) &&
       previous.cards.every((card, slot) => card.id === cards[slot].id)
     this._stableFrames = unchanged ? Math.min(3, this._stableFrames + 1) : 1
+    this._missedFrames = 0
     this._focusedCapture = true
     if (!unchanged) this._skipStableCapture = false
-    this._latest = { frame: message, cards }
+    const expiresAt = message.capturedAt + DISPLAY_TIMEOUT_MS
+    this._latest = { frame: message, cards, expiresAt }
     this._publish()
     if (this._expiry) clearTimeout(this._expiry)
-    this._expiry = setTimeout(
-      () => this._clear(),
-      Math.max(0, MAX_FRAME_AGE_MS - (Date.now() - message.capturedAt))
-    )
+    this._expiry = setTimeout(() => this._clear(), Math.max(0, expiresAt - Date.now()))
   }
 
   private async _loadRatings(generation: number, championId: number) {
@@ -250,7 +251,7 @@ export class HextechAugmentOverlayController {
 
   private _publish() {
     const latest = this._latest
-    if (!latest || Date.now() - latest.frame.capturedAt > MAX_FRAME_AGE_MS) return
+    if (!latest || Date.now() >= latest.expiresAt) return
     const details =
       this._details &&
       this._details.championId === this._championId &&
@@ -264,6 +265,7 @@ export class HextechAugmentOverlayController {
     const snapshot = {
       championId: this._championId,
       capturedAt: latest.frame.capturedAt,
+      expiresAt: latest.expiresAt,
       window: latest.frame.window,
       labels: latest.cards.map((card) => {
         const rating = ratings.get(card.id)
@@ -272,8 +274,7 @@ export class HextechAugmentOverlayController {
           tier:
             rating?.tier === null || rating?.tier === undefined
               ? null
-              : (TIER_NAMES[rating.tier] ?? null),
-          performance: rating?.performanceScore ?? null
+              : (TIER_NAMES[rating.tier] ?? null)
         }
       })
     }
@@ -289,6 +290,7 @@ export class HextechAugmentOverlayController {
     this._stableFrames = 0
     this._skipStableCapture = false
     this._focusedCapture = false
+    this._missedFrames = 0
     if (this._expiry) clearTimeout(this._expiry)
     this._expiry = null
     runInAction(() => {

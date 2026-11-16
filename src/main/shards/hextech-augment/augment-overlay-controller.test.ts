@@ -215,7 +215,7 @@ describe.skipIf(process.platform !== 'win32')('augment overlay state and async f
     await vi.advanceTimersByTimeAsync(0)
     worker.send!(frame())
     worker.send!(frame([1, 4, 3]))
-    expect(state.snapshot?.labels[1]).toMatchObject({ id: 4, tier: null, performance: null })
+    expect(state.snapshot?.labels[1]).toMatchObject({ id: 4, tier: null })
   })
 
   it('reduces repeat captures for stable quick reads and resumes fast reads after a reroll', async () => {
@@ -294,18 +294,54 @@ describe.skipIf(process.platform !== 'win32')('augment overlay state and async f
     expect(worker.capture).toHaveBeenCalledTimes(2)
   })
 
-  it('hides unrecognized selections and expires a frame when capture stalls', async () => {
+  it('expires the displayed selection when capture stalls', async () => {
     const { state, window } = setup()
     await vi.advanceTimersByTimeAsync(0)
     worker.send!(frame())
-    await vi.advanceTimersByTimeAsync(1201)
+    await vi.advanceTimersByTimeAsync(4001)
     expect(state.snapshot).toBeNull()
     expect(window.present).toHaveBeenLastCalledWith(null)
+  })
+
+  it('retains a selection through isolated OCR misses and clears it after three consecutive misses', async () => {
+    const { state, window } = setup()
+    await vi.advanceTimersByTimeAsync(0)
     worker.send!(frame())
+    window.present.mockClear()
     const incomplete = frame()
     incomplete.lines.pop()
     worker.send!(incomplete)
+    expect(state.snapshot?.labels).toHaveLength(3)
+    expect(window.present).not.toHaveBeenCalledWith(null)
+    worker.send!(frame())
+    worker.send!(incomplete)
+    worker.send!(incomplete)
+    expect(state.snapshot?.labels).toHaveLength(3)
+    worker.send!(incomplete)
     expect(state.snapshot).toBeNull()
+    expect(window.present).toHaveBeenLastCalledWith(null)
+  })
+
+  it('keeps ratings visible through a slow OCR read without extending the stall deadline', async () => {
+    const { state, window } = setup()
+    await vi.advanceTimersByTimeAsync(0)
+    worker.send!(frame())
+    window.present.mockClear()
+    await vi.advanceTimersByTimeAsync(1400)
+    expect(state.snapshot?.labels).toHaveLength(3)
+    worker.send!({ ...frame(), capturedAt: Date.now() - 1400, elapsedMs: 1400 })
+    expect(state.snapshot?.labels).toHaveLength(3)
+    expect(window.present).not.toHaveBeenCalledWith(null)
+    await vi.advanceTimersByTimeAsync(2601)
+    expect(state.snapshot).toBeNull()
+  })
+
+  it('ignores an old frame without clearing a newer visible selection', async () => {
+    const { state } = setup()
+    await vi.advanceTimersByTimeAsync(0)
+    worker.send!(frame([1, 4, 3]))
+    worker.send!({ ...frame(), capturedAt: Date.now() - 3100 })
+    expect(state.snapshot?.labels[1].id).toBe(4)
   })
 
   it('cannot publish a late data response after the champion context changes', async () => {
@@ -336,7 +372,7 @@ describe.skipIf(process.platform !== 'win32')('augment overlay state and async f
     let resolve!: (value: ChampionDataLoadResult<ChampionDataDetails>) => void
     const newer = ratings()
     if (newer.status !== 'success') throw new Error('Expected rating fixture')
-    newer.data.sections.augments![0].performanceScore = 99
+    newer.data.sections.augments![0].tier = 1
     const load = vi
       .fn()
       .mockImplementationOnce(
@@ -354,10 +390,10 @@ describe.skipIf(process.platform !== 'win32')('augment overlay state and async f
     expect(previousSignal.aborted).toBe(true)
     await vi.advanceTimersByTimeAsync(0)
     worker.send!(frame())
-    expect(state.snapshot?.labels[0].performance).toBe(99)
+    expect(state.snapshot?.labels[0].tier).toBe('A')
     resolve(ratings())
     await vi.advanceTimersByTimeAsync(0)
-    expect(state.snapshot?.labels[0].performance).toBe(99)
+    expect(state.snapshot?.labels[0].tier).toBe('A')
   })
 
   it('stops the worker and hides ratings when the connected game changes to another mode', async () => {
