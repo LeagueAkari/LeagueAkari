@@ -12,6 +12,8 @@
     "src/renderer/src-ongoing-game-window/**/*.vue",
     "src/renderer/src-cd-timer-window/**/*",
     "src/renderer/src-cd-timer-window/**/*.vue",
+    "src/renderer/src-hextech-augment-window/**/*",
+    "src/renderer/src-hextech-augment-window/**/*.vue",
     "src/preload/*.d.ts",
     "src/shared/**/*",
     "src/renderer-shared/**/*",

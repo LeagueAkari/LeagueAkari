@@ -120,9 +120,10 @@ export class ChampionDataMain implements IAkariShardInitDispose {
 
   loadDetails(
     query: Parameters<ChampionDataServiceController['loadDetails']>[0],
-    championId: number
+    championId: number,
+    options?: Parameters<ChampionDataServiceController['loadDetails']>[2]
   ) {
-    return this._service.loadDetails(query, championId)
+    return this._service.loadDetails(query, championId, options)
   }
 
   private _createHttpClient(headers?: Record<string, string>) {

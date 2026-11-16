@@ -532,6 +532,7 @@ export const enum PickMode {
 }
 
 export interface Augment {
+  augmentNameId?: string
   id: number
   nameTRA: string
   augmentSmallIconPath: string

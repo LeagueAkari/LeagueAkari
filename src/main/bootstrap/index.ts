@@ -15,6 +15,7 @@ import { ConfigMigrateMain } from '@main/shards/config-migrate'
 import { ExtraAssetsMain } from '@main/shards/extra-assets'
 import { FeatureGatingMain } from '@main/shards/feature-gating'
 import { GameClientMain } from '@main/shards/game-client'
+import { HextechAugmentMain } from '@main/shards/hextech-augment'
 import { InGameSendMain } from '@main/shards/in-game-send'
 import { AkariIpcMain } from '@main/shards/ipc'
 import { KeyboardShortcutsMain } from '@main/shards/keyboard-shortcuts'
@@ -320,6 +321,7 @@ export function bootstrap() {
     manager.use(StorageMain)
 
     manager.use(AkariProtocolMain)
+    manager.use(HextechAugmentMain)
     manager.use(GameClientMain)
     manager.use(LeagueClientMain)
     manager.use(LeagueClientUxMain)

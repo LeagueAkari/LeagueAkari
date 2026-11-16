@@ -1,0 +1,6 @@
+hextechAugment:
+  showRatings: 显示海克斯评分
+  helpLabel: 海克斯评分使用说明
+  displayHelp: 请在游戏的视频设置中选择“无边框”或“窗口化”。开启后会自动识别三选一选项，并在卡片下方显示当前英雄的评分。独占全屏下可能无法显示，可随时关闭。
+  noData: 暂无评分
+  performance: '表现 {{value}}'
