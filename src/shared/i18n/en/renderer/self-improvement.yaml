@@ -1,13 +1,25 @@
 selfImprovement:
-  page:
+  summary:
     title: Self-Improvement
+    open: Open full analysis
+    basis: Latest {{recent}} vs previous {{previous}} matches
+    notEnough: More matches are needed to build a trend
+    modalDescription: 'Based on the current match-history filters: {{count}} matches'
+    csPerMinute: CS / min
+    goldPerMinute: Gold / min
+    kda: KDA
+    visionScorePerMinute: Vision / min
+    pageSize: Page size {{count}}
+    validCount_one: '{{count}} valid match'
+    validCount_other: '{{count}} valid matches'
+    allPositions: All positions
+  positionDistribution:
+    title: Position distribution
+    tooltip: '{{count}} matches · {{rate}}% win rate'
+    description: Based on current filters.
   sections:
-    overview: Overview
-    overviewHint: Recent form and problem summary
     details: Detailed data
     detailsHint: Choose which aspect to display
-    matches: Match details
-    matchesHint: Recent matches for the current filters, for checking charts and trends
   categories:
     economy: Farming & Economy
     combat: Combat
@@ -19,32 +31,6 @@ selfImprovement:
       description: KDA and damage reflect kill participation and damage output.
     vision:
       description: Ward investment, denial, and control wards help evaluate map information.
-  description: Tracks ranked solo/duo games only. With a position selected, the match count applies to that position.
-  waitingSgp: The SGP data source is still preparing. Match data will load automatically once it is ready.
-  loading: Loading match data…
-  loadingProgress: Loading match data ({{loaded}} / {{total}})
-  updatedAt: Updated at {{time}}
-  footnote: Ranked solo/duo only; per-minute metrics are weighted by game duration; up to the latest 200 matches of the selected position.
-  player:
-    unknown: Unknown player
-    notConnected: Sign in to the League Client first, then your long-term match data can be loaded.
-  controls:
-    queueOnly: Ranked Solo/Duo
-    refresh: Refresh
-    matchCountOption_one: Last {{count}} match
-    matchCountOption_other: Last {{count}} matches
-  positions:
-    all: All positions
-    TOP: Top
-    JUNGLE: Jungle
-    MIDDLE: Mid
-    BOTTOM: Bot
-    UTILITY: Support
-  errors:
-    loadFailedTitle: Failed to load
-    loadFailed: 'Failed to load match data: {{reason}}'
-  empty:
-    noMatches: There are no ranked solo/duo matches to chart yet.
   insights:
     title: Recent problem summary
     description: Latest {{recent}} vs previous {{previous}}
@@ -61,30 +47,6 @@ selfImprovement:
     winRateUp: Win rate is up {{value}}. Recent form is recovering.
     winRateDown: Win rate is down {{value}}. Review your latest matches.
     economyStanding: 'Economy: latest 10-match GPM {{latest}}, personal best {{best}}, gap {{gap}}; ranked #{{rank}} of {{total}} 10-match windows.'
-  recentMatches:
-    title: Recent match details
-    description_one: Latest {{count}} match for checking charts and trends.
-    description_other: Latest {{count}} matches for checking charts and trends.
-    columns:
-      date: Date
-      champion: Champion
-      result: Result
-      kda: KDA
-      cs: CS
-      csPerMinute: CS / min
-      goldPerMinute: Gold / min
-      visionScorePerMinute: Vision / min
-      damagePerMinute: Damage / min
-      duration: Duration
-  summary:
-    csPerMinute: CS / min
-    goldPerMinute: Gold / min
-    kda: KDA
-    visionScorePerMinute: Vision / min
-    winRate: Win rate
-    noComparison: No earlier matches to compare
-    deltaHint: vs previous {{count}}
-    windowDescription: 'Averages: latest {{count}} vs previous {{previous}} · {{total}} total'
   charts:
     csPerMinute: CS per minute
     goldPerMinute: Gold per minute

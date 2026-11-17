@@ -3,6 +3,7 @@
     <MatchHistoryPagination />
     <NormalTagBlock />
     <SummaryPane />
+    <SelfImprovementSummary />
     <ChampionMasteryPane />
     <RecentlyPlayers side="ally" />
     <RecentlyPlayers side="enemy" />
@@ -18,5 +19,6 @@ import MatchHistoryPagination from './widgets/match-history-pagination'
 import NormalTagBlock from './widgets/NormalTagBlock.vue'
 import PlayerChallenges from './widgets/PlayerChallenges.vue'
 import RecentlyPlayers from './widgets/RecentlyPlayers.vue'
+import SelfImprovementSummary from './widgets/self-improvement/SelfImprovementSummary.vue'
 import SummaryPane from './widgets/SummaryPane.vue'
 </script>

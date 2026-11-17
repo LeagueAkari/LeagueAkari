@@ -1,13 +1,25 @@
 selfImprovement:
-  page:
+  summary:
     title: 自我提升
+    open: 查看完整分析
+    basis: 最近 {{recent}} 场 vs 前 {{previous}} 场
+    notEnough: 需要至少两段对局才能生成趋势
+    modalDescription: 基于当前战绩筛选的 {{count}} 场对局
+    csPerMinute: 分均补刀
+    goldPerMinute: 分均经济
+    kda: KDA
+    visionScorePerMinute: 分均视野
+    pageSize: 分页 {{count}} 项
+    validCount_one: 有效 {{count}} 场
+    validCount_other: 有效 {{count}} 场
+    allPositions: 全部位置
+  positionDistribution:
+    title: 位置分布
+    tooltip: '{{count}} 场 · 胜率 {{rate}}%'
+    description: 按当前筛选的对局统计。
   sections:
-    overview: 概览
-    overviewHint: 近期状态与问题总结
     details: 详细数据
     detailsHint: 选择要查看的方面
-    matches: 对局明细
-    matchesHint: 按当前筛选展示最近对局，用于核对图表与长期趋势
   categories:
     economy: 发育与经济
     combat: 战斗
@@ -19,32 +31,6 @@ selfImprovement:
       description: KDA 与伤害反映击杀参与和输出质量。
     vision:
       description: 视野投入、排眼和真眼习惯，辅助判断地图信息获取。
-  description: 仅统计单双排对局；选择位置后，场次按该位置的最近对局计算。
-  waitingSgp: SGP 数据源正在准备中，就绪后会自动加载对局数据。
-  loading: 正在加载对局数据…
-  loadingProgress: 正在加载对局数据（{{loaded}} / {{total}}）
-  updatedAt: 更新于 {{time}}
-  footnote: 仅统计单双排；分均数据按对局时长加权；最多统计最近 200 场所选位置对局。
-  player:
-    unknown: 未知玩家
-    notConnected: 请先登录 League Client，连接成功后才能读取你的长期对局数据。
-  controls:
-    queueOnly: 单双排
-    refresh: 刷新
-    matchCountOption_one: 最近 {{count}} 场
-    matchCountOption_other: 最近 {{count}} 场
-  positions:
-    all: 全部位置
-    TOP: 上单
-    JUNGLE: 打野
-    MIDDLE: 中单
-    BOTTOM: 下路
-    UTILITY: 辅助
-  errors:
-    loadFailedTitle: 加载失败
-    loadFailed: '无法加载对局数据：{{reason}}'
-  empty:
-    noMatches: 当前没有可用于统计的单双排对局。
   insights:
     title: 近期问题总结
     description: 最近 {{recent}} 场对比之前 {{previous}} 场
@@ -61,30 +47,6 @@ selfImprovement:
     winRateUp: 胜率提升 {{value}}，近期状态在回升。
     winRateDown: 胜率下降 {{value}}，建议复盘最近的对局。
     economyStanding: 经济状态：近 10 场分均经济 {{latest}}，个人最佳 {{best}}，差距 {{gap}}；在 {{total}} 个 10 场窗口中排第 {{rank}}。
-  recentMatches:
-    title: 最近对局明细
-    description_one: 最近 {{count}} 场对局，用于核对图表与长期趋势。
-    description_other: 最近 {{count}} 场对局，用于核对图表与长期趋势。
-    columns:
-      date: 日期
-      champion: 英雄
-      result: 结果
-      kda: KDA
-      cs: 补刀
-      csPerMinute: 补刀/分
-      goldPerMinute: 经济/分
-      visionScorePerMinute: 视野/分
-      damagePerMinute: 伤害/分
-      duration: 时长
-  summary:
-    csPerMinute: 分均补刀
-    goldPerMinute: 分均经济
-    kda: KDA
-    visionScorePerMinute: 分均视野
-    winRate: 胜率
-    noComparison: 暂无更早的对局可对比
-    deltaHint: 对比前 {{count}} 场
-    windowDescription: 均值：最近 {{count}} 场 vs 之前 {{previous}} 场 · 图表共 {{total}} 场
   charts:
     csPerMinute: 补刀 / 分钟
     goldPerMinute: 经济 / 分钟
@@ -102,7 +64,7 @@ selfImprovement:
     loss: 负
     kdaLabel: KDA
     movingAverage: '{{count}} 场移动平均'
-    winLossHint: '数据点：绿色为胜，红色为负；虚线为移动平均。'
+    winLossHint: 数据点：绿色为胜，红色为负；虚线为移动平均。
     empty: 暂无可绘制的数据
     ariaLabel: '{{title}}，共 {{count}} 场对局'
   units:

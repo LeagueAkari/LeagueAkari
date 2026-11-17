@@ -1,23 +1,23 @@
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
-import { computed, watch } from 'vue'
+import { type MaybeRefOrGetter, computed, toValue } from 'vue'
 
 import type { SelfImprovementChartView } from '../components/types'
 import {
   SELF_IMPROVEMENT_BUCKET_SIZE,
   SELF_IMPROVEMENT_RECENT_WINDOW,
+  type SelfImprovementMatch,
   type SelfImprovementMetricKey,
   buildSelfImprovementBuckets,
+  buildSelfImprovementInsights,
   buildSelfImprovementMovingAverage,
   compareRecentSelfImprovementMatches,
+  evaluateSelfImprovementEconomyStanding,
   getSelfImprovementMetricValue,
+  sortSelfImprovementMatchesByTime,
   summarizeSelfImprovementMatches
 } from '../data/self-improvement-metrics'
-import {
-  SELF_IMPROVEMENT_MATCH_COUNT_OPTIONS,
-  useSelfImprovementData
-} from './useSelfImprovementData'
 
 interface SelfImprovementChartConfig {
   key: SelfImprovementMetricKey
@@ -28,99 +28,31 @@ interface SelfImprovementChartConfig {
   percent?: boolean
 }
 
-const POSITION_ORDER = ['TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY'] as const
-
-const positionTextKeys: Record<string, string> = {
-  TOP: 'selfImprovement.positions.TOP',
-  JUNGLE: 'selfImprovement.positions.JUNGLE',
-  MIDDLE: 'selfImprovement.positions.MIDDLE',
-  BOTTOM: 'selfImprovement.positions.BOTTOM',
-  UTILITY: 'selfImprovement.positions.UTILITY'
-}
-
 /**
- * 自我提升页面的共享状态
+ * 基于当前战绩筛选结果生成自我提升分析
  *
- * 页面只加载一次数据，各分类页通过 context 共享，切换分类不会重新请求。
+ * 不额外请求数据；分页、队列、时间等筛选由战绩页面负责。
  */
-export function useSelfImprovementPage() {
+export function useSelfImprovementAnalysis(matches: MaybeRefOrGetter<SelfImprovementMatch[]>) {
   const { t } = useTranslation()
   const lcs = useLeagueClientStore()
 
-  const data = useSelfImprovementData()
-
-  const me = computed(() => lcs.summoner.me)
-
-  const playerName = computed(() => {
-    const summoner = me.value
-    if (!summoner) {
-      return ''
-    }
-
-    if (summoner.gameName && summoner.tagLine) {
-      return `${summoner.gameName}#${summoner.tagLine}`
-    }
-
-    return summoner.displayName || summoner.gameName || summoner.internalName
-  })
-
-  const matchCountOptions = computed(() =>
-    SELF_IMPROVEMENT_MATCH_COUNT_OPTIONS.map((count) => ({
-      label: t('selfImprovement.controls.matchCountOption', { count }),
-      value: count
-    }))
-  )
-
-  const updatedAtText = computed(() => {
-    if (!data.lastLoadedAt.value) {
-      return ''
-    }
-
-    return dayjs(data.lastLoadedAt.value).format('HH:mm:ss')
-  })
-
-  const loadingText = computed(() => {
-    if (data.loadProgress.value) {
-      return t('selfImprovement.loadingProgress', {
-        loaded: data.loadProgress.value.loaded,
-        total: data.loadProgress.value.total
-      })
-    }
-
-    return t('selfImprovement.loading')
-  })
-
-  const selectedPosition = data.selectedPosition
-  const handlePositionUpdate = data.handlePositionUpdate
-
-  const positionOptions = computed(() =>
-    POSITION_ORDER.filter((position) => data.availablePositions.value.includes(position)).map(
-      (position) => ({
-        value: position,
-        label: t(positionTextKeys[position])
-      })
-    )
-  )
-
-  watch(positionOptions, (options) => {
-    if (
-      selectedPosition.value &&
-      !options.some((option) => option.value === selectedPosition.value)
-    ) {
-      selectedPosition.value = null
-    }
-  })
-
-  const visibleMatches = computed(() => data.matches.value)
+  const orderedMatches = computed(() => sortSelfImprovementMatchesByTime(toValue(matches)))
 
   const windowComparison = computed(() =>
-    compareRecentSelfImprovementMatches(visibleMatches.value, SELF_IMPROVEMENT_RECENT_WINDOW)
+    compareRecentSelfImprovementMatches(orderedMatches.value, SELF_IMPROVEMENT_RECENT_WINDOW)
   )
 
-  const overallSummary = computed(() => summarizeSelfImprovementMatches(visibleMatches.value))
+  const overallSummary = computed(() => summarizeSelfImprovementMatches(orderedMatches.value))
 
   const buckets = computed(() =>
-    buildSelfImprovementBuckets(visibleMatches.value, SELF_IMPROVEMENT_BUCKET_SIZE)
+    buildSelfImprovementBuckets(orderedMatches.value, SELF_IMPROVEMENT_BUCKET_SIZE)
+  )
+
+  const insights = computed(() => buildSelfImprovementInsights(windowComparison.value))
+
+  const economyStanding = computed(() =>
+    buckets.value.length >= 2 ? evaluateSelfImprovementEconomyStanding(buckets.value) : null
   )
 
   const chartConfigs = computed<SelfImprovementChartConfig[]>(() => [
@@ -203,24 +135,24 @@ export function useSelfImprovementPage() {
     }
   ])
 
-  const averageOf = (getter: (match: (typeof visibleMatches.value)[number]) => number) => {
-    if (visibleMatches.value.length === 0) {
+  const averageOf = (getter: (match: SelfImprovementMatch) => number) => {
+    if (orderedMatches.value.length === 0) {
       return 0
     }
 
     return (
-      visibleMatches.value.reduce((acc, match) => acc + getter(match), 0) /
-      visibleMatches.value.length
+      orderedMatches.value.reduce((acc, match) => acc + getter(match), 0) /
+      orderedMatches.value.length
     )
   }
 
   const chartMap = computed(() => {
-    const totalDamage = visibleMatches.value.reduce(
+    const totalDamage = orderedMatches.value.reduce(
       (acc, match) => acc + match.damageToChampions,
       0
     )
-    const totalGold = visibleMatches.value.reduce((acc, match) => acc + match.gold, 0)
-    const totalTeamDamage = visibleMatches.value.reduce(
+    const totalGold = orderedMatches.value.reduce((acc, match) => acc + match.gold, 0)
+    const totalTeamDamage = orderedMatches.value.reduce(
       (acc, match) => acc + match.teamDamageToChampions,
       0
     )
@@ -242,7 +174,7 @@ export function useSelfImprovementPage() {
     const result = {} as Record<SelfImprovementMetricKey, SelfImprovementChartView>
 
     for (const config of chartConfigs.value) {
-      const points = visibleMatches.value.map((match) => {
+      const points = orderedMatches.value.map((match) => {
         const date = dayjs(match.gameCreation)
 
         return {
@@ -282,20 +214,13 @@ export function useSelfImprovementPage() {
   })
 
   return {
-    ...data,
-    me,
-    playerName,
-    matchCountOptions,
-    updatedAtText,
-    loadingText,
-    selectedPosition,
-    positionOptions,
-    handlePositionUpdate,
-    visibleMatches,
+    matches: orderedMatches,
     windowComparison,
     buckets,
+    insights,
+    economyStanding,
     chartMap
   }
 }
 
-export type SelfImprovementPageContext = ReturnType<typeof useSelfImprovementPage>
+export type SelfImprovementAnalysis = ReturnType<typeof useSelfImprovementAnalysis>

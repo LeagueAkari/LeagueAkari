@@ -7,9 +7,6 @@ import { isPveQueue } from '@shared/types/league-client/match-history'
 /** 低于该时长的对局通常为重开或异常结束，不纳入长期统计 */
 export const SELF_IMPROVEMENT_MIN_GAME_DURATION = 5 * 60
 
-/** 当前只统计单双排（Ranked Solo/Duo） */
-export const SELF_IMPROVEMENT_QUEUE_ID = 420
-
 /** 近期窗口与移动平均的默认场次 */
 export const SELF_IMPROVEMENT_RECENT_WINDOW = 10
 

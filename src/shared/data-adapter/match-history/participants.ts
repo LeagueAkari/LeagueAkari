@@ -111,6 +111,22 @@ export type MatchParticipant = {
   pentaKills: number
 }
 
+// LCU 没有 teamPosition，只能从 lane / role 推导位置
+function mapLcuLaneRoleToPosition(lane: string | undefined, role: string | undefined) {
+  switch (lane) {
+    case 'TOP':
+      return 'TOP'
+    case 'JUNGLE':
+      return 'JUNGLE'
+    case 'MIDDLE':
+      return 'MIDDLE'
+    case 'BOTTOM':
+      return role === 'SUPPORT' ? 'UTILITY' : 'BOTTOM'
+    default:
+      return null
+  }
+}
+
 // 以 SGP 的格式为参照，将 LCU 数据映射为抽象格式
 function mapLcuDataToPerks(participant: Participant): MatchParticipantPerks {
   return {
@@ -318,7 +334,7 @@ export function toParticipants(
         tagLine: identity.player.tagLine,
         profileIconId: identity.player.profileIcon,
         championId: participant.championId,
-        position: null,
+        position: mapLcuLaneRoleToPosition(participant.timeline?.lane, participant.timeline?.role),
         teamId: participant.teamId,
         playerSubteamId: participant.stats.playerSubteamId,
         teamIdentifier,
