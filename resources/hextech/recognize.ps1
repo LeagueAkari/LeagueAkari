@@ -63,6 +63,24 @@ function Get-TitleSignature($Bitmap, $Regions) {
     } finally { $hash.Dispose(); $bytes.Dispose() }
 }
 
+function Get-VisibleCardCount($Bitmap, $Regions) {
+    $visible = 0
+    foreach ($region in $Regions) {
+        $hits = 0
+        foreach ($offsetY in @(0.13, 0.16)) {
+            foreach ($offsetX in @(-0.06, -0.03, 0, 0.03, 0.06)) {
+                $x = [int]($region.x + $region.width / 2 + $Bitmap.Height * $offsetX)
+                $y = [int]($region.y + $region.height + $Bitmap.Height * $offsetY)
+                if ($x -lt 0 -or $y -lt 0 -or $x -ge $Bitmap.Width -or $y -ge $Bitmap.Height) { continue }
+                $pixel = $Bitmap.GetPixel($x, $y)
+                if ($pixel.R -le 16 -and $pixel.G -ge 7 -and $pixel.G -le 38 -and $pixel.B -ge 7 -and $pixel.B -le 42 -and [Math]::Abs([int]$pixel.G - $pixel.B) -le 10 -and $pixel.G -gt $pixel.R + 3) { $hits += 1 }
+            }
+        }
+        if ($hits -ge 6) { $visible += 1 }
+    }
+    $visible
+}
+
 function Recognize-Frame {
     $bitmap = $null; $graphics = $null; $memory = $null; $stream = $null; $writer = $null; $software = $null
     $startedAt = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
@@ -72,7 +90,7 @@ function Recognize-Frame {
         $processNumber = [uint32]0
         $null = [HextechWindow]::GetWindowThreadProcessId($handle, [ref]$processNumber)
         $process = Get-Process -Id $processNumber -ErrorAction SilentlyContinue
-        if (-not $process -or $process.ProcessName -ne 'League of Legends' -or [HextechWindow]::IsIconic($handle)) { Write-Result @{ type = 'hidden'; capturedAt = $startedAt }; return }
+        if (-not $process -or $process.ProcessName -ne 'League of Legends' -or [HextechWindow]::IsIconic($handle)) { $script:bodyKey = $null; Write-Result @{ type = 'hidden'; capturedAt = $startedAt }; return }
         $previousContext = [HextechWindow]::SetThreadDpiAwarenessContext([IntPtr](-4))
         try {
             $rect = New-Object HextechWindow+Rect
@@ -92,14 +110,24 @@ function Recognize-Frame {
         if (@($ReuseRegions).Count -eq 3) {
             # Reuse only title slots confirmed by main. Pixel changes, movement,
             # changed slots or the three-second deadline always force a new OCR read.
-            $signature = Get-TitleSignature $bitmap $ReuseRegions
             $cacheKey = ($window | ConvertTo-Json -Compress) + ($ReuseRegions | ConvertTo-Json -Compress)
+            # Enable the fast disappearance check only after the verified title
+            # geometry also locates at least two dark card bodies in this window.
+            $visibleCards = Get-VisibleCardCount $bitmap $ReuseRegions
+            if ($visibleCards -ge 2) { $script:bodyKey = $cacheKey }
+            elseif ($visibleCards -eq 0 -and $script:bodyKey -eq $cacheKey) {
+                $script:lastRecognition = $null
+                Write-Result @{ type = 'absent'; capturedAt = $startedAt }
+                return
+            }
+            $signature = Get-TitleSignature $bitmap $ReuseRegions
             $cached = $script:lastRecognition
             if ($signature -and $cached -and $cached.key -eq $cacheKey -and $cached.signature -eq $signature -and $startedAt - $cached.readAt -lt 3000) {
                 Write-Result @{ type = 'frame'; capturedAt = $startedAt; elapsedMs = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds() - $startedAt; window = $window; lines = $cached.lines; reused = $true }
                 return
             }
         }
+        if (@($ReuseRegions).Count -ne 3) { $script:bodyKey = $null }
         $cropLeft = 0; $cropTop = 0
         if ($Focused) {
             # Preferred after a verified sighting, and alternated with full reads

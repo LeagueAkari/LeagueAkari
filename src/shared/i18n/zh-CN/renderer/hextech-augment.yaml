@@ -4,6 +4,10 @@ hextechAugment:
   helpLabel: 海克斯评分使用说明
   displayHelp: 请在游戏的视频设置中选择“无边框”或“窗口化”。开启后会自动识别三选一选项，在三列横条中显示当前英雄的推荐等级。拖动横条标题可以调整位置，可随时关闭。
   noData: 暂无评分
+  tierRank: '同级 #{{rank}}/{{total}}'
+  rankUnavailable: 同级排序暂无数据
+  rankHelp: 三段条显示同级排序所在的前、中、后区间。 当前英雄同等级强化按数据源综合表现排序，数字越小越靠前。相同表现显示相同排序。
+  bestPick: 首选
   positions:
     '0': 左侧
     '1': 中间

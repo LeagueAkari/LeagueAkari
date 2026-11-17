@@ -5,7 +5,7 @@ import type { WindowManagerMainContext } from '../context'
 import { AkariHextechAugmentWindow } from './window'
 
 const nativeWindow = vi.hoisted(() => ({
-  bounds: { x: 0, y: 0, width: 600, height: 120 },
+  bounds: { x: 0, y: 0, width: 352, height: 136 },
   isDestroyed: vi.fn(() => false),
   getBounds: vi.fn(),
   setBounds: vi.fn(),
@@ -40,7 +40,7 @@ const snapshot = (): HextechAugmentSnapshot => ({
 describe('augment strip window placement', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    nativeWindow.bounds = { x: 0, y: 0, width: 600, height: 120 }
+    nativeWindow.bounds = { x: 0, y: 0, width: 352, height: 136 }
     nativeWindow.isDestroyed.mockReturnValue(false)
     nativeWindow.getBounds.mockImplementation(() => ({ ...nativeWindow.bounds }))
     nativeWindow.setBounds.mockImplementation((bounds) => {
@@ -65,7 +65,7 @@ describe('augment strip window placement', () => {
     window.state.ready = true
     nativeWindow.once.mock.calls[0][1]()
     expect(window.showOrRestore).toHaveBeenCalledOnce()
-    expect(nativeWindow.bounds).toEqual({ x: 1380, y: 24, width: 600, height: 120 })
+    expect(nativeWindow.bounds).toEqual({ x: 1504, y: 24, width: 352, height: 136 })
   })
 
   it('keeps a cleared result hidden when the window finishes loading', () => {
@@ -94,8 +94,8 @@ describe('augment strip window placement', () => {
   it('places the strip in game coordinates and retains a dragged position across recognition updates', () => {
     const window = new AkariHextechAugmentWindow({} as WindowManagerMainContext)
     window.present(snapshot())
-    expect(nativeWindow.bounds).toEqual({ x: 980, y: 24, width: 600, height: 120 })
-    nativeWindow.bounds = { x: 1100, y: 200, width: 600, height: 120 }
+    expect(nativeWindow.bounds).toEqual({ x: 1104, y: 24, width: 352, height: 136 })
+    nativeWindow.bounds = { x: 1100, y: 200, width: 352, height: 136 }
     window.present(snapshot())
     expect(nativeWindow.setBounds).toHaveBeenCalledOnce()
     expect(nativeWindow.bounds).toMatchObject({ x: 1100, y: 200 })
@@ -104,15 +104,15 @@ describe('augment strip window placement', () => {
   it('follows a moved game and clamps the strip inside a resized game', () => {
     const window = new AkariHextechAugmentWindow({} as WindowManagerMainContext)
     window.present(snapshot())
-    nativeWindow.bounds = { x: 1100, y: 200, width: 600, height: 120 }
+    nativeWindow.bounds = { x: 1100, y: 200, width: 352, height: 136 }
     const moved = snapshot()
     moved.window.x = 600
     moved.window.y = 300
     window.present(moved)
-    expect(nativeWindow.bounds).toEqual({ x: 1500, y: 400, width: 600, height: 120 })
+    expect(nativeWindow.bounds).toEqual({ x: 1500, y: 400, width: 352, height: 136 })
     moved.window.width = 750
     window.present(moved)
-    expect(nativeWindow.bounds).toEqual({ x: 400, y: 400, width: 500, height: 120 })
+    expect(nativeWindow.bounds).toEqual({ x: 548, y: 400, width: 352, height: 136 })
     window.present(null)
     expect(window.hide).toHaveBeenCalledOnce()
   })

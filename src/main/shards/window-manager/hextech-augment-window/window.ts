@@ -19,8 +19,8 @@ export class AkariHextechAugmentWindow extends BaseAkariWindow<
       new HextechAugmentWindowState(),
       new HextechAugmentWindowSettings(),
       {
-        baseWidth: 600,
-        baseHeight: 120,
+        baseWidth: 352,
+        baseHeight: 136,
         minWidth: 1,
         minHeight: 1,
         htmlEntry: 'hextech-augment-window.html',
@@ -70,8 +70,8 @@ export class AkariHextechAugmentWindow extends BaseAkariWindow<
       (['x', 'y', 'width', 'height'] as const).some((key) => previous[key] !== bounds[key])
     ) {
       const current = this._window.getBounds()
-      const width = Math.min(600, bounds.width)
-      const height = Math.min(120, bounds.height)
+      const width = Math.min(352, bounds.width)
+      const height = Math.min(136, bounds.height)
       const x = previous ? current.x + bounds.x - previous.x : bounds.x + (bounds.width - width) / 2
       const y = previous ? current.y + bounds.y - previous.y : bounds.y + 24
       this._window.setBounds({

@@ -5,7 +5,11 @@ import path from 'node:path'
 import { type Interface, createInterface } from 'node:readline'
 
 export type RecognitionWorkerMessage =
-  OcrFrame | { type: 'hidden' } | { type: 'ready' } | { type: 'error'; message: string }
+  | OcrFrame
+  | { type: 'absent'; capturedAt: number }
+  | { type: 'hidden' }
+  | { type: 'ready' }
+  | { type: 'error'; message: string }
 
 /** Single persistent offline OCR process. One request at a time; no screenshot queue or uploads. */
 export class RecognitionWorkerController {
@@ -37,7 +41,7 @@ export class RecognitionWorkerController {
       if (this._process !== child) return
       try {
         const message = JSON.parse(line) as RecognitionWorkerMessage
-        if (!['ready', 'hidden', 'frame', 'error'].includes(message.type)) return
+        if (!['ready', 'hidden', 'absent', 'frame', 'error'].includes(message.type)) return
         if (this._timeout) clearTimeout(this._timeout)
         this._timeout = null
         this._busy = false

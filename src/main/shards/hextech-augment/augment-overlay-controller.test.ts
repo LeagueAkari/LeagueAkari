@@ -176,6 +176,37 @@ describe.skipIf(process.platform !== 'win32')('augment overlay state and async f
     return { controller, league, settings, state, window, loadDetails, championData }
   }
 
+  it('ranks equal tiers using performance and retains equal ranks for ties', async () => {
+    const result = ratings()
+    if (result.status !== 'success') throw new Error('Expected rating fixture')
+    const augments = result.data.sections.augments!
+    augments.forEach((augment, index) => {
+      augment.tier = 2
+      augment.performanceScore = [90, 80, 80][index]
+    })
+    augments.push({ ...augments[0], augmentId: 99, performanceScore: 95 })
+    const { state } = setup(vi.fn().mockResolvedValue(result))
+    await vi.advanceTimersByTimeAsync(0)
+    worker.send!(frame())
+    expect(
+      state.snapshot?.labels.map(({ tier, tierRank, tierCount }) => ({ tier, tierRank, tierCount }))
+    ).toEqual([
+      { tier: 'B', tierRank: 2, tierCount: 4 },
+      { tier: 'B', tierRank: 3, tierCount: 4 },
+      { tier: 'B', tierRank: 3, tierCount: 4 }
+    ])
+  })
+
+  it('keeps tiers independent and leaves missing performance unranked', async () => {
+    const result = ratings()
+    if (result.status !== 'success') throw new Error('Expected rating fixture')
+    result.data.sections.augments![2].performanceScore = null
+    const { state } = setup(vi.fn().mockResolvedValue(result))
+    await vi.advanceTimersByTimeAsync(0)
+    worker.send!(frame())
+    expect(state.snapshot?.labels.map(({ tierRank }) => tierRank)).toEqual([1, 1, null])
+  })
+
   it('waits for opt-in and stops recognition immediately when disabled', async () => {
     const { settings, state, loadDetails, window } = setup(undefined, false)
     await vi.advanceTimersByTimeAsync(1400)
@@ -218,28 +249,47 @@ describe.skipIf(process.platform !== 'win32')('augment overlay state and async f
     expect(state.snapshot?.labels[1]).toMatchObject({ id: 4, tier: null })
   })
 
-  it('reduces repeat captures for stable quick reads and resumes fast reads after a reroll', async () => {
+  it('checks stable selections every 300 ms and keeps that cadence after a reroll', async () => {
     setup()
-    await vi.advanceTimersByTimeAsync(0)
     worker.send!({ type: 'ready' })
     for (let i = 0; i < 3; i++) worker.send!(frame())
     worker.capture.mockClear()
-    await vi.advanceTimersByTimeAsync(700)
+    await vi.advanceTimersByTimeAsync(299)
+    expect(worker.capture).not.toHaveBeenCalled()
+    await vi.advanceTimersByTimeAsync(1)
     expect(worker.capture).toHaveBeenCalledTimes(1)
     worker.send!(frame([1, 4, 3]))
-    worker.capture.mockClear()
-    await vi.advanceTimersByTimeAsync(700)
+    await vi.advanceTimersByTimeAsync(300)
     expect(worker.capture).toHaveBeenCalledTimes(2)
   })
 
-  it('keeps slow recognition at full cadence to preserve the frame freshness budget', async () => {
-    setup()
-    await vi.advanceTimersByTimeAsync(0)
+  it('hides within two light checks after the cards disappear', async () => {
+    const { state, window } = setup()
     worker.send!({ type: 'ready' })
-    for (let i = 0; i < 3; i++) worker.send!({ ...frame(), elapsedMs: 450 })
-    worker.capture.mockClear()
-    await vi.advanceTimersByTimeAsync(700)
-    expect(worker.capture).toHaveBeenCalledTimes(2)
+    worker.send!(frame())
+    window.present.mockClear()
+    await vi.advanceTimersByTimeAsync(300)
+    worker.send!({ type: 'absent', capturedAt: Date.now() })
+    expect(state.snapshot?.labels).toHaveLength(3)
+    await vi.advanceTimersByTimeAsync(300)
+    expect(worker.capture).toHaveBeenLastCalledWith(true, expect.any(Array))
+    worker.send!({ type: 'absent', capturedAt: Date.now() })
+    expect(state.snapshot).toBeNull()
+    expect(window.present).toHaveBeenLastCalledWith(null)
+  })
+
+  it('retains the selection through an isolated disappearance check and rejects stale checks', async () => {
+    const { state } = setup()
+    worker.send!(frame())
+    worker.send!({ type: 'absent', capturedAt: Date.now() })
+    worker.send!(frame())
+    worker.send!({ type: 'absent', capturedAt: Date.now() - 3100 })
+    worker.send!({ type: 'absent', capturedAt: Date.now() })
+    expect(state.snapshot?.labels).toHaveLength(3)
+    worker.send!({ type: 'absent', capturedAt: Date.now() })
+    expect(state.snapshot).toBeNull()
+    worker.send!(frame([1, 4, 3]))
+    expect(state.snapshot?.labels[1].id).toBe(4)
   })
 
   it('prefers focused reads after a verified selection and falls back after an incomplete read', async () => {
@@ -247,7 +297,7 @@ describe.skipIf(process.platform !== 'win32')('augment overlay state and async f
     worker.send!({ type: 'ready' })
     expect(worker.capture).toHaveBeenLastCalledWith(false, [])
     worker.send!(frame())
-    await vi.advanceTimersByTimeAsync(350)
+    await vi.advanceTimersByTimeAsync(300)
     expect(worker.capture).toHaveBeenLastCalledWith(true, expect.any(Array))
     const regions = worker.capture.mock.lastCall![1]
     expect(regions).toHaveLength(3)
@@ -261,7 +311,7 @@ describe.skipIf(process.platform !== 'win32')('augment overlay state and async f
     const incomplete = frame()
     incomplete.lines.pop()
     worker.send!(incomplete)
-    await vi.advanceTimersByTimeAsync(700)
+    await vi.advanceTimersByTimeAsync(600)
     expect(worker.capture).toHaveBeenLastCalledWith(false, [])
   })
 
@@ -271,11 +321,11 @@ describe.skipIf(process.platform !== 'win32')('augment overlay state and async f
     const incomplete = frame()
     incomplete.lines.pop()
     worker.send!(incomplete)
-    await vi.advanceTimersByTimeAsync(700)
+    await vi.advanceTimersByTimeAsync(600)
     expect(worker.capture).toHaveBeenLastCalledWith(true, [])
     expect(state.snapshot).toBeNull()
     worker.send!(incomplete)
-    await vi.advanceTimersByTimeAsync(700)
+    await vi.advanceTimersByTimeAsync(600)
     expect(worker.capture).toHaveBeenLastCalledWith(false, [])
   })
 
@@ -286,11 +336,11 @@ describe.skipIf(process.platform !== 'win32')('augment overlay state and async f
     incomplete.lines.pop()
     worker.send!(incomplete)
     worker.capture.mockClear()
-    await vi.advanceTimersByTimeAsync(700)
+    await vi.advanceTimersByTimeAsync(600)
     expect(worker.capture).toHaveBeenCalledTimes(1)
     worker.send!(frame())
     worker.capture.mockClear()
-    await vi.advanceTimersByTimeAsync(700)
+    await vi.advanceTimersByTimeAsync(600)
     expect(worker.capture).toHaveBeenCalledTimes(2)
   })
 

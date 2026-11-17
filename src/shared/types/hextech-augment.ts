@@ -22,6 +22,8 @@ export interface RecognizedAugment {
 }
 export interface HextechAugmentLabel extends RecognizedAugment {
   tier: string | null
+  tierRank?: number | null
+  tierCount?: number
 }
 export interface HextechAugmentSnapshot {
   championId: number

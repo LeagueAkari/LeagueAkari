@@ -33,8 +33,8 @@ export class HextechAugmentOverlayController {
   private _failed = false
   private _workerReady = false
   private _retryRatingsAt = 0
-  private _stableFrames = 0
-  private _skipStableCapture = false
+  private _absentFrames = 0
+  private _skipIdleCapture = false
   private _focusedCapture = false
   private _missedFrames = 0
 
@@ -98,14 +98,12 @@ export class HextechAugmentOverlayController {
         this._timer = setInterval(() => {
           if (this._failed) return
           if (this._workerReady) {
-            // At most 700 ms between requests while quick, stable reads keep
-            // capture + recognition under one second. Slow reads stay at full
-            // cadence so throttling cannot consume the frame's freshness budget.
-            const stable = this._stableFrames >= 3 && (this._latest?.frame.elapsedMs ?? 0) <= 300
+            // Stable title pixels reuse the worker's cached OCR result. Only
+            // idle acquisition skips a tick; visible cards are checked every 300 ms.
             const idle = this._state.status === 'unrecognized'
-            if ((stable || idle) && !this._skipStableCapture) this._skipStableCapture = true
+            if (idle && !this._skipIdleCapture) this._skipIdleCapture = true
             else {
-              this._skipStableCapture = false
+              this._skipIdleCapture = false
               const latest = this._latest
               const regions =
                 latest && this._missedFrames === 0
@@ -135,7 +133,7 @@ export class HextechAugmentOverlayController {
             this._publish()
             void this._loadRatings(this._generation, championId)
           }
-        }, 350)
+        }, 300)
       },
       {
         fireImmediately: true,
@@ -178,6 +176,13 @@ export class HextechAugmentOverlayController {
       return
     }
     if (Date.now() - message.capturedAt > MAX_FRAME_AGE_MS) return
+    if (message.type === 'absent') {
+      // Confirm disappearance twice without waiting for OCR miss retries.
+      this._absentFrames += 1
+      if (this._absentFrames >= 2) this._clear()
+      return
+    }
+    this._absentFrames = 0
     const cards = recognizeAugmentCards(
       message,
       Object.values(this._leagueClient.data.gameData.augments).map((augment) => ({
@@ -189,8 +194,7 @@ export class HextechAugmentOverlayController {
     if (cards.length !== 3) {
       const focused = this._focusedCapture
       this._missedFrames += 1
-      this._stableFrames = 0
-      this._skipStableCapture = false
+      this._skipIdleCapture = false
       if (this._missedFrames >= MAX_MISSED_FRAMES) this._clear()
       this._focusedCapture = !focused
       runInAction(() => {
@@ -199,17 +203,9 @@ export class HextechAugmentOverlayController {
       return
     }
     // Always replace the whole selection. A rerolled card cannot retain a previous card's score.
-    const previous = this._latest
-    const unchanged =
-      previous &&
-      (['id', 'x', 'y', 'width', 'height'] as const).every(
-        (key) => previous.frame.window[key] === message.window[key]
-      ) &&
-      previous.cards.every((card, slot) => card.id === cards[slot].id)
-    this._stableFrames = unchanged ? Math.min(3, this._stableFrames + 1) : 1
     this._missedFrames = 0
     this._focusedCapture = true
-    if (!unchanged) this._skipStableCapture = false
+    this._skipIdleCapture = false
     const expiresAt = message.capturedAt + DISPLAY_TIMEOUT_MS
     this._latest = { frame: message, cards, expiresAt }
     this._publish()
@@ -269,8 +265,21 @@ export class HextechAugmentOverlayController {
       window: latest.frame.window,
       labels: latest.cards.map((card) => {
         const rating = ratings.get(card.id)
+        const performanceScore = rating?.performanceScore
+        const scores = [...ratings.values()]
+          .filter((candidate) => candidate.tier === rating?.tier)
+          .map((candidate) => candidate.performanceScore)
+          .filter((score): score is number => typeof score === 'number' && Number.isFinite(score))
+        const tierRank =
+          rating?.tier != null &&
+          typeof performanceScore === 'number' &&
+          Number.isFinite(performanceScore)
+            ? 1 + scores.filter((score) => score > performanceScore).length
+            : null
         return {
           ...card,
+          tierRank,
+          tierCount: scores.length,
           tier:
             rating?.tier === null || rating?.tier === undefined
               ? null
@@ -287,8 +296,8 @@ export class HextechAugmentOverlayController {
 
   private _clear() {
     this._latest = null
-    this._stableFrames = 0
-    this._skipStableCapture = false
+    this._absentFrames = 0
+    this._skipIdleCapture = false
     this._focusedCapture = false
     this._missedFrames = 0
     if (this._expiry) clearTimeout(this._expiry)
