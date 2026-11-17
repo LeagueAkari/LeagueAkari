@@ -10,6 +10,7 @@ export class AkariHextechAugmentWindow extends BaseAkariWindow<
   HextechAugmentWindowSettings
 > {
   private _gameBounds: Rectangle | null = null
+  private _snapshot: HextechAugmentSnapshot | null = null
 
   constructor(context: WindowManagerMainContext) {
     super(
@@ -44,13 +45,16 @@ export class AkariHextechAugmentWindow extends BaseAkariWindow<
   }
 
   present(snapshot: HextechAugmentSnapshot | null) {
-    if (!snapshot) {
+    this._snapshot = snapshot
+    if (!snapshot || Date.now() >= snapshot.expiresAt) {
+      this._snapshot = null
       this.hide()
       return
     }
     if (!this._window || this._window.isDestroyed()) {
       this._gameBounds = null
       this.createWindow()
+      this._window?.once('ready-to-show', () => this.present(this._snapshot))
     }
     if (!this._window || !this.state.ready) return
     // OCR returns physical pixels; Electron windows use device independent coordinates.

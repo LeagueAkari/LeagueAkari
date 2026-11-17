@@ -104,14 +104,15 @@ function Recognize-Frame {
         if ($Focused) {
             # Preferred after a verified sighting, and alternated with full reads
             # during acquisition. A failed focused read falls back to the full window.
-            $cropLeft = [int]($width * 0.1); $cropTop = [int]($height * 0.34)
-            $region = New-Object System.Drawing.Rectangle($cropLeft, $cropTop, [int]($width * 0.8), [int]($height * 0.14))
+            $cropLeft = [int]($width * 0.1); $cropTop = [int]($height * 0.33)
+            $region = New-Object System.Drawing.Rectangle($cropLeft, $cropTop, [int]($width * 0.8), [int]($height * 0.19))
             $cropped = $bitmap.Clone($region, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
             $bitmap.Dispose(); $bitmap = $cropped
         }
         # Limit OCR work on very large monitors; coordinates are mapped back to physical pixels.
-        $maximumScale = if ($Focused) { 3.0 } else { 1.5 }
-        $scale = [Math]::Min($maximumScale, [Math]::Min(1920.0 / $bitmap.Width, [Windows.Media.Ocr.OcrEngine]::MaxImageDimension / [double][Math]::Max($bitmap.Width, $bitmap.Height)))
+        $maximumScale = if ($Focused) { [Math]::Min(3.0, 308.0 / $bitmap.Height) } else { 1.5 }
+        $maximumWidth = if ($Focused) { [Windows.Media.Ocr.OcrEngine]::MaxImageDimension } else { 1920.0 }
+        $scale = [Math]::Min($maximumScale, [Math]::Min($maximumWidth / $bitmap.Width, [Windows.Media.Ocr.OcrEngine]::MaxImageDimension / [double][Math]::Max($bitmap.Width, $bitmap.Height)))
         if ($scale -ne 1) {
             $scaled = New-Object System.Drawing.Bitmap($bitmap, [int]($bitmap.Width * $scale), [int]($bitmap.Height * $scale))
             $bitmap.Dispose(); $bitmap = $scaled

@@ -28,8 +28,38 @@ export function recognizeAugmentCards(frame: OcrFrame, names: AugmentName[]): Re
       dictionary.set(normalized, { name: null, priority })
     }
   }
+  const lines = [...frame.lines]
+  const rows = frame.lines
+    .filter((line) => line.words.length > 0)
+    .map((line) => {
+      const x = Math.min(...line.words.map((word) => word.x))
+      const y = Math.min(...line.words.map((word) => word.y))
+      const right = Math.max(...line.words.map((word) => word.x + word.width))
+      const bottom = Math.max(...line.words.map((word) => word.y + word.height))
+      return { ...line, x, y, width: right - x, height: bottom - y }
+    })
+    .filter((row) => row.width <= frame.window.width * 0.3)
+  for (const row of rows) {
+    const next = rows
+      .filter(
+        (candidate) =>
+          candidate.y >= row.y + row.height * 0.8 &&
+          Math.abs(candidate.x + candidate.width / 2 - row.x - row.width / 2) <=
+            Math.max(candidate.height, row.height)
+      )
+      .sort((a, b) => a.y - b.y)[0]
+    if (
+      !next ||
+      next.y - row.y - row.height > Math.max(row.height, next.height) * 0.5 ||
+      Math.max(row.height, next.height) > Math.min(row.height, next.height) * 1.5
+    )
+      continue
+    const words = [...row.words, ...next.words]
+    const name = normalizeAugmentName(words.map((word) => word.text).join(''))
+    if (dictionary.get(name)?.name) lines.push({ words })
+  }
   const matches: RecognizedAugment[] = []
-  for (const line of frame.lines) {
+  for (const line of lines) {
     for (let start = 0; start < line.words.length; start++) {
       const words: OcrWord[] = []
       for (let end = start; end < Math.min(line.words.length, start + 16); end++) {

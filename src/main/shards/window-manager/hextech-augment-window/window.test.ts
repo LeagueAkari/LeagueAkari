@@ -1,5 +1,5 @@
 import type { HextechAugmentSnapshot } from '@shared/types/hextech-augment'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { WindowManagerMainContext } from '../context'
 import { AkariHextechAugmentWindow } from './window'
@@ -10,7 +10,8 @@ const nativeWindow = vi.hoisted(() => ({
   getBounds: vi.fn(),
   setBounds: vi.fn(),
   setContentProtection: vi.fn(),
-  setAlwaysOnTop: vi.fn()
+  setAlwaysOnTop: vi.fn(),
+  once: vi.fn()
 }))
 vi.mock('electron', () => ({
   screen: {
@@ -24,6 +25,7 @@ vi.mock('../base-akari-window', () => ({
     state = { ready: true }
     hide = vi.fn()
     showOrRestore = vi.fn()
+    createWindow = vi.fn()
   }
 }))
 
@@ -39,10 +41,54 @@ describe('augment strip window placement', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     nativeWindow.bounds = { x: 0, y: 0, width: 600, height: 120 }
+    nativeWindow.isDestroyed.mockReturnValue(false)
     nativeWindow.getBounds.mockImplementation(() => ({ ...nativeWindow.bounds }))
     nativeWindow.setBounds.mockImplementation((bounds) => {
       nativeWindow.bounds = bounds
     })
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('shows the current result when the first window finishes loading', () => {
+    const window = new AkariHextechAugmentWindow({} as WindowManagerMainContext)
+    window.state.ready = false
+    nativeWindow.isDestroyed.mockReturnValueOnce(true)
+    window.present(snapshot())
+    expect(window.showOrRestore).not.toHaveBeenCalled()
+    expect(nativeWindow.once).toHaveBeenCalledWith('ready-to-show', expect.any(Function))
+    const current = snapshot()
+    current.window.x = 600
+    window.present(current)
+    window.state.ready = true
+    nativeWindow.once.mock.calls[0][1]()
+    expect(window.showOrRestore).toHaveBeenCalledOnce()
+    expect(nativeWindow.bounds).toEqual({ x: 1380, y: 24, width: 600, height: 120 })
+  })
+
+  it('keeps a cleared result hidden when the window finishes loading', () => {
+    const window = new AkariHextechAugmentWindow({} as WindowManagerMainContext)
+    window.state.ready = false
+    nativeWindow.isDestroyed.mockReturnValueOnce(true)
+    window.present(snapshot())
+    window.present(null)
+    window.state.ready = true
+    nativeWindow.once.mock.calls[0][1]()
+    expect(window.showOrRestore).not.toHaveBeenCalled()
+  })
+
+  it('keeps an expired result hidden when the window finishes loading', () => {
+    vi.useFakeTimers()
+    const window = new AkariHextechAugmentWindow({} as WindowManagerMainContext)
+    window.state.ready = false
+    nativeWindow.isDestroyed.mockReturnValueOnce(true)
+    window.present(snapshot())
+    vi.advanceTimersByTime(4000)
+    window.state.ready = true
+    nativeWindow.once.mock.calls[0][1]()
+    expect(window.showOrRestore).not.toHaveBeenCalled()
   })
 
   it('places the strip in game coordinates and retains a dragged position across recognition updates', () => {

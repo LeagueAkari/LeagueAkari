@@ -33,6 +33,49 @@ describe('three augment card recognition', () => {
     expect(result[0]).toMatchObject({ x: 180, y: 330, width: 120 })
   })
 
+  it.each([
+    { name: '面包和黄油', first: '面包和', second: '黄油' },
+    { name: 'Quest: Three Sacred Treasures', first: 'Quest: Three', second: 'Sacred Treasures' }
+  ])('recognizes an aligned two-line title: $name', ({ name, first, second }) => {
+    const input = frame()
+    input.lines.splice(
+      2,
+      1,
+      { words: [{ text: first, x: 1110, y: 310, width: 180, height: 30 }] },
+      { words: [{ text: second, x: 1140, y: 348, width: 120, height: 30 }] }
+    )
+    const result = recognizeAugmentCards(input, [...names.slice(0, 2), { id: 3, name }])
+    expect(result.map((card) => card.id)).toEqual([1, 2, 3])
+    expect(result[2]).toMatchObject({ x: 1110, y: 310, width: 180, height: 68 })
+  })
+
+  it.each([
+    { label: 'another card', x: 1440, y: 348, height: 30 },
+    { label: 'separated text', x: 1140, y: 420, height: 30 },
+    { label: 'smaller body text', x: 1140, y: 348, height: 16 }
+  ])('rejects a title fragment joined with $label', ({ x, y, height }) => {
+    const input = frame()
+    input.lines.splice(
+      2,
+      1,
+      { words: [{ text: '面包和', x: 1110, y: 310, width: 180, height: 30 }] },
+      { words: [{ text: '黄油', x, y, width: 120, height }] }
+    )
+    expect(recognizeAugmentCards(input, names)).toEqual([])
+  })
+
+  it('rejects fragments separated by an intervening line in the same card', () => {
+    const input = frame()
+    input.lines.splice(
+      2,
+      1,
+      { words: [{ text: '面包和', x: 1110, y: 310, width: 180, height: 30 }] },
+      { words: [{ text: '伤害', x: 1170, y: 342, width: 60, height: 10 }] },
+      { words: [{ text: '黄油', x: 1140, y: 348, width: 120, height: 30 }] }
+    )
+    expect(recognizeAugmentCards(input, names)).toEqual([])
+  })
+
   it('never guesses a rating for a dropped or misread character', () => {
     const input = frame()
     input.lines[2].words.splice(2, 1)
