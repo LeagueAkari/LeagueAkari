@@ -1,0 +1,88 @@
+selfImprovement:
+  summary:
+    title: 自我提升
+    open: 查看完整分析
+    basis: 最近 {{recent}} 场 vs 前 {{previous}} 场
+    notEnough: 需要至少两段对局才能生成趋势
+    modalDescription: 基于当前战绩筛选的 {{count}} 场对局
+    csPerMinute: 分均补刀
+    goldPerMinute: 分均经济
+    kda: KDA
+    visionScorePerMinute: 分均视野
+    pageSize: 分页 {{count}} 项
+    validCount_one: 有效 {{count}} 场
+    validCount_other: 有效 {{count}} 场
+    allPositions: 全部位置
+  positionDistribution:
+    title: 位置分布
+    tooltip: '{{count}} 场 · 胜率 {{rate}}%'
+    description: 按当前筛选的对局统计。
+  sections:
+    details: 详细数据
+    detailsHint: 选择要查看的方面
+  categories:
+    economy: 发育与经济
+    combat: 战斗
+    vision: 视野
+  panes:
+    economy:
+      description: 补刀和经济是长期发育的核心，下面按每 10 场汇总长期趋势。
+    combat:
+      description: KDA 与伤害反映击杀参与和输出质量。
+    vision:
+      description: 视野投入、排眼和真眼习惯，辅助判断地图信息获取。
+  insights:
+    title: 近期问题总结
+    description: 最近 {{recent}} 场对比之前 {{previous}} 场
+    notEnough: 至少需要两段完整的 10 场对局才能生成对比总结。
+    stable: 近期各项指标基本稳定，暂未发现明显退步。
+    economyUp: 分均经济提升 {{value}}，经济获取在变好。
+    economyDown: 分均经济下降 {{value}}，注意补刀与资源获取。
+    farmingUp: 分均补刀提升 {{value}}，发育效率在提高。
+    farmingDown: 分均补刀下降 {{value}}，优先检查对线期漏刀。
+    combatUp: KDA 提升 {{value}}，团战处理更稳。
+    combatDown: KDA 下降 {{value}}，注意减少无谓死亡。
+    visionUp: 分均视野提升 {{value}}，地图信息更充分。
+    visionDown: 分均视野下降 {{value}}，可适当增加真眼与游走。
+    winRateUp: 胜率提升 {{value}}，近期状态在回升。
+    winRateDown: 胜率下降 {{value}}，建议复盘最近的对局。
+    economyStanding: 经济状态：近 10 场分均经济 {{latest}}，个人最佳 {{best}}，差距 {{gap}}；在 {{total}} 个 10 场窗口中排第 {{rank}}。
+  charts:
+    csPerMinute: 补刀 / 分钟
+    goldPerMinute: 经济 / 分钟
+    kda: KDA
+    cs: 补刀数
+    visionScorePerMinute: 视野 / 分钟
+    damagePerMinute: 伤害 / 分钟
+    damageGoldEfficiency: 伤转率
+    damageShare: 伤害占比
+    wardsPlaced: 每场插眼
+    wardsKilled: 每场排眼
+    visionWardsBoughtInGame: 每场真眼
+    average: 均值
+    win: 胜
+    loss: 负
+    kdaLabel: KDA
+    movingAverage: '{{count}} 场移动平均'
+    winLossHint: 数据点：绿色为胜，红色为负；虚线为移动平均。
+    empty: 暂无可绘制的数据
+    ariaLabel: '{{title}}，共 {{count}} 场对局'
+  units:
+    csPerMinute: 刀/分钟
+    goldPerMinute: 金币/分钟
+    cs: 刀
+    visionScorePerMinute: 分/分钟
+    damagePerMinute: 伤害/分钟
+    wardsPlaced: 个
+    wardsKilled: 个
+    visionWardsBoughtInGame: 个
+  buckets:
+    title: 长期趋势（每 {{size}} 场）
+    description: 按场次分组后的均值，用于观察长期经济状态变化。
+    columns:
+      range: 时间范围
+      matches: 场次
+      csPerMinute: 分均补刀
+      goldPerMinute: 分均经济
+      kda: KDA
+      winRate: 胜率

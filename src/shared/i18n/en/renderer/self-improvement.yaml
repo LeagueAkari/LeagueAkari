@@ -1,0 +1,88 @@
+selfImprovement:
+  summary:
+    title: Self-Improvement
+    open: Open full analysis
+    basis: Latest {{recent}} vs previous {{previous}} matches
+    notEnough: More matches are needed to build a trend
+    modalDescription: 'Based on the current match-history filters: {{count}} matches'
+    csPerMinute: CS / min
+    goldPerMinute: Gold / min
+    kda: KDA
+    visionScorePerMinute: Vision / min
+    pageSize: Page size {{count}}
+    validCount_one: '{{count}} valid match'
+    validCount_other: '{{count}} valid matches'
+    allPositions: All positions
+  positionDistribution:
+    title: Position distribution
+    tooltip: '{{count}} matches · {{rate}}% win rate'
+    description: Based on current filters.
+  sections:
+    details: Detailed data
+    detailsHint: Choose which aspect to display
+  categories:
+    economy: Farming & Economy
+    combat: Combat
+    vision: Vision
+  panes:
+    economy:
+      description: Farming and gold are the core of long-term development. The table below groups matches in tens.
+    combat:
+      description: KDA and damage reflect kill participation and damage output.
+    vision:
+      description: Ward investment, denial, and control wards help evaluate map information.
+  insights:
+    title: Recent problem summary
+    description: Latest {{recent}} vs previous {{previous}}
+    notEnough: Two full 10-match windows are needed to compare recent form.
+    stable: Recent metrics are stable; no clear regression detected.
+    economyUp: Gold per minute is up {{value}}. Your economy is improving.
+    economyDown: Gold per minute is down {{value}}. Watch your farming and resource access.
+    farmingUp: CS per minute is up {{value}}. Your farming efficiency is improving.
+    farmingDown: CS per minute is down {{value}}. Check for missed lane CS first.
+    combatUp: KDA is up {{value}}. Teamfight execution looks steadier.
+    combatDown: KDA is down {{value}}. Look for avoidable deaths.
+    visionUp: Vision per minute is up {{value}}. You have more map information.
+    visionDown: Vision per minute is down {{value}}. Consider more control wards and roams.
+    winRateUp: Win rate is up {{value}}. Recent form is recovering.
+    winRateDown: Win rate is down {{value}}. Review your latest matches.
+    economyStanding: 'Economy: latest 10-match GPM {{latest}}, personal best {{best}}, gap {{gap}}; ranked #{{rank}} of {{total}} 10-match windows.'
+  charts:
+    csPerMinute: CS per minute
+    goldPerMinute: Gold per minute
+    kda: KDA
+    cs: Total CS
+    visionScorePerMinute: Vision per minute
+    damagePerMinute: Damage per minute
+    damageGoldEfficiency: Damage conversion
+    damageShare: Damage share
+    wardsPlaced: Wards placed per game
+    wardsKilled: Wards killed per game
+    visionWardsBoughtInGame: Control wards per game
+    average: Avg
+    win: Win
+    loss: Loss
+    kdaLabel: KDA
+    movingAverage: '{{count}}-match moving average'
+    winLossHint: 'Points: green = win, red = loss. Dashed line = moving average.'
+    empty: Nothing to plot yet
+    ariaLabel: '{{title}}, {{count}} matches'
+  units:
+    csPerMinute: CS/min
+    goldPerMinute: gold/min
+    cs: CS
+    visionScorePerMinute: pts/min
+    damagePerMinute: dmg/min
+    wardsPlaced: wards
+    wardsKilled: wards
+    visionWardsBoughtInGame: wards
+  buckets:
+    title: Long-term trend (every {{size}} matches)
+    description: Averages per match group, useful for spotting long-term economy changes.
+    columns:
+      range: Date range
+      matches: Matches
+      csPerMinute: CS / min
+      goldPerMinute: Gold / min
+      kda: KDA
+      winRate: Win rate

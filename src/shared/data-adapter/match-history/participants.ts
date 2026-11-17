@@ -92,6 +92,9 @@ export type MatchParticipant = {
   totalDamageToTowers: number
   totalHeal: number
   visionScore: number
+  wardsPlaced?: number
+  wardsKilled?: number
+  visionWardsBoughtInGame?: number
   timeCCingOthers: number
   soloKills: number | null
   effectiveHealAndShielding: number | null
@@ -106,6 +109,22 @@ export type MatchParticipant = {
   tripleKills: number
   quadraKills: number
   pentaKills: number
+}
+
+// LCU 没有 teamPosition，只能从 lane / role 推导位置
+function mapLcuLaneRoleToPosition(lane: string | undefined, role: string | undefined) {
+  switch (lane) {
+    case 'TOP':
+      return 'TOP'
+    case 'JUNGLE':
+      return 'JUNGLE'
+    case 'MIDDLE':
+      return 'MIDDLE'
+    case 'BOTTOM':
+      return role === 'SUPPORT' ? 'UTILITY' : 'BOTTOM'
+    default:
+      return null
+  }
 }
 
 // 以 SGP 的格式为参照，将 LCU 数据映射为抽象格式
@@ -244,6 +263,9 @@ export function toParticipants(
         totalDamageToTowers: p.damageDealtToTurrets,
         totalHeal: p.totalHeal,
         visionScore: p.visionScore ?? 0,
+        wardsPlaced: p.wardsPlaced,
+        wardsKilled: p.wardsKilled,
+        visionWardsBoughtInGame: p.visionWardsBoughtInGame,
         timeCCingOthers: p.timeCCingOthers,
         soloKills: p.challenges?.soloKills ?? null,
         effectiveHealAndShielding: p.challenges?.effectiveHealAndShielding ?? null,
@@ -312,7 +334,7 @@ export function toParticipants(
         tagLine: identity.player.tagLine,
         profileIconId: identity.player.profileIcon,
         championId: participant.championId,
-        position: null,
+        position: mapLcuLaneRoleToPosition(participant.timeline?.lane, participant.timeline?.role),
         teamId: participant.teamId,
         playerSubteamId: participant.stats.playerSubteamId,
         teamIdentifier,
@@ -370,6 +392,9 @@ export function toParticipants(
         totalDamageToTowers: participant.stats.damageDealtToTurrets,
         totalHeal: participant.stats.totalHeal,
         visionScore: participant.stats.visionScore ?? 0,
+        wardsPlaced: participant.stats.wardsPlaced,
+        wardsKilled: participant.stats.wardsKilled,
+        visionWardsBoughtInGame: participant.stats.visionWardsBoughtInGame,
         timeCCingOthers: participant.stats.timeCCingOthers,
 
         effectiveHealAndShielding: null, // lcu has no effective heal and shielding record
