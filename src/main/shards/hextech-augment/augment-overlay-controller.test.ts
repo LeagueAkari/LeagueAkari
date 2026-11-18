@@ -344,6 +344,22 @@ describe.skipIf(process.platform !== 'win32')('augment overlay state and async f
     expect(state.snapshot).toBeNull()
   })
 
+  it('backs off idle reads and resumes acquisition when two offers appear', async () => {
+    setup()
+    worker.send!({ type: 'ready' })
+    worker.send!({ ...frame([]), focused: false })
+    worker.capture.mockClear()
+    await vi.advanceTimersByTimeAsync(1499)
+    expect(worker.capture).not.toHaveBeenCalled()
+    await vi.advanceTimersByTimeAsync(1)
+    expect(worker.capture).toHaveBeenCalledOnce()
+    const partial = frame()
+    partial.lines.splice(1, 1)
+    worker.send!(partial)
+    await vi.advanceTimersByTimeAsync(600)
+    expect(worker.capture).toHaveBeenCalledTimes(2)
+  })
+
   it('expires the displayed selection when capture stalls', async () => {
     const { state, window } = setup()
     await vi.advanceTimersByTimeAsync(0)

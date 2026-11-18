@@ -176,15 +176,16 @@ export class HextechAugmentOverlayController {
       this._worker.capture(false, [], true)
       return
     }
-    this._scheduleCapture(message.reused ? 300 : 600)
     if (cards.length < 2) {
       this._missedFrames += 1
       if (this._missedFrames >= MAX_MISSED_FRAMES) this._clear()
+      this._scheduleCapture(this._latest ? 600 : 1500)
       runInAction(() => {
         this._state.status = this._latest ? 'scanning' : 'unrecognized'
       })
       return
     }
+    this._scheduleCapture(message.reused ? 300 : 600)
     // Always replace the whole selection. A rerolled card cannot retain a previous card's score.
     this._missedFrames = 0
     const expiresAt = message.capturedAt + DISPLAY_TIMEOUT_MS
