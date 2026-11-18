@@ -5,113 +5,255 @@ export interface AugmentName {
   name: string
   augmentNameId?: string
 }
+
+interface TitleLine {
+  words: OcrWord[]
+  text: string
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
+interface TitleMatch extends RecognizedAugment {
+  score: number
+}
+
 export function normalizeAugmentName(name: string) {
   return name
     .normalize('NFKC')
-    .replace(/[\s\p{P}\p{S}]/gu, '')
+    .normalize('NFD')
+    .replace(/[\s\p{P}\p{S}\p{M}]/gu, '')
     .toLocaleLowerCase()
 }
 
-/** Exact dictionary matches only. Ambiguous aliases and fuzzy OCR guesses never receive ratings. */
+function shapeName(name: string) {
+  const normalized = normalizeAugmentName(name)
+  if (/\p{Script=Han}/u.test(normalized)) return normalized
+  return normalized.replace(/[l1j]/g, 'i').replace(/0/g, 'o').replace(/5/g, 's')
+}
+
+function similarity(first: string, second: string) {
+  const left = [...first]
+  const right = [...second]
+  let previous = Array.from({ length: right.length + 1 }, (_, index) => index)
+  for (let row = 1; row <= left.length; row++) {
+    const current = [row]
+    for (let column = 1; column <= right.length; column++) {
+      current.push(
+        Math.min(
+          current[column - 1] + 1,
+          previous[column] + 1,
+          previous[column - 1] + Number(left[row - 1] !== right[column - 1])
+        )
+      )
+    }
+    previous = current
+  }
+  return 1 - previous[right.length] / Math.max(left.length, right.length)
+}
+
+function matchName(
+  text: string,
+  dictionary: Map<string, AugmentName | null>,
+  relaxed = false,
+  excluded = new Set<number>()
+): { name: AugmentName; score: number } | null {
+  const normalized = shapeName(text)
+  if (normalized.length < 2) return null
+  if (dictionary.has(normalized)) {
+    const name = dictionary.get(normalized)
+    return name && !excluded.has(name.id) ? { name, score: 1 } : null
+  }
+  const matches = new Map<number, { name: AugmentName; score: number; threshold: number }>()
+  let ambiguousScore = 0
+  for (const [alias, name] of dictionary) {
+    if (name && excluded.has(name.id)) continue
+    const length = Math.max([...alias].length, [...normalized].length)
+    if (Math.abs([...alias].length - [...normalized].length) / length > (relaxed ? 0.5 : 0.35))
+      continue
+    const score = similarity(normalized, alias)
+    if (!name) {
+      ambiguousScore = Math.max(ambiguousScore, score)
+      continue
+    }
+    const threshold = relaxed ? 0.6 : alias.length < 7 ? 0.9 : alias.length < 15 ? 0.78 : 0.72
+    if (score > (matches.get(name.id)?.score ?? 0)) matches.set(name.id, { name, score, threshold })
+  }
+  const ordered = [...matches.values()].sort((first, second) => second.score - first.score)
+  const best = ordered[0]
+  const runnerUp = Math.max(ordered[1]?.score ?? 0, ambiguousScore)
+  return best && best.score >= best.threshold && best.score - runnerUp >= 0.08 ? best : null
+}
+
+function titleLine(words: OcrWord[]): TitleLine {
+  const x = Math.min(...words.map((word) => word.x))
+  const y = Math.min(...words.map((word) => word.y))
+  return {
+    words,
+    text: words.map((word) => word.text).join(''),
+    x,
+    y,
+    width: Math.max(...words.map((word) => word.x + word.width)) - x,
+    height: Math.max(...words.map((word) => word.y + word.height)) - y
+  }
+}
+
+function sameRow(first: TitleLine | RecognizedAugment, second: TitleLine | RecognizedAugment) {
+  return (
+    Math.abs(first.y + first.height / 2 - second.y - second.height / 2) <=
+    Math.max(first.height, second.height)
+  )
+}
+
+function validColumns(cards: RecognizedAugment[], width: number) {
+  if (cards.length < 2 || cards.length > 3) return false
+  const centers = cards.map((card) => card.x + card.width / 2)
+  const gaps = centers.slice(1).map((center, index) => center - centers[index])
+  return Math.min(...gaps) >= width * 0.09 && Math.max(...gaps) / Math.min(...gaps) <= 1.5
+}
+
+/** Matches title text within the three card columns and preserves incomplete readings. */
 export function recognizeAugmentCards(frame: OcrFrame, names: AugmentName[]): RecognizedAugment[] {
-  // LCU mixes Arena and Mayhem entries. Prefer the explicitly ARAM variant of a
-  // translated name, retaining shared entries that have no mode-specific override.
-  const dictionary = new Map<string, { name: AugmentName | null; priority: number }>()
+  const aliases = new Map<string, { name: AugmentName | null; priority: number }>()
   for (const name of names) {
-    const normalized = normalizeAugmentName(name.name)
+    const normalized = shapeName(name.name)
     if (normalized.length < 2) continue
     const priority = name.augmentNameId?.startsWith('ARAM_') ? 1 : 0
-    const previous = dictionary.get(normalized)
+    const previous = aliases.get(normalized)
     if (!previous || priority > previous.priority) {
-      dictionary.set(normalized, { name, priority })
+      aliases.set(normalized, { name, priority })
     } else if (priority === previous.priority && previous.name?.id !== name.id) {
-      dictionary.set(normalized, { name: null, priority })
+      aliases.set(normalized, { name: null, priority })
     }
   }
-  const lines = [...frame.lines]
-  const rows = frame.lines
-    .filter((line) => line.words.length > 0)
-    .map((line) => {
-      const x = Math.min(...line.words.map((word) => word.x))
-      const y = Math.min(...line.words.map((word) => word.y))
-      const right = Math.max(...line.words.map((word) => word.x + word.width))
-      const bottom = Math.max(...line.words.map((word) => word.y + word.height))
-      return { ...line, x, y, width: right - x, height: bottom - y }
-    })
-    .filter((row) => row.width <= frame.window.width * 0.3)
-  for (const row of rows) {
-    const next = rows
+  const dictionary = new Map([...aliases].map(([alias, entry]) => [alias, entry.name]))
+  const rows: TitleLine[] = []
+  for (const line of frame.lines) {
+    let words: OcrWord[] = []
+    for (const word of [...line.words].sort((first, second) => first.x - second.x)) {
+      const previous = words.at(-1)
+      if (previous && word.x - previous.x - previous.width > frame.window.width * 0.06) {
+        rows.push(titleLine(words))
+        words = []
+      }
+      words.push(word)
+    }
+    if (words.length) rows.push(titleLine(words))
+  }
+  const candidates = rows.filter(
+    (row) =>
+      row.y >= frame.window.height * 0.3 &&
+      row.y + row.height <= frame.window.height * 0.54 &&
+      row.height >= frame.window.height * 0.01 &&
+      row.width <= frame.window.width * 0.3
+  )
+  const joined: TitleLine[] = []
+  for (const row of candidates) {
+    const next = candidates
       .filter(
         (candidate) =>
           candidate.y >= row.y + row.height * 0.8 &&
           Math.abs(candidate.x + candidate.width / 2 - row.x - row.width / 2) <=
             Math.max(candidate.height, row.height)
       )
-      .sort((a, b) => a.y - b.y)[0]
+      .sort((first, second) => first.y - second.y)[0]
     if (
-      !next ||
-      next.y - row.y - row.height > Math.max(row.height, next.height) * 0.5 ||
-      Math.max(row.height, next.height) > Math.min(row.height, next.height) * 1.5
+      next &&
+      next.y - row.y - row.height <= Math.max(row.height, next.height) * 0.5 &&
+      Math.max(row.height, next.height) <= Math.min(row.height, next.height) * 1.5
     )
-      continue
-    const words = [...row.words, ...next.words]
-    const name = normalizeAugmentName(words.map((word) => word.text).join(''))
-    if (dictionary.get(name)?.name) lines.push({ words })
+      joined.push(titleLine([...row.words, ...next.words]))
   }
-  const matches: RecognizedAugment[] = []
-  for (const line of lines) {
-    for (let start = 0; start < line.words.length; start++) {
-      const words: OcrWord[] = []
-      for (let end = start; end < Math.min(line.words.length, start + 16); end++) {
-        words.push(line.words[end])
-        const text = normalizeAugmentName(words.map((word) => word.text).join(''))
-        const name = dictionary.get(text)?.name
-        if (!name) continue
-        const x = Math.min(...words.map((word) => word.x))
-        const y = Math.min(...words.map((word) => word.y))
-        const right = Math.max(...words.map((word) => word.x + word.width))
-        const bottom = Math.max(...words.map((word) => word.y + word.height))
-        if (
-          y < frame.window.height * 0.12 ||
-          bottom > frame.window.height * 0.8 ||
-          right - x > frame.window.width * 0.3
+  candidates.push(...joined)
+  const matches: TitleMatch[] = []
+  for (const line of candidates) {
+    const match = matchName(line.text, dictionary)
+    if (match) matches.push({ ...match.name, ...line, score: match.score })
+  }
+  const groups = new Map<string, TitleMatch[]>()
+  for (const anchor of matches) {
+    const row = matches
+      .filter((match) => sameRow(match, anchor))
+      .sort((first, second) => first.x - second.x || second.score - first.score)
+    const cards: TitleMatch[] = []
+    for (const match of row) {
+      const previous = cards.at(-1)
+      if (
+        previous &&
+        Math.abs(match.x + match.width / 2 - previous.x - previous.width / 2) <
+          frame.window.width * 0.08
+      ) {
+        if (match.score > previous.score) cards[cards.length - 1] = match
+      } else cards.push(match)
+    }
+    if (!validColumns(cards, frame.window.width)) continue
+    if (new Set(cards.map((card) => card.id)).size !== cards.length) continue
+    if (cards.length === 2) {
+      const excluded = new Set(cards.map((card) => card.id))
+      const remaining = candidates
+        .filter(
+          (line) =>
+            cards.every((card) => sameRow(card, line)) &&
+            cards.every(
+              (card) =>
+                Math.abs(card.x + card.width / 2 - line.x - line.width / 2) >=
+                frame.window.width * 0.09
+            )
         )
-          continue
-        matches.push({ ...name, x, y, width: right - x, height: bottom - y })
+        .map((line) => ({ line, match: matchName(line.text, dictionary, true, excluded) }))
+        .filter((entry) => entry.match !== null)
+        .sort((first, second) => second.match!.score - first.match!.score)
+      const third = remaining[0]
+      const competing = remaining.find((entry) => entry.match?.name.id !== third?.match?.name.id)
+      if (
+        third?.match &&
+        (!competing?.match || third.match.score - competing.match.score >= 0.08)
+      ) {
+        const complete = [
+          ...cards,
+          { ...third.match.name, ...third.line, score: third.match.score }
+        ].sort((first, second) => first.x - second.x)
+        if (validColumns(complete, frame.window.width)) cards.splice(0, cards.length, ...complete)
       }
     }
+    const key = cards.map((card) => `${card.id}:${Math.round(card.y / 10)}`).join('|')
+    groups.set(key, cards)
   }
-  const ordered = matches.sort((a, b) => a.x - b.x || b.name.length - a.name.length)
-  const groups: RecognizedAugment[][] = []
-  for (const anchor of ordered) {
-    const row = ordered.filter(
-      (match) => Math.abs(match.y - anchor.y) < Math.max(match.height, anchor.height) * 0.8
-    )
-    const slots: RecognizedAugment[] = []
-    for (const match of row) {
-      const previous = slots.at(-1)
-      if (previous && match.x - previous.x < frame.window.width * 0.12) {
-        if (match.name.length > previous.name.length) slots[slots.length - 1] = match
-      } else slots.push(match)
-    }
-    if (slots.length !== 3) continue
-    const centers = slots.map((match) => match.x + match.width / 2)
-    const firstGap = centers[1] - centers[0]
-    const secondGap = centers[2] - centers[1]
-    if (
-      firstGap < frame.window.width * 0.14 ||
-      secondGap < frame.window.width * 0.14 ||
-      Math.max(firstGap, secondGap) / Math.min(firstGap, secondGap) > 1.5
-    )
-      continue
-    if (new Set(slots.map((match) => match.id)).size !== 3) continue
-    groups.push(slots)
-  }
-  const unique = new Map(
-    groups.map((group) => [
-      group.map((match) => `${match.id}:${Math.round(match.y / 10)}`).join('|'),
-      group
-    ])
+  const ordered = [...groups.values()].sort(
+    (first, second) =>
+      second.length - first.length ||
+      second.reduce((total, card) => total + card.score, 0) -
+        first.reduce((total, card) => total + card.score, 0)
   )
-  return unique.size === 1 ? [...unique.values()][0] : []
+  const best = ordered[0]
+  if (!best) return []
+  const next = ordered[1]
+  if (
+    next?.length === best.length &&
+    Math.abs(
+      best.reduce((total, card) => total + card.score, 0) -
+        next.reduce((total, card) => total + card.score, 0)
+    ) < 0.08
+  )
+    return []
+  let slots: (0 | 1 | 2)[] = [0, 1, 2]
+  if (best.length === 2) {
+    slots = [0, 2]
+    const centers = best.map((card) => card.x + card.width / 2)
+    const distances = centers.map((center) => Math.abs(center - frame.window.width / 2))
+    const nearest = distances[0] < distances[1] ? 0 : 1
+    if (distances[nearest] <= (centers[1] - centers[0]) * 0.35) {
+      slots = nearest === 0 ? [1, 2] : [0, 1]
+    }
+  }
+  return best.map((card, index) => ({
+    id: card.id,
+    name: card.name,
+    x: card.x,
+    y: card.y,
+    width: card.width,
+    height: card.height,
+    slot: slots[index]
+  }))
 }

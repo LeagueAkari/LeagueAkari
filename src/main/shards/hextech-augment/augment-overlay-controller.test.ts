@@ -24,8 +24,8 @@ vi.mock('./recognition-worker-controller', () => ({
     start() {
       worker.start()
     }
-    capture(focused = false, regions: unknown[] = []) {
-      worker.capture(focused, regions)
+    capture(focused = true, regions: unknown[] = [], reuseCapture = false) {
+      worker.capture(focused, regions, reuseCapture)
     }
     stop() {
       worker.stop()
@@ -45,6 +45,7 @@ function frame(ids = [1, 2, 3]): OcrFrame {
     type: 'frame',
     capturedAt: Date.now(),
     elapsedMs: 150,
+    focused: true,
     window: { id: 'game', x: 0, y: 0, width: 1600, height: 900 },
     lines: ids.map((id, slot) => ({
       words: [
@@ -249,16 +250,19 @@ describe.skipIf(process.platform !== 'win32')('augment overlay state and async f
     expect(state.snapshot?.labels[1]).toMatchObject({ id: 4, tier: null })
   })
 
-  it('checks stable selections every 300 ms and keeps that cadence after a reroll', async () => {
+  it('checks reused stable selections every 300 ms and waits 600 ms after an OCR read', async () => {
     setup()
     worker.send!({ type: 'ready' })
-    for (let i = 0; i < 3; i++) worker.send!(frame())
+    await vi.advanceTimersByTimeAsync(80)
+    worker.send!({ ...frame(), reused: true })
     worker.capture.mockClear()
     await vi.advanceTimersByTimeAsync(299)
     expect(worker.capture).not.toHaveBeenCalled()
     await vi.advanceTimersByTimeAsync(1)
     expect(worker.capture).toHaveBeenCalledTimes(1)
     worker.send!(frame([1, 4, 3]))
+    await vi.advanceTimersByTimeAsync(300)
+    expect(worker.capture).toHaveBeenCalledTimes(1)
     await vi.advanceTimersByTimeAsync(300)
     expect(worker.capture).toHaveBeenCalledTimes(2)
   })
@@ -272,7 +276,7 @@ describe.skipIf(process.platform !== 'win32')('augment overlay state and async f
     worker.send!({ type: 'absent', capturedAt: Date.now() })
     expect(state.snapshot?.labels).toHaveLength(3)
     await vi.advanceTimersByTimeAsync(300)
-    expect(worker.capture).toHaveBeenLastCalledWith(true, expect.any(Array))
+    expect(worker.capture).toHaveBeenLastCalledWith(true, expect.any(Array), false)
     worker.send!({ type: 'absent', capturedAt: Date.now() })
     expect(state.snapshot).toBeNull()
     expect(window.present).toHaveBeenLastCalledWith(null)
@@ -292,13 +296,13 @@ describe.skipIf(process.platform !== 'win32')('augment overlay state and async f
     expect(state.snapshot?.labels[1].id).toBe(4)
   })
 
-  it('prefers focused reads after a verified selection and falls back after an incomplete read', async () => {
+  it('starts with title-band OCR and reuses the same capture for a full fallback', async () => {
     setup()
     worker.send!({ type: 'ready' })
-    expect(worker.capture).toHaveBeenLastCalledWith(false, [])
+    expect(worker.capture).toHaveBeenLastCalledWith(true, [], false)
     worker.send!(frame())
-    await vi.advanceTimersByTimeAsync(300)
-    expect(worker.capture).toHaveBeenLastCalledWith(true, expect.any(Array))
+    await vi.advanceTimersByTimeAsync(600)
+    expect(worker.capture).toHaveBeenLastCalledWith(true, expect.any(Array), false)
     const regions = worker.capture.mock.lastCall![1]
     expect(regions).toHaveLength(3)
     frame().lines.forEach((line, slot) => {
@@ -309,39 +313,35 @@ describe.skipIf(process.platform !== 'win32')('augment overlay state and async f
       expect(regions[slot].y + regions[slot].height).toBeGreaterThan(title.y + title.height)
     })
     const incomplete = frame()
-    incomplete.lines.pop()
+    incomplete.lines.splice(1)
     worker.send!(incomplete)
-    await vi.advanceTimersByTimeAsync(600)
-    expect(worker.capture).toHaveBeenLastCalledWith(false, [])
+    expect(worker.capture).toHaveBeenLastCalledWith(false, [], true)
   })
 
-  it('tries a title-region read when full-window acquisition fails, without publishing guessed cards', async () => {
+  it('publishes two confirmed offers with the unread middle slot pending and then fills it', async () => {
     const { state } = setup()
     worker.send!({ type: 'ready' })
     const incomplete = frame()
-    incomplete.lines.pop()
+    incomplete.lines.splice(1, 1)
     worker.send!(incomplete)
+    expect(state.snapshot?.labels.map((label) => label.id)).toEqual([1, null, 3])
     await vi.advanceTimersByTimeAsync(600)
-    expect(worker.capture).toHaveBeenLastCalledWith(true, [])
-    expect(state.snapshot).toBeNull()
-    worker.send!(incomplete)
-    await vi.advanceTimersByTimeAsync(600)
-    expect(worker.capture).toHaveBeenLastCalledWith(false, [])
+    expect(worker.capture).toHaveBeenLastCalledWith(true, [], false)
+    worker.send!(frame())
+    expect(state.snapshot?.labels.map((label) => label.id)).toEqual([1, 2, 3])
   })
 
-  it('reduces OCR requests while no selection is recognized and resumes fast acquisition on a sighting', async () => {
-    setup()
+  it('counts a title-band and full-read failure pair as one miss', async () => {
+    const { state } = setup()
     worker.send!({ type: 'ready' })
-    const incomplete = frame()
-    incomplete.lines.pop()
-    worker.send!(incomplete)
-    worker.capture.mockClear()
-    await vi.advanceTimersByTimeAsync(600)
-    expect(worker.capture).toHaveBeenCalledTimes(1)
     worker.send!(frame())
-    worker.capture.mockClear()
-    await vi.advanceTimersByTimeAsync(600)
-    expect(worker.capture).toHaveBeenCalledTimes(2)
+    worker.send!(frame([]))
+    worker.send!({ ...frame([]), focused: false })
+    expect(state.snapshot).not.toBeNull()
+    worker.send!(frame([]))
+    expect(state.snapshot).not.toBeNull()
+    worker.send!({ ...frame([]), focused: false })
+    expect(state.snapshot).toBeNull()
   })
 
   it('expires the displayed selection when capture stalls', async () => {
@@ -353,23 +353,33 @@ describe.skipIf(process.platform !== 'win32')('augment overlay state and async f
     expect(window.present).toHaveBeenLastCalledWith(null)
   })
 
-  it('retains a selection through isolated OCR misses and clears it after three consecutive misses', async () => {
+  it('retains a selection through an isolated OCR miss and clears it after two full misses', async () => {
     const { state, window } = setup()
     await vi.advanceTimersByTimeAsync(0)
     worker.send!(frame())
     window.present.mockClear()
-    const incomplete = frame()
-    incomplete.lines.pop()
+    const incomplete = { ...frame([]), focused: false }
     worker.send!(incomplete)
     expect(state.snapshot?.labels).toHaveLength(3)
     expect(window.present).not.toHaveBeenCalledWith(null)
     worker.send!(frame())
     worker.send!(incomplete)
-    worker.send!(incomplete)
     expect(state.snapshot?.labels).toHaveLength(3)
     worker.send!(incomplete)
     expect(state.snapshot).toBeNull()
     expect(window.present).toHaveBeenLastCalledWith(null)
+  })
+
+  it('removes a previous card rating while its rerolled title remains unreadable', async () => {
+    const { state } = setup()
+    await vi.advanceTimersByTimeAsync(0)
+    worker.send!(frame())
+    const incomplete = frame()
+    incomplete.lines.splice(1, 1)
+    worker.send!(incomplete)
+    expect(state.snapshot?.labels[1]).toMatchObject({ id: null, tier: null })
+    worker.send!(frame([1, 4, 3]))
+    expect(state.snapshot?.labels[1]).toMatchObject({ id: 4, tier: null })
   })
 
   it('keeps ratings visible through a slow OCR read without extending the stall deadline', async () => {

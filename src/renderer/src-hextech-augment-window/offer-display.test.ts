@@ -3,11 +3,20 @@ import { describe, expect, it } from 'vitest'
 
 import { getChangedAugmentIds, getRankBars, getTopAugmentIds } from './offer-display'
 
-function label(id: number, tier: string | null, tierRank: number | null): HextechAugmentLabel {
+function label(
+  id: number | null,
+  tier: string | null,
+  tierRank: number | null
+): HextechAugmentLabel {
   return { id, tier, tierRank, name: String(id), x: 0, y: 0, width: 10, height: 10 }
 }
 
 describe('top offered augments', () => {
+  it('waits for the unread offer before highlighting the best pick', () => {
+    expect([
+      ...getTopAugmentIds([label(1, 'S', 1), label(null, null, null), label(3, 'B', 1)])
+    ]).toEqual([])
+  })
   it('marks the best within-tier rank when all three have the same grade', () => {
     expect([...getTopAugmentIds([label(1, 'A', 12), label(2, 'A', 3), label(3, 'A', 8)])]).toEqual([
       2
@@ -45,7 +54,7 @@ describe('top offered augments', () => {
   })
 })
 
-function selection(ids: number[], championId = 11): HextechAugmentSnapshot {
+function selection(ids: (number | null)[], championId = 11): HextechAugmentSnapshot {
   return {
     championId,
     capturedAt: Date.now(),
@@ -56,6 +65,10 @@ function selection(ids: number[], championId = 11): HextechAugmentSnapshot {
 }
 
 describe('changed offered augments', () => {
+  it('animates a resolved offer while leaving a pending slot quiet', () => {
+    expect(getChangedAugmentIds(selection([1, 2, 3]), selection([1, null, 3]))).toEqual([])
+    expect(getChangedAugmentIds(selection([1, null, 3]), selection([1, 4, 3]))).toEqual([4])
+  })
   it('detects a changed option even when its grade and rank are equal', () => {
     expect(getChangedAugmentIds(selection([1, 2, 3]), selection([1, 4, 3]))).toEqual([4])
   })

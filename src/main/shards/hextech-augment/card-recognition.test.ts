@@ -53,7 +53,7 @@ describe('three augment card recognition', () => {
     { label: 'another card', x: 1440, y: 348, height: 30 },
     { label: 'separated text', x: 1140, y: 420, height: 30 },
     { label: 'smaller body text', x: 1140, y: 348, height: 16 }
-  ])('rejects a title fragment joined with $label', ({ x, y, height }) => {
+  ])('keeps ambiguous fragments unresolved with $label', ({ x, y, height }) => {
     const input = frame()
     input.lines.splice(
       2,
@@ -61,7 +61,11 @@ describe('three augment card recognition', () => {
       { words: [{ text: '面包和', x: 1110, y: 310, width: 180, height: 30 }] },
       { words: [{ text: '黄油', x, y, width: 120, height }] }
     )
-    expect(recognizeAugmentCards(input, names)).toEqual([])
+    const result = recognizeAugmentCards(input, [...names, { id: 4, name: '面包和奶油' }])
+    expect(result.map(({ id, slot }) => ({ id, slot }))).toEqual([
+      { id: 1, slot: 0 },
+      { id: 2, slot: 1 }
+    ])
   })
 
   it('rejects fragments separated by an intervening line in the same card', () => {
@@ -73,13 +77,15 @@ describe('three augment card recognition', () => {
       { words: [{ text: '伤害', x: 1170, y: 342, width: 60, height: 10 }] },
       { words: [{ text: '黄油', x: 1140, y: 348, width: 120, height: 30 }] }
     )
-    expect(recognizeAugmentCards(input, names)).toEqual([])
+    expect(
+      recognizeAugmentCards(input, [...names, { id: 4, name: '面包和奶油' }]).map((card) => card.id)
+    ).toEqual([1, 2])
   })
 
-  it('never guesses a rating for a dropped or misread character', () => {
+  it('recovers a dropped character with two confirmed titles in the same row', () => {
     const input = frame()
     input.lines[2].words.splice(2, 1)
-    expect(recognizeAugmentCards(input, names)).toEqual([])
+    expect(recognizeAugmentCards(input, names).map((card) => card.id)).toEqual([1, 2, 3])
   })
 
   it('prefers Mayhem IDs over same-name Arena entries while retaining shared augments', () => {
@@ -118,14 +124,23 @@ describe('three augment card recognition', () => {
   })
 
   it('rejects dictionary names with ambiguous IDs', () => {
-    expect(recognizeAugmentCards(frame(), [...names, { id: 9, name: names[1].name }])).toEqual([])
+    expect(
+      recognizeAugmentCards(frame(), [...names, { id: 9, name: names[1].name }]).map(
+        ({ id, slot }) => ({ id, slot })
+      )
+    ).toEqual([
+      { id: 1, slot: 0 },
+      { id: 3, slot: 2 }
+    ])
   })
 
   it('rejects scoreboard-like vertical names and unevenly spaced incidental matches', () => {
     const input = frame()
-    input.lines[1].words.forEach((word) => {
-      word.y += 70
-    })
+    input.lines.forEach((line, slot) =>
+      line.words.forEach((word) => {
+        word.y += slot * 70
+      })
+    )
     expect(recognizeAugmentCards(input, names)).toEqual([])
     const uneven = frame()
     uneven.lines[2].words.forEach((word) => {
@@ -138,7 +153,7 @@ describe('three augment card recognition', () => {
     const input = frame()
     input.lines.push(
       ...input.lines.map((line) => ({
-        words: line.words.map((word) => ({ ...word, y: word.y - 80 }))
+        words: line.words.map((word) => ({ ...word, y: word.y + 80 }))
       }))
     )
     expect(recognizeAugmentCards(input, names)).toEqual([])
@@ -149,5 +164,33 @@ describe('three augment card recognition', () => {
     const updated = [...names, { id: 4, name: '珠光护手' }]
     input.lines[1].words = [{ text: '珠光护手', x: 660, y: 330, width: 120, height: 40 }]
     expect(recognizeAugmentCards(input, updated).map((card) => card.id)).toEqual([1, 4, 3])
+  })
+
+  it('splits a merged OCR row into the three card columns', () => {
+    const input = frame()
+    input.lines = [{ words: input.lines.flatMap((line) => line.words) }]
+    expect(recognizeAugmentCards(input, names).map((card) => card.id)).toEqual([1, 2, 3])
+  })
+
+  it('normalizes Latin OCR shapes and recovers a long title typo', () => {
+    const input = frame()
+    input.lines[0].words = [{ text: 'Lightn1ng Str1kes', x: 180, y: 330, width: 250, height: 40 }]
+    input.lines[2].words = [
+      { text: 'Quest Three Sacred Treasvres', x: 1110, y: 330, width: 280, height: 40 }
+    ]
+    expect(
+      recognizeAugmentCards(input, [
+        { id: 1, name: 'Lightning Strikes' },
+        names[1],
+        { id: 3, name: 'Quest: Three Sacred Treasures' }
+      ]).map((card) => card.id)
+    ).toEqual([1, 2, 3])
+  })
+
+  it('requires two confirmed columns before accepting a relaxed title match', () => {
+    const input = frame()
+    input.lines.splice(0, 2)
+    input.lines[0].words.splice(2, 1)
+    expect(recognizeAugmentCards(input, names)).toEqual([])
   })
 })

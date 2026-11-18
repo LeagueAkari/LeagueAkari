@@ -81,10 +81,16 @@ export class RecognitionWorkerController {
     }, 15000)
   }
 
-  capture(focused = false, regions: Pick<OcrWord, 'x' | 'y' | 'width' | 'height'>[] = []) {
+  capture(
+    focused = true,
+    regions: Pick<OcrWord, 'x' | 'y' | 'width' | 'height'>[] = [],
+    reuseCapture = false
+  ) {
     if (!this._ready || !this._process || this._busy) return
     this._busy = true
-    this._process.stdin.write(`${JSON.stringify({ type: 'capture', focused, regions })}\n`)
+    this._process.stdin.write(
+      `${JSON.stringify({ type: 'capture', focused, regions, reuseCapture })}\n`
+    )
     this._timeout = setTimeout(() => {
       this.stop()
       this._onMessage({ type: 'error', message: 'Windows OCR capture timed out' })

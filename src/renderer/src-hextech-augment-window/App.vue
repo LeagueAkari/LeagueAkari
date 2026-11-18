@@ -8,10 +8,10 @@
     <div class="augment-options">
       <div
         v-for="(label, slot) in snapshot.labels"
-        :key="label.id"
+        :key="label.id ?? `pending-${slot}`"
         class="augment-option"
         :class="{
-          'is-recommended': topAugmentIds.has(label.id),
+          'is-recommended': label.id !== null && topAugmentIds.has(label.id),
           'is-updated': isUpdated(label.id)
         }"
         :title="label.name"
@@ -23,16 +23,18 @@
         </div>
         <div class="augment-rank" :title="t('hextechAugment.rankHelp')">
           {{
-            label.tierRank != null
-              ? t('hextechAugment.tierRank', { rank: label.tierRank, total: label.tierCount })
-              : t('hextechAugment.noData')
+            label.id === null
+              ? t('hextechAugment.recognizing')
+              : label.tierRank != null
+                ? t('hextechAugment.tierRank', { rank: label.tierRank, total: label.tierCount })
+                : t('hextechAugment.noData')
           }}
         </div>
         <div class="augment-option-footer">
           <div class="augment-bars" :title="t('hextechAugment.rankHelp')" aria-hidden="true">
             <span v-for="bar in 3" :key="bar" :class="{ filled: bar <= getRankBars(label) }" />
           </div>
-          <span v-if="topAugmentIds.has(label.id)" class="augment-best">{{
+          <span v-if="label.id !== null && topAugmentIds.has(label.id)" class="augment-best">{{
             t('hextechAugment.bestPick')
           }}</span>
         </div>
@@ -62,7 +64,7 @@ const snapshot = computed(() =>
 )
 const topAugmentIds = computed(() => getTopAugmentIds(snapshot.value?.labels ?? []))
 const updatedUntil = ref<Record<number, number>>({})
-const isUpdated = (id: number) => Boolean(updatedUntil.value[id])
+const isUpdated = (id: number | null) => id !== null && Boolean(updatedUntil.value[id])
 watch(now, (date) => {
   const active = Object.entries(updatedUntil.value).filter(([, until]) => until > date.getTime())
   if (active.length !== Object.keys(updatedUntil.value).length) {
@@ -78,10 +80,12 @@ watch(snapshot, (current, previous) => {
   if (!changed.length) return
   const expiresAt = Date.now() + 1600
   updatedUntil.value = Object.fromEntries(
-    current.labels.map((label) => [
-      label.id,
-      changed.includes(label.id) ? expiresAt : (updatedUntil.value[label.id] ?? 0)
-    ])
+    current.labels
+      .filter((label) => label.id !== null)
+      .map((label) => [
+        label.id!,
+        changed.includes(label.id!) ? expiresAt : (updatedUntil.value[label.id!] ?? 0)
+      ])
   )
 })
 useColorThemeAttr(

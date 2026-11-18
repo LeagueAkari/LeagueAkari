@@ -30,8 +30,14 @@ describe.skipIf(process.platform !== 'win32')('recognition worker capture protoc
       expect(write).toHaveBeenCalledTimes(1)
       child.stdout.write('{"type":"absent","capturedAt":1234}\n')
       expect(onMessage).toHaveBeenLastCalledWith({ type: 'absent', capturedAt: 1234 })
-      worker.capture()
+      worker.capture(false, [], true)
       expect(write).toHaveBeenCalledTimes(2)
+      expect(JSON.parse(String(write.mock.lastCall![0]))).toEqual({
+        type: 'capture',
+        focused: false,
+        regions: [],
+        reuseCapture: true
+      })
       worker.stop()
       child.stdout.write('{"type":"absent","capturedAt":1235}\n')
       expect(onMessage).toHaveBeenCalledTimes(2)
