@@ -38,7 +38,8 @@ const augmentNames = [
   { id: 1, nameTRA: '双重打击' },
   { id: 2, nameTRA: '针插垫' },
   { id: 3, nameTRA: '面包和黄油' },
-  { id: 4, nameTRA: '珠光护手' }
+  { id: 4, nameTRA: '珠光护手' },
+  { id: 5, nameTRA: '夺金' }
 ]
 function frame(ids = [1, 2, 3]): OcrFrame {
   return {
@@ -51,7 +52,7 @@ function frame(ids = [1, 2, 3]): OcrFrame {
       words: [
         {
           text: augmentNames.find((augment) => augment.id === id)!.nameTRA,
-          x: 180 + 480 * slot,
+          x: ids.length === 4 ? 190 + 360 * slot : 180 + 480 * slot,
           y: 330,
           width: 140,
           height: 30
@@ -248,6 +249,50 @@ describe.skipIf(process.platform !== 'win32')('augment overlay state and async f
     worker.send!(frame())
     worker.send!(frame([1, 4, 3]))
     expect(state.snapshot?.labels[1]).toMatchObject({ id: 4, tier: null })
+  })
+
+  it('publishes and monitors four slots, clearing stale scores through a reroll and dismissal', async () => {
+    const result = ratings()
+    if (result.status !== 'success') throw new Error('Expected rating data')
+    result.data.sections.augments!.push({
+      ...result.data.sections.augments![0],
+      augmentId: 4,
+      performanceScore: 100
+    })
+    const { state, window } = setup(vi.fn().mockResolvedValue(result))
+    await vi.advanceTimersByTimeAsync(0)
+    worker.send?.(frame([1, 2, 3, 4]))
+    expect(state.snapshot?.labels.map(({ id, tier }) => [id, tier])).toEqual([
+      [1, 'S'],
+      [2, 'A'],
+      [3, 'B'],
+      [4, 'S']
+    ])
+    expect(state.snapshot?.labels[3].tierRank).toBe(1)
+    await vi.advanceTimersByTimeAsync(600)
+    expect(worker.capture).toHaveBeenLastCalledWith(true, expect.any(Array), false)
+    expect(worker.capture.mock.lastCall?.[1]).toHaveLength(4)
+
+    const partial = frame([1, 2, 3, 4])
+    partial.lines.splice(1, 1)
+    partial.lines.pop()
+    worker.send?.(partial)
+    expect(state.snapshot?.labels.map(({ id }) => id)).toEqual([1, null, 3, null])
+    await vi.advanceTimersByTimeAsync(600)
+    expect(worker.capture).toHaveBeenLastCalledWith(true, [], false)
+
+    worker.send?.(frame([1, 2, 3, 5]))
+    expect(state.snapshot?.labels[3]).toMatchObject({ id: 5, slot: 3, tier: null })
+    await vi.advanceTimersByTimeAsync(600)
+    worker.send?.({ type: 'absent', capturedAt: Date.now() })
+    expect(state.snapshot?.labels).toHaveLength(4)
+    await vi.advanceTimersByTimeAsync(300)
+    worker.send?.({ type: 'absent', capturedAt: Date.now() })
+    expect(state.snapshot).toBeNull()
+    expect(window.present).toHaveBeenLastCalledWith(null)
+    await vi.advanceTimersByTimeAsync(300)
+    worker.send?.(frame())
+    expect(state.snapshot?.labels.map(({ id }) => id)).toEqual([1, 2, 3])
   })
 
   it('checks reused stable selections every 300 ms and waits 600 ms after an OCR read', async () => {

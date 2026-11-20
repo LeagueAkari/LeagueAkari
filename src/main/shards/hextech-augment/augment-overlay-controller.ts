@@ -1,8 +1,8 @@
 import type { ChampionAugment, ChampionDataDetails } from '@shared/data-adapter/champion-data'
 import type {
   HextechAugmentLabel,
-  OcrFrame,
-  RecognizedAugment
+  HextechAugmentSnapshot,
+  OcrFrame
 } from '@shared/types/hextech-augment'
 import { reaction, runInAction } from 'mobx'
 
@@ -10,7 +10,7 @@ import type { ChampionDataMain } from '../champion-data'
 import type { LeagueClientMain } from '../league-client'
 import type { AkariLogger } from '../logger-factory'
 import type { AkariHextechAugmentWindow } from '../window-manager/hextech-augment-window/window'
-import { recognizeAugmentCards } from './card-recognition'
+import { recognizeAugmentOffer } from './card-recognition'
 import {
   RecognitionWorkerController,
   type RecognitionWorkerMessage
@@ -34,7 +34,12 @@ export class HextechAugmentOverlayController {
   private _generation = 0
   private _details: ChampionDataDetails | null = null
   private _fetchedAt: number | null = null
-  private _latest: { frame: OcrFrame; cards: RecognizedAugment[]; expiresAt: number } | null = null
+  private _latest:
+    | (NonNullable<ReturnType<typeof recognizeAugmentOffer>> & {
+        frame: OcrFrame
+        expiresAt: number
+      })
+    | null = null
   private _failed = false
   private _retryRatingsAt = 0
   private _absentFrames = 0
@@ -164,19 +169,25 @@ export class HextechAugmentOverlayController {
       return
     }
     this._absentFrames = 0
-    const cards = recognizeAugmentCards(
+    const previousWindow = this._latest?.frame.window
+    const sameWindow =
+      previousWindow?.id === message.window.id &&
+      previousWindow.width === message.window.width &&
+      previousWindow.height === message.window.height
+    const offer = recognizeAugmentOffer(
       message,
       Object.values(this._leagueClient.data.gameData.augments).map((augment) => ({
         id: augment.id,
         name: augment.nameTRA,
         augmentNameId: augment.augmentNameId
-      }))
+      })),
+      sameWindow ? this._latest?.layout : undefined
     )
-    if (cards.length < 2 && message.focused !== false) {
+    if (!offer && message.focused !== false) {
       this._worker.capture(false, [], true)
       return
     }
-    if (cards.length < 2) {
+    if (!offer) {
       this._missedFrames += 1
       if (this._missedFrames >= MAX_MISSED_FRAMES) this._clear()
       this._scheduleCapture(this._latest ? 600 : 1500)
@@ -189,7 +200,7 @@ export class HextechAugmentOverlayController {
     // Always replace the whole selection. A rerolled card cannot retain a previous card's score.
     this._missedFrames = 0
     const expiresAt = message.capturedAt + DISPLAY_TIMEOUT_MS
-    this._latest = { frame: message, cards, expiresAt }
+    this._latest = { frame: message, ...offer, expiresAt }
     this._publish()
     if (this._expiry) clearTimeout(this._expiry)
     this._expiry = setTimeout(() => this._clear(), Math.max(0, expiresAt - Date.now()))
@@ -201,7 +212,7 @@ export class HextechAugmentOverlayController {
       if (this._failed || !this._championId || !this._settings.enabled) return
       const latest = this._latest
       const regions =
-        latest && latest.cards.length === 3 && this._missedFrames === 0
+        latest && latest.cards.length === latest.layout.count && this._missedFrames === 0
           ? latest.cards.map((card) => {
               // Include longer replacement titles while excluding animated card borders.
               const width = Math.max(
@@ -265,18 +276,18 @@ export class HextechAugmentOverlayController {
     const ratings = new Map<number, ChampionAugment>(
       (details?.sections.augments ?? []).map((augment) => [augment.augmentId, augment])
     )
-    const snapshot = {
+    const snapshot: HextechAugmentSnapshot = {
       championId: this._championId,
       capturedAt: latest.frame.capturedAt,
       expiresAt: latest.expiresAt,
       window: latest.frame.window,
-      labels: Array.from({ length: 3 }, (_, slot): HextechAugmentLabel => {
+      labels: Array.from({ length: latest.layout.count }, (_, slot): HextechAugmentLabel => {
         const card = latest.cards.find((candidate, index) => (candidate.slot ?? index) === slot)
         if (!card) {
           return {
             id: null,
             name: '',
-            slot: slot as 0 | 1 | 2,
+            slot: slot as HextechAugmentLabel['slot'],
             x: 0,
             y: 0,
             width: 0,

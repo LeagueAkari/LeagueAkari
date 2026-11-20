@@ -5,7 +5,7 @@
       <AkariLogo class="augment-logo" aria-hidden="true" />
       <span>League Akari</span>
     </div>
-    <div class="augment-options">
+    <div class="augment-options" :class="{ 'has-four-options': snapshot.labels.length === 4 }">
       <div
         v-for="(label, slot) in snapshot.labels"
         :key="label.id ?? `pending-${slot}`"
@@ -18,7 +18,11 @@
         :aria-label="label.name"
       >
         <div class="augment-option-header">
-          <span class="augment-position">{{ t(`hextechAugment.positions.${slot}`) }}</span>
+          <span class="augment-position">{{
+            t(
+              `hextechAugment.${snapshot.labels.length === 4 ? 'fourPositions' : 'positions'}.${slot}`
+            )
+          }}</span>
           <span class="augment-tier" :data-tier="label.tier">{{ label.tier ?? '?' }}</span>
         </div>
         <div class="augment-rank" :title="t('hextechAugment.rankHelp')">
@@ -134,6 +138,9 @@ body,
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 7px;
+}
+.augment-options.has-four-options {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 .augment-option {
   box-sizing: border-box;

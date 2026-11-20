@@ -101,6 +101,27 @@ describe('augment strip window placement', () => {
     expect(nativeWindow.bounds).toMatchObject({ x: 1100, y: 200 })
   })
 
+  it('resizes between three and four slots without resetting the dragged position', () => {
+    const window = new AkariHextechAugmentWindow({} as WindowManagerMainContext)
+    const three = snapshot()
+    three.labels = [1, 2, 3].map((id) => ({
+      id,
+      name: '',
+      tier: null,
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0
+    }))
+    const four = { ...three, labels: [...three.labels, { ...three.labels[0], id: 4 }] }
+    window.present(three)
+    nativeWindow.bounds = { x: 1100, y: 200, width: 352, height: 136 }
+    window.present(four)
+    expect(nativeWindow.bounds).toEqual({ x: 1044, y: 200, width: 464, height: 136 })
+    window.present(three)
+    expect(nativeWindow.bounds).toEqual({ x: 1100, y: 200, width: 352, height: 136 })
+  })
+
   it('follows a moved game and clamps the strip inside a resized game', () => {
     const window = new AkariHextechAugmentWindow({} as WindowManagerMainContext)
     window.present(snapshot())

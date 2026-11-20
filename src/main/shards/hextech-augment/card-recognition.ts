@@ -19,6 +19,10 @@ interface TitleMatch extends RecognizedAugment {
   score: number
 }
 
+type CardSlot = NonNullable<RecognizedAugment['slot']>
+type CardLayout = { count: 3 } | { count: 4; spacing: number }
+type PositionedLayout = { layout: CardLayout; slots: CardSlot[] }
+
 export function normalizeAugmentName(name: string) {
   return name
     .normalize('NFKC')
@@ -106,15 +110,82 @@ function sameRow(first: TitleLine | RecognizedAugment, second: TitleLine | Recog
   )
 }
 
-function validColumns(cards: RecognizedAugment[], width: number) {
+function validThreeColumns(cards: RecognizedAugment[], width: number) {
   if (cards.length < 2 || cards.length > 3) return false
   const centers = cards.map((card) => card.x + card.width / 2)
   const gaps = centers.slice(1).map((center, index) => center - centers[index])
   return Math.min(...gaps) >= width * 0.09 && Math.max(...gaps) / Math.min(...gaps) <= 1.5
 }
 
-/** Matches title text within the three card columns and preserves incomplete readings. */
-export function recognizeAugmentCards(frame: OcrFrame, names: AugmentName[]): RecognizedAugment[] {
+function centerX(card: RecognizedAugment | TitleLine) {
+  return card.x + card.width / 2
+}
+
+const FOUR_SLOTS = [0, 1, 2, 3] as const
+
+function matchFourColumns(
+  cards: TitleMatch[],
+  width: number,
+  previous?: CardLayout
+): PositionedLayout | null {
+  const offsets = cards.map((card) => centerX(card) - width / 2)
+  if (cards.length === 2 && previous?.count === 4) {
+    const slots = offsets.map((offset) =>
+      FOUR_SLOTS.find((slot) => Math.abs(offset / previous.spacing - (slot - 1.5)) <= 0.2)
+    )
+    if (slots[0] !== undefined && slots[1] !== undefined && slots[0] < slots[1]) {
+      return { layout: previous, slots: [slots[0], slots[1]] }
+    }
+  }
+  // Fit equally spaced slots around the game window center. With three readable
+  // titles, try each possible missing slot before treating it as a three-card row.
+  const candidates =
+    cards.length === 4
+      ? [[...FOUR_SLOTS]]
+      : cards.length === 3
+        ? FOUR_SLOTS.map((missing) => FOUR_SLOTS.filter((slot) => slot !== missing))
+        : []
+  const layouts = candidates.flatMap((slots) => {
+    const steps = slots.map((slot) => slot - 1.5)
+    const spacing =
+      offsets.reduce((sum, offset, index) => sum + offset * steps[index], 0) /
+      steps.reduce((sum, step) => sum + step ** 2, 0)
+    if (spacing < width * 0.09 || spacing > width * 0.31) return []
+    if (offsets.some((offset, index) => Math.abs(offset - spacing * steps[index]) > spacing * 0.2))
+      return []
+    return [{ layout: { count: 4, spacing } as const, slots }]
+  })
+  return layouts.length === 1 ? layouts[0] : null
+}
+
+function positionCards(
+  cards: TitleMatch[],
+  width: number,
+  previous?: CardLayout
+): PositionedLayout | null {
+  if (new Set(cards.map((card) => card.id)).size !== cards.length) return null
+  const four = matchFourColumns(cards, width, previous)
+  if (four) return four
+  if (!validThreeColumns(cards, width)) return null
+  let slots: CardSlot[] = [0, 1, 2]
+  if (cards.length === 2) {
+    slots = [0, 2]
+    const centers = cards.map(centerX)
+    const distances = centers.map((center) => Math.abs(center - width / 2))
+    const nearest = distances[0] < distances[1] ? 0 : 1
+    if (distances[nearest] <= (centers[1] - centers[0]) * 0.35) {
+      slots = nearest === 0 ? [1, 2] : [0, 1]
+    }
+  }
+  return { layout: { count: 3 }, slots }
+}
+
+/** Identifies a card row and maps its readable titles to their visible slots. */
+export function recognizeAugmentOffer(
+  frame: OcrFrame,
+  names: AugmentName[],
+  previous?: CardLayout
+): { layout: CardLayout; cards: RecognizedAugment[] } | null {
   const aliases = new Map<string, { name: AugmentName | null; priority: number }>()
   for (const name of names) {
     const normalized = shapeName(name.name)
@@ -133,7 +204,7 @@ export function recognizeAugmentCards(frame: OcrFrame, names: AugmentName[]): Re
     let words: OcrWord[] = []
     for (const word of [...line.words].sort((first, second) => first.x - second.x)) {
       const previous = words.at(-1)
-      if (previous && word.x - previous.x - previous.width > frame.window.width * 0.06) {
+      if (previous && word.x - previous.x - previous.width > frame.window.width * 0.03) {
         rows.push(titleLine(words))
         words = []
       }
@@ -171,11 +242,11 @@ export function recognizeAugmentCards(frame: OcrFrame, names: AugmentName[]): Re
     const match = matchName(line.text, dictionary)
     if (match) matches.push({ ...match.name, ...line, score: match.score })
   }
-  const groups = new Map<string, TitleMatch[]>()
+  const groups = new Map<string, PositionedLayout & { cards: TitleMatch[] }>()
   for (const anchor of matches) {
     const row = matches
       .filter((match) => sameRow(match, anchor))
-      .sort((first, second) => first.x - second.x || second.score - first.score)
+      .sort((first, second) => centerX(first) - centerX(second) || second.score - first.score)
     const cards: TitleMatch[] = []
     for (const match of row) {
       const previous = cards.at(-1)
@@ -187,73 +258,61 @@ export function recognizeAugmentCards(frame: OcrFrame, names: AugmentName[]): Re
         if (match.score > previous.score) cards[cards.length - 1] = match
       } else cards.push(match)
     }
-    if (!validColumns(cards, frame.window.width)) continue
-    if (new Set(cards.map((card) => card.id)).size !== cards.length) continue
-    if (cards.length === 2) {
+    const width = frame.window.width
+    let positioned = positionCards(cards, width, previous)
+    if (!positioned) continue
+    const count = positioned.layout.count
+    if (cards.length < count) {
       const excluded = new Set(cards.map((card) => card.id))
       const remaining = candidates
-        .filter(
-          (line) =>
-            cards.every((card) => sameRow(card, line)) &&
-            cards.every(
-              (card) =>
-                Math.abs(card.x + card.width / 2 - line.x - line.width / 2) >=
-                frame.window.width * 0.09
-            )
+        .filter((line) =>
+          cards.every(
+            (card) => sameRow(card, line) && Math.abs(centerX(card) - centerX(line)) >= width * 0.09
+          )
         )
-        .map((line) => ({ line, match: matchName(line.text, dictionary, true, excluded) }))
-        .filter((entry) => entry.match !== null)
-        .sort((first, second) => second.match!.score - first.match!.score)
-      const third = remaining[0]
-      const competing = remaining.find((entry) => entry.match?.name.id !== third?.match?.name.id)
-      if (
-        third?.match &&
-        (!competing?.match || third.match.score - competing.match.score >= 0.08)
-      ) {
-        const complete = [
-          ...cards,
-          { ...third.match.name, ...third.line, score: third.match.score }
-        ].sort((first, second) => first.x - second.x)
-        if (validColumns(complete, frame.window.width)) cards.splice(0, cards.length, ...complete)
+        .flatMap((line) => {
+          const match = matchName(line.text, dictionary, true, excluded)
+          if (!match) return []
+          const complete = [...cards, { ...match.name, ...line, score: match.score }].sort(
+            (first, second) => centerX(first) - centerX(second)
+          )
+          const layout = positionCards(complete, width, previous)
+          return layout?.layout.count === count
+            ? [{ id: match.name.id, score: match.score, complete, layout }]
+            : []
+        })
+        .sort((first, second) => second.score - first.score)
+      const missing = remaining[0]
+      const competing = remaining.find((entry) => entry.id !== missing?.id)
+      if (missing && (!competing || missing.score - competing.score >= 0.08)) {
+        cards.splice(0, cards.length, ...missing.complete)
+        positioned = missing.layout
       }
     }
     const key = cards.map((card) => `${card.id}:${Math.round(card.y / 10)}`).join('|')
-    groups.set(key, cards)
+    groups.set(key, { ...positioned, cards })
   }
+  const score = (group: { cards: TitleMatch[] }) =>
+    group.cards.reduce((total, card) => total + card.score, 0)
   const ordered = [...groups.values()].sort(
-    (first, second) =>
-      second.length - first.length ||
-      second.reduce((total, card) => total + card.score, 0) -
-        first.reduce((total, card) => total + card.score, 0)
+    (first, second) => second.cards.length - first.cards.length || score(second) - score(first)
   )
-  const best = ordered[0]
-  if (!best) return []
-  const next = ordered[1]
+  const [best, next] = ordered
   if (
-    next?.length === best.length &&
-    Math.abs(
-      best.reduce((total, card) => total + card.score, 0) -
-        next.reduce((total, card) => total + card.score, 0)
-    ) < 0.08
+    !best ||
+    (next?.cards.length === best.cards.length && Math.abs(score(best) - score(next)) < 0.08)
   )
-    return []
-  let slots: (0 | 1 | 2)[] = [0, 1, 2]
-  if (best.length === 2) {
-    slots = [0, 2]
-    const centers = best.map((card) => card.x + card.width / 2)
-    const distances = centers.map((center) => Math.abs(center - frame.window.width / 2))
-    const nearest = distances[0] < distances[1] ? 0 : 1
-    if (distances[nearest] <= (centers[1] - centers[0]) * 0.35) {
-      slots = nearest === 0 ? [1, 2] : [0, 1]
-    }
+    return null
+  return {
+    layout: best.layout,
+    cards: best.cards.map((card, index) => ({
+      id: card.id,
+      name: card.name,
+      x: card.x,
+      y: card.y,
+      width: card.width,
+      height: card.height,
+      slot: best.slots[index]
+    }))
   }
-  return best.map((card, index) => ({
-    id: card.id,
-    name: card.name,
-    x: card.x,
-    y: card.y,
-    width: card.width,
-    height: card.height,
-    slot: slots[index]
-  }))
 }

@@ -1,7 +1,10 @@
 import type { OcrFrame } from '@shared/types/hextech-augment'
 import { describe, expect, it } from 'vitest'
 
-import { recognizeAugmentCards } from './card-recognition'
+import { type AugmentName, recognizeAugmentOffer } from './card-recognition'
+
+const recognizeAugmentCards = (input: OcrFrame, names: AugmentName[]) =>
+  recognizeAugmentOffer(input, names)?.cards ?? []
 
 const names = [
   { id: 1, name: '双重打击' },
@@ -192,5 +195,82 @@ describe('three augment card recognition', () => {
     input.lines.splice(0, 2)
     input.lines[0].words.splice(2, 1)
     expect(recognizeAugmentCards(input, names)).toEqual([])
+  })
+})
+
+describe('four augment card recognition', () => {
+  const offers = [...names, { id: 4, name: '珠光护手' }]
+  function fourCardFrame() {
+    const input = frame()
+    input.lines = offers.map((offer, slot) => ({
+      words: [...offer.name].map((text, index) => ({
+        text,
+        x: 260 + slot * 360 + (index - offer.name.length / 2) * 28,
+        y: 330,
+        width: 28,
+        height: 36
+      }))
+    }))
+    return input
+  }
+
+  it('splits a single OCR line into four ordered cards', () => {
+    const input = fourCardFrame()
+    input.lines = [{ words: input.lines.flatMap((line) => line.words) }]
+    const offer = recognizeAugmentOffer(input, offers)
+    expect(offer?.layout.count).toBe(4)
+    expect(offer?.cards.map(({ id, slot }) => [id, slot])).toEqual([
+      [1, 0],
+      [2, 1],
+      [3, 2],
+      [4, 3]
+    ])
+  })
+
+  it('separates narrow gutters between long titles without splitting name words', () => {
+    const input = fourCardFrame()
+    const longNames = [
+      'Lightning Strikes',
+      'Quest Sacred Treasures',
+      'Ultimate Revolution',
+      'Steadfast Presence'
+    ].map((name, index) => ({ id: index + 1, name }))
+    input.lines = [
+      {
+        words: longNames.flatMap(({ name }, slot) => {
+          const words = name.split(' ')
+          return words.map((text, index) => ({
+            text,
+            x: 107 + slot * 360 + index * (306 / words.length),
+            y: 330,
+            width: 306 / words.length - (index === words.length - 1 ? 0 : 12),
+            height: 36
+          }))
+        })
+      }
+    ]
+    expect(recognizeAugmentOffer(input, longNames)?.cards.map(({ id }) => id)).toEqual([1, 2, 3, 4])
+  })
+
+  it.each([0, 1, 2, 3])('preserves the other slot positions when slot %i is unreadable', (slot) => {
+    const input = fourCardFrame()
+    input.lines.splice(slot, 1)
+    const offer = recognizeAugmentOffer(input, offers)
+    expect(offer?.layout.count).toBe(4)
+    expect(offer?.cards.map(({ slot }) => slot)).toEqual([0, 1, 2, 3].filter((i) => i !== slot))
+  })
+
+  it('recovers a dropped character in the fourth title with three confirmed cards', () => {
+    const input = fourCardFrame()
+    input.lines[3].words.splice(1, 1)
+    const offer = recognizeAugmentOffer(input, offers)
+    expect(offer?.layout.count).toBe(4)
+    expect(offer?.cards.map(({ id }) => id)).toEqual([1, 2, 3, 4])
+  })
+
+  it('rejects an incidental match beyond a three-card row', () => {
+    const input = frame()
+    input.lines.push({ words: [{ text: offers[3].name, x: 1430, y: 330, width: 120, height: 40 }] })
+    expect(recognizeAugmentOffer(input, offers)).toBeNull()
   })
 })

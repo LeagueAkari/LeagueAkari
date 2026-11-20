@@ -27,6 +27,11 @@ describe('top offered augments', () => {
       2
     ])
   })
+  it('includes the fourth offer in best-pick ranking', () => {
+    expect([
+      ...getTopAugmentIds([label(1, 'A', 12), label(2, 'A', 3), label(3, 'A', 8), label(4, 'A', 1)])
+    ]).toEqual([4])
+  })
   it('marks every tied best offer', () => {
     expect([...getTopAugmentIds([label(1, 'A', 3), label(2, 'A', 8), label(3, 'A', 3)])]).toEqual([
       1, 3
@@ -71,6 +76,9 @@ describe('changed offered augments', () => {
   })
   it('detects a changed option even when its grade and rank are equal', () => {
     expect(getChangedAugmentIds(selection([1, 2, 3]), selection([1, 4, 3]))).toEqual([4])
+  })
+  it('animates only the changed fourth card after a reroll', () => {
+    expect(getChangedAugmentIds(selection([1, 2, 3, 4]), selection([1, 2, 3, 5]))).toEqual([5])
   })
   it('detects multiple changed options', () => {
     expect(getChangedAugmentIds(selection([1, 2, 3]), selection([4, 2, 5]))).toEqual([4, 5])

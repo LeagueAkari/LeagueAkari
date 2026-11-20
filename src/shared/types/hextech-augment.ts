@@ -16,7 +16,7 @@ export interface OcrFrame {
 }
 export interface RecognizedAugment {
   id: number
-  slot?: 0 | 1 | 2
+  slot?: 0 | 1 | 2 | 3
   name: string
   x: number
   y: number

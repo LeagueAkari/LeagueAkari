@@ -118,8 +118,8 @@ function Recognize-Frame {
                 $width = $rect.Right - $rect.Left; $height = $rect.Bottom - $rect.Top
                 if ($width -lt 640 -or $height -lt 360) { Write-Result @{ type = 'hidden'; capturedAt = $startedAt }; return }
                 $window = [ordered]@{ id = $handle.ToInt64().ToString(); x = $point.X; y = $point.Y; width = $width; height = $height }
-                $captureLeft = [int]($width * 0.1); $captureTop = [int]($height * 0.12)
-                $bitmap = New-Object System.Drawing.Bitmap([int]($width * 0.8), [int]($height * 0.66), [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
+                $captureLeft = [int]($width * 0.05); $captureTop = [int]($height * 0.12)
+                $bitmap = New-Object System.Drawing.Bitmap(($width - 2 * $captureLeft), [int]($height * 0.66), [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
                 $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
                 $graphics.CopyFromScreen($point.X + $captureLeft, $point.Y + $captureTop, 0, 0, $bitmap.Size, [System.Drawing.CopyPixelOperation]::SourceCopy)
                 $graphics.Dispose(); $graphics = $null
@@ -128,9 +128,10 @@ function Recognize-Frame {
             $script:lastCapture = @{ bitmap = $bitmap.Clone(); window = $window; capturedAt = $startedAt }
         }
         $width = $window.width; $height = $window.height
-        $captureLeft = [int]($width * 0.1); $captureTop = [int]($height * 0.12)
+        $captureLeft = [int]($width * 0.05); $captureTop = [int]($height * 0.12)
         $signature = $null; $cacheKey = $null
-        if ($Focused -and @($ReuseRegions).Count -eq 3) {
+        $hasCardRegions = @(3, 4) -contains @($ReuseRegions).Count
+        if ($Focused -and $hasCardRegions) {
             $cacheKey = ($window | ConvertTo-Json -Compress) + ($ReuseRegions | ConvertTo-Json -Compress)
             $visibleCards = Get-VisibleCardCount $bitmap $ReuseRegions $window $captureLeft $captureTop
             if ($visibleCards -ge 2) { $script:bodyKey = $cacheKey }
@@ -147,7 +148,7 @@ function Recognize-Frame {
                 return
             }
         }
-        if (@($ReuseRegions).Count -ne 3) { $script:bodyKey = $null }
+        if (-not $hasCardRegions) { $script:bodyKey = $null }
         $cropLeft = $captureLeft; $cropTop = $captureTop
         if ($Focused) {
             $cropTop = [int]($height * 0.33)

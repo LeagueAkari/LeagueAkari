@@ -2,7 +2,7 @@ hextechAugment:
   title: Augment recommendations
   showRatings: Show augment ratings
   helpLabel: About augment ratings
-  displayHelp: Choose Borderless or Windowed in the game video settings. When enabled, the three offers are recognized automatically and champion-specific tiers appear in a three-column strip. Drag the strip title to move it. You can turn this off at any time.
+  displayHelp: Choose Borderless or Windowed in the game video settings. When enabled, your offers are recognized automatically and champion-specific tiers appear in a strip with one column per offer. Drag the strip title to move it. You can turn this off at any time.
   noData: No rating
   recognizing: Reading
   tierRank: 'In tier #{{rank}}/{{total}}'
@@ -13,3 +13,8 @@ hextechAugment:
     '0': Left
     '1': Middle
     '2': Right
+  fourPositions:
+    '0': Left
+    '1': Mid-left
+    '2': Mid-right
+    '3': Right

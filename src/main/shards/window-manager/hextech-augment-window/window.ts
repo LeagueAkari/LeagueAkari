@@ -65,14 +65,17 @@ export class AkariHextechAugmentWindow extends BaseAkariWindow<
       height: Math.round(snapshot.window.height)
     })
     const previous = this._gameBounds
+    const width = Math.min(352 + (snapshot.labels.length === 4 ? 112 : 0), bounds.width)
+    const current = this._window.getBounds()
     if (
       !previous ||
+      current.width !== width ||
       (['x', 'y', 'width', 'height'] as const).some((key) => previous[key] !== bounds[key])
     ) {
-      const current = this._window.getBounds()
-      const width = Math.min(352, bounds.width)
       const height = Math.min(136, bounds.height)
-      const x = previous ? current.x + bounds.x - previous.x : bounds.x + (bounds.width - width) / 2
+      const x = previous
+        ? current.x + bounds.x - previous.x + (current.width - width) / 2
+        : bounds.x + (bounds.width - width) / 2
       const y = previous ? current.y + bounds.y - previous.y : bounds.y + 24
       this._window.setBounds({
         x: Math.round(Math.max(bounds.x, Math.min(x, bounds.x + bounds.width - width))),
