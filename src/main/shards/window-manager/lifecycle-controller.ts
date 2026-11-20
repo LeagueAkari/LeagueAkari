@@ -2,11 +2,13 @@ import type { AkariAuxWindow } from './aux-window/window'
 import { isSystemBackgroundMaterialSupported } from './background-material-resolver'
 import type { AkariCdTimerWindow } from './cd-timer-window/windows'
 import type { WindowManagerMainContext } from './context'
+import type { AkariHextechAugmentWindow } from './hextech-augment-window/window'
 import type { AkariMainWindow } from './main-window/window'
 import type { AkariOngoingGameWindow } from './ongoing-game-window/window'
 import type { AkariOpggWindow } from './opgg-window/window'
 
 interface WindowManagerWindows {
+  hextechAugmentWindow?: AkariHextechAugmentWindow
   mainWindow: AkariMainWindow
   auxWindow: AkariAuxWindow
   opggWindow: AkariOpggWindow
@@ -56,6 +58,7 @@ export class WindowManagerLifecycleController {
     await this._windows.opggWindow.onInit()
     await this._windows.ongoingGameWindow.onInit()
     await this._windows.cdTimerWindow.onInit()
+    await this._windows.hextechAugmentWindow?.onInit()
   }
 
   finish() {

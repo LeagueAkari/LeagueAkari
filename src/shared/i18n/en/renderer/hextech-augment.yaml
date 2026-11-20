@@ -1,0 +1,20 @@
+hextechAugment:
+  title: Augment recommendations
+  showRatings: Show augment ratings
+  helpLabel: About augment ratings
+  displayHelp: Choose Borderless or Windowed in the game video settings. When enabled, your offers are recognized automatically and champion-specific tiers appear in a strip with one column per offer. Drag the strip title to move it. You can turn this off at any time.
+  noData: No rating
+  recognizing: Reading
+  tierRank: 'In tier #{{rank}}/{{total}}'
+  rankUnavailable: Rank unavailable
+  rankHelp: The bars show the upper, middle or lower third of the within-tier order. Augments in the same tier for this champion are ordered by the data source's performance metric. Lower numbers come first. Equal metrics share a rank.
+  bestPick: Pick
+  positions:
+    '0': Left
+    '1': Middle
+    '2': Right
+  fourPositions:
+    '0': Left
+    '1': Mid-left
+    '2': Mid-right
+    '3': Right

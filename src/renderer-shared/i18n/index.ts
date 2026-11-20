@@ -3,6 +3,7 @@ import automationEn from '@shared/i18n/en/renderer/automation.yaml'
 import auxWindowEn from '@shared/i18n/en/renderer/aux-window.yaml'
 import cdTimerEn from '@shared/i18n/en/renderer/cd-timer.yaml'
 import gameAssetsEn from '@shared/i18n/en/renderer/game-assets.yaml'
+import hextechAugmentEn from '@shared/i18n/en/renderer/hextech-augment.yaml'
 import leagueClientEn from '@shared/i18n/en/renderer/league-client.yaml'
 import matchCardEn from '@shared/i18n/en/renderer/match-card.yaml'
 import notificationsEn from '@shared/i18n/en/renderer/notifications.yaml'
@@ -18,6 +19,7 @@ import automationZhCN from '@shared/i18n/zh-CN/renderer/automation.yaml'
 import auxWindowZhCN from '@shared/i18n/zh-CN/renderer/aux-window.yaml'
 import cdTimerZhCN from '@shared/i18n/zh-CN/renderer/cd-timer.yaml'
 import gameAssetsZhCN from '@shared/i18n/zh-CN/renderer/game-assets.yaml'
+import hextechAugmentZhCN from '@shared/i18n/zh-CN/renderer/hextech-augment.yaml'
 import leagueClientZhCN from '@shared/i18n/zh-CN/renderer/league-client.yaml'
 import matchCardZhCN from '@shared/i18n/zh-CN/renderer/match-card.yaml'
 import notificationsZhCN from '@shared/i18n/zh-CN/renderer/notifications.yaml'
@@ -47,6 +49,7 @@ function mergeRendererResources(...resources: Record<string, unknown>[]) {
 }
 
 const rendererEn = mergeRendererResources(
+  hextechAugmentEn,
   shellEn,
   settingsEn,
   automationEn,
@@ -64,6 +67,7 @@ const rendererEn = mergeRendererResources(
 )
 
 const rendererZhCN = mergeRendererResources(
+  hextechAugmentZhCN,
   shellZhCN,
   settingsZhCN,
   automationZhCN,

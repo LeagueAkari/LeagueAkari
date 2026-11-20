@@ -15,6 +15,7 @@ import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { AkariAuxWindow } from './aux-window/window'
 import { AkariCdTimerWindow } from './cd-timer-window/windows'
 import { WINDOW_MANAGER_MAIN_NAMESPACE, type WindowManagerMainContext } from './context'
+import { AkariHextechAugmentWindow } from './hextech-augment-window/window'
 import { WindowManagerLifecycleController } from './lifecycle-controller'
 import { AkariMainWindow } from './main-window/window'
 import { AkariOngoingGameWindow } from './ongoing-game-window/window'
@@ -33,6 +34,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   public readonly settings = new WindowManagerSettings()
   public readonly state = new WindowManagerState()
 
+  public readonly hextechAugmentWindow: AkariHextechAugmentWindow
   public readonly mainWindow: AkariMainWindow
   public readonly auxWindow: AkariAuxWindow
   public readonly opggWindow: AkariOpggWindow
@@ -71,11 +73,13 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this.opggWindow = new AkariOpggWindow(this._context)
     this.ongoingGameWindow = new AkariOngoingGameWindow(this._context)
     this.cdTimerWindow = new AkariCdTimerWindow(this._context)
+    this.hextechAugmentWindow = new AkariHextechAugmentWindow(this._context)
     this._lifecycleController = new WindowManagerLifecycleController(this._context, {
       mainWindow: this.mainWindow,
       auxWindow: this.auxWindow,
       opggWindow: this.opggWindow,
       ongoingGameWindow: this.ongoingGameWindow,
+      hextechAugmentWindow: this.hextechAugmentWindow,
       cdTimerWindow: this.cdTimerWindow
     })
   }
