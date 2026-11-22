@@ -66,7 +66,7 @@ reference this guide instead of duplicating its general coding rules in skills.
 /
 ├── src/
 │   ├── main/               # Electron main process
-│   ├── renderer/           # 5 independent renderer windows
+│   ├── renderer/           # 4 independent renderer windows
 │   ├── renderer-shared/    # Shared renderer components, composables, shards, assets
 │   ├── shared/             # Code shared between main and renderer (types, HTTP clients, shard framework)
 │   └── preload/            # Electron preload script (exposes limited API to renderer)
@@ -123,21 +123,20 @@ Everything is organized as **shards** — dependency-injected, lifecycle-managed
 
 Mirror shards on the renderer side communicate with main via IPC and expose synced state to Vue
 components. Some window-specific renderer shards live under that window's own `shards/` directory
-such as `src/renderer/src-champion-data-window/shards/`.
+such as `src/renderer/src-secondary-window/shards/`.
 
 ---
 
 ## Windows
 
-There are **5 renderer windows**, each an independent Vite entry:
+There are **4 renderer windows**, each an independent Vite entry:
 
-| Window        | Entry                                    | Role                                           |
-| ------------- | ---------------------------------------- | ---------------------------------------------- |
-| Main          | `src/renderer/src-main-window/`          | Primary UI: player lookup, automation, toolkit |
-| Aux           | `src/renderer/src-aux-window/`           | Lightweight secondary window                   |
-| Champion Data | `src/renderer/src-champion-data-window/` | Champion data from multiple sources            |
-| Ongoing Game  | `src/renderer/src-ongoing-game-window/`  | Real-time in-game display                      |
-| CD Timer      | `src/renderer/src-cd-timer-window/`      | Floating cooldown tracker                      |
+| Window       | Entry                                   | Role                                             |
+| ------------ | --------------------------------------- | ------------------------------------------------ |
+| Main         | `src/renderer/src-main-window/`         | Primary UI: player lookup, automation, toolkit   |
+| Secondary    | `src/renderer/src-secondary-window/`    | Current activity, champion select, champion data |
+| Ongoing Game | `src/renderer/src-ongoing-game-window/` | Real-time in-game display                        |
+| CD Timer     | `src/renderer/src-cd-timer-window/`     | Floating cooldown tracker                        |
 
 Each window has its own HTML entry, `main.ts`, `NaiveUIProviderApp.vue`, `App.vue`, and shard
 manager. The main window uses Vue Router; the smaller windows usually compose their views directly.
@@ -161,7 +160,7 @@ manager. The main window uses Vue Router; the smaller windows usually compose th
 
 ## Renderer-Shared Code (`src/renderer-shared/`)
 
-Shared across all 5 windows:
+Shared across all 4 windows:
 
 | Directory      | Contents                                                     |
 | -------------- | ------------------------------------------------------------ |

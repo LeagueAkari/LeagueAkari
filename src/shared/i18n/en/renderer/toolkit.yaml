@@ -94,17 +94,11 @@ toolkit:
     loot-tools: Loot Tools
   championBench:
     title: Champion Bench
-    reroll: Reroll
-    charity: Charity
-    charityTitle: Perform a reroll but immediately reclaim the previously assigned champion
     notInBenchMode: Not currently in a random mode
     notInPhase: Not in the champion selection phase
     swapFailedNotification:
       title: Champion Bench
       description: Failed to swap champions, maybe the champion is no longer available
-    rerollFailedNotification:
-      title: Champion Bench
-      description: Failed to reroll, maybe the champion is no longer available
   gameflowInProgress:
     title: In Progress
     dodge:

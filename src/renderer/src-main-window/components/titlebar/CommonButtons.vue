@@ -57,31 +57,17 @@
       {{ t('titlebar.actions.github') }}
     </NTooltip>
 
-    <!-- aux window -->
-    <HorizontalExpand :show="aws.settings.enabled" class="h-full">
+    <!-- secondary window -->
+    <HorizontalExpand :show="secondaryWindowStore.settings.enabled" class="h-full">
       <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
         <template #trigger>
-          <div class="common-button-outer" @click="handleShowAuxWindow">
+          <div class="common-button-outer" @click="handleShowSecondaryWindow">
             <div class="common-button-inner">
               <NIcon><Window24Filled /></NIcon>
             </div>
           </div>
         </template>
-        {{ t('titlebar.actions.auxWindow') }}
-      </NTooltip>
-    </HorizontalExpand>
-
-    <!-- champion data -->
-    <HorizontalExpand :show="championDataWindowStore.settings.enabled" class="h-full">
-      <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
-        <template #trigger>
-          <div class="common-button-outer" @click="handleShowChampionDataWindow">
-            <div class="common-button-inner">
-              <NIcon><ChartLineData /></NIcon>
-            </div>
-          </div>
-        </template>
-        {{ t('titlebar.actions.championDataWindow') }}
+        {{ t('titlebar.actions.secondaryWindow') }}
       </NTooltip>
     </HorizontalExpand>
 
@@ -113,9 +99,8 @@ import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import {
-  useAuxWindowStore,
   useMainWindowStore,
-  useChampionDataWindowStore
+  useSecondaryWindowStore
 } from '@renderer-shared/shards/window-manager/store'
 import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import {
@@ -126,7 +111,7 @@ import {
   getThemeColorTheme,
   isAppThemeSetting
 } from '@shared/types/app-theme'
-import { ChartLineData, Checkmark, Notification } from '@vicons/carbon'
+import { Checkmark, Notification } from '@vicons/carbon'
 import { Window24Filled } from '@vicons/fluent'
 import { ColorPaletteOutline, LogoGithub } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'
@@ -140,8 +125,7 @@ import { useSimpleNotificationsStore } from '@main-window/shards/simple-notifica
 const { t } = useTranslation()
 
 const mws = useMainWindowStore()
-const aws = useAuxWindowStore()
-const championDataWindowStore = useChampionDataWindowStore()
+const secondaryWindowStore = useSecondaryWindowStore()
 const aks = useAkariApiStore()
 const sns = useSimpleNotificationsStore()
 const as = useAppCommonStore()
@@ -151,12 +135,8 @@ const app = useInstance(AppCommonRenderer)
 
 const TITLE_BAR_TOOLTIP_Z_INDEX = 75000
 
-const handleShowAuxWindow = () => {
-  wm.auxWindow.show()
-}
-
-const handleShowChampionDataWindow = () => {
-  wm.championDataWindow.show()
+const handleShowSecondaryWindow = () => {
+  wm.secondaryWindow.show()
 }
 
 const handleToGithub = () => {

@@ -1,18 +1,16 @@
 import { BaseAkariWindowRenderer } from './base-akari-window'
 import {
-  AUX_WINDOW_MAIN_NAMESPACE,
   CD_TIMER_WINDOW_MAIN_NAMESPACE,
-  CHAMPION_DATA_WINDOW_MAIN_NAMESPACE,
   MAIN_WINDOW_MAIN_NAMESPACE,
   ONGOING_GAME_WINDOW_MAIN_NAMESPACE,
+  SECONDARY_WINDOW_MAIN_NAMESPACE,
   type WindowManagerRendererContext
 } from './context'
 import {
-  useAuxWindowStore,
   useCdTimerWindowStore,
-  useChampionDataWindowStore,
   useMainWindowStore,
-  useOngoingGameWindowStore
+  useOngoingGameWindowStore,
+  useSecondaryWindowStore
 } from './store'
 
 export class AkariMainWindow extends BaseAkariWindowRenderer<
@@ -49,70 +47,48 @@ export class AkariMainWindow extends BaseAkariWindowRenderer<
   }
 }
 
-export class AkariAuxWindow extends BaseAkariWindowRenderer<
-  ReturnType<typeof useAuxWindowStore>,
-  ReturnType<typeof useAuxWindowStore>['settings']
+export class AkariSecondaryWindow extends BaseAkariWindowRenderer<
+  ReturnType<typeof useSecondaryWindowStore>,
+  ReturnType<typeof useSecondaryWindowStore>['settings']
 > {
-  constructor(_context: WindowManagerRendererContext) {
-    super(
-      _context,
-      AUX_WINDOW_MAIN_NAMESPACE,
-      () => useAuxWindowStore(),
-      () => useAuxWindowStore().settings
-    )
-  }
-
-  setAutoShow(value: boolean) {
-    return this._context.setting.set(AUX_WINDOW_MAIN_NAMESPACE, 'autoShow', value)
-  }
-
-  setEnabled(value: boolean) {
-    return this._context.setting.set(AUX_WINDOW_MAIN_NAMESPACE, 'enabled', value)
-  }
-
-  repositionToAlignLeagueClientUx() {
-    return this._context.ipc.call(
-      AUX_WINDOW_MAIN_NAMESPACE,
-      'repositionToAlignLeagueClientUx',
-      'top-right'
-    )
-  }
-}
-
-export class AkariChampionDataWindow extends BaseAkariWindowRenderer<
-  ReturnType<typeof useChampionDataWindowStore>,
-  ReturnType<typeof useChampionDataWindowStore>['settings']
-> {
-  static SHOW_WINDOW_SHORTCUT_TARGET_ID = `${CHAMPION_DATA_WINDOW_MAIN_NAMESPACE}/show`
+  static SHOW_WINDOW_SHORTCUT_TARGET_ID = `${SECONDARY_WINDOW_MAIN_NAMESPACE}/show`
 
   constructor(_context: WindowManagerRendererContext) {
     super(
       _context,
-      CHAMPION_DATA_WINDOW_MAIN_NAMESPACE,
-      () => useChampionDataWindowStore(),
-      () => useChampionDataWindowStore().settings
+      SECONDARY_WINDOW_MAIN_NAMESPACE,
+      () => useSecondaryWindowStore(),
+      () => useSecondaryWindowStore().settings
     )
   }
 
-  setAutoShow(value: boolean) {
-    return this._context.setting.set(CHAMPION_DATA_WINDOW_MAIN_NAMESPACE, 'autoShow', value)
+  setAutoShowInLobby(value: boolean) {
+    return this._context.setting.set(SECONDARY_WINDOW_MAIN_NAMESPACE, 'autoShowInLobby', value)
+  }
+
+  setAutoShowInChampSelect(value: boolean) {
+    return this._context.setting.set(
+      SECONDARY_WINDOW_MAIN_NAMESPACE,
+      'autoShowInChampSelect',
+      value
+    )
   }
 
   setEnabled(value: boolean) {
-    return this._context.setting.set(CHAMPION_DATA_WINDOW_MAIN_NAMESPACE, 'enabled', value)
+    return this._context.setting.set(SECONDARY_WINDOW_MAIN_NAMESPACE, 'enabled', value)
   }
 
   setShowShortcut(value: string | null) {
-    return this._context.setting.set(CHAMPION_DATA_WINDOW_MAIN_NAMESPACE, 'showShortcut', value)
+    return this._context.setting.set(SECONDARY_WINDOW_MAIN_NAMESPACE, 'showShortcut', value)
   }
 
   setShowSkinSelector(value: boolean) {
-    return this._context.setting.set(CHAMPION_DATA_WINDOW_MAIN_NAMESPACE, 'showSkinSelector', value)
+    return this._context.setting.set(SECONDARY_WINDOW_MAIN_NAMESPACE, 'showSkinSelector', value)
   }
 
   repositionToAlignLeagueClientUx() {
     return this._context.ipc.call(
-      CHAMPION_DATA_WINDOW_MAIN_NAMESPACE,
+      SECONDARY_WINDOW_MAIN_NAMESPACE,
       'repositionToAlignLeagueClientUx',
       'top-left'
     )

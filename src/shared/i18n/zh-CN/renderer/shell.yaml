@@ -139,8 +139,7 @@ titlebar:
     noticeOk: 确认
     noticeSeeMore: 查看详情
     github: 项目主页
-    auxWindow: 小窗口
-    championDataWindow: 英雄数据
+    secondaryWindow: 英雄数据
     backgroundTasks: 后台任务
     themeSelector:
       title: 主题配色
@@ -217,3 +216,10 @@ startup:
 backgroundTasks:
   taskTitle: 正在进行 ({{count}})
   emptyPlaceholder: 无后台任务
+
+secondaryWindow:
+  settings: 设置
+  close: 关闭
+  minimize: 最小化
+  pin: 置顶
+  unpin: 取消置顶

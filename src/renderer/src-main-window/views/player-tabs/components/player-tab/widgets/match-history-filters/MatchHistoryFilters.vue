@@ -142,8 +142,8 @@
 </template>
 
 <script setup lang="ts">
-import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
-import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
+import SettingsRow from '@renderer-shared/components/settings-navigation/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/settings-navigation/SettingsSection.vue'
 import { Filter20Regular, Info16Regular } from '@vicons/fluent'
 import { RefreshFilled } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'

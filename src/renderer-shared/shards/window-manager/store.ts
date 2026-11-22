@@ -58,28 +58,13 @@ export const useMainWindowStore = defineStore('shard:window-manager-renderer/mai
   }
 })
 
-export const useAuxWindowStore = defineStore('shard:window-manager-renderer/aux-window', () => {
-  const settings = shallowReactive({
-    enabled: true,
-    autoShow: true,
-    opacity: 0.9,
-    pinned: true
-  })
-
-  const basicWindowState = useBasicWindowStates()
-
-  return {
-    settings,
-    ...basicWindowState
-  }
-})
-
-export const useChampionDataWindowStore = defineStore(
-  'shard:window-manager-renderer/champion-data-window',
+export const useSecondaryWindowStore = defineStore(
+  'shard:window-manager-renderer/secondary-window',
   () => {
     const settings = shallowReactive({
       enabled: true,
-      autoShow: true,
+      autoShowInLobby: true,
+      autoShowInChampSelect: true,
       opacity: 0.9,
       pinned: true,
       showShortcut: null as string | null,

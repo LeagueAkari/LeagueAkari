@@ -3,7 +3,7 @@ import { afterEach, describe, expect, test, vi } from 'vitest'
 
 import type { AkariNavigationRendererContext } from './context'
 import { AkariNavigationController } from './navigation-controller'
-import type { AkariNavigationActivationHandler } from './useAkariNavigation'
+import type { AkariNavigationActivationHandler } from './types'
 
 function createController(deadlineMs = 1000) {
   const logger = {
@@ -82,27 +82,24 @@ describe('AkariNavigationController', () => {
 
   test('does not invoke the next step before an asynchronous step is ready', async () => {
     const { controller } = createController()
-    let finishStep: (() => void) | undefined
+    const started = Promise.withResolvers<void>()
+    const finished = Promise.withResolvers<void>()
     const target = vi.fn()
 
-    register(
-      controller,
-      'slow-step',
-      () =>
-        new Promise<void>((resolve) => {
-          finishStep = resolve
-        })
-    )
+    register(controller, 'slow-step', () => {
+      started.resolve()
+      return finished.promise
+    })
     register(controller, 'target', target)
 
     const navigation = controller.navigate([
       { key: 'slow-step', payload: 'pane' },
       { key: 'target', payload: 'destination' }
     ])
-    await Promise.resolve()
+    await started.promise
     expect(target).not.toHaveBeenCalled()
 
-    finishStep?.()
+    finished.resolve()
     await expect(navigation).resolves.toMatchObject({ status: 'completed' })
     expect(target).toHaveBeenCalledOnce()
   })
@@ -155,6 +152,39 @@ describe('AkariNavigationController', () => {
 
     expect(() => register(controller, 'missing')).not.toThrow()
   })
+
+  test.each(['cancelled', 'timed-out'] as const)(
+    'stops an in-flight activation when navigation is %s',
+    async (status) => {
+      vi.useFakeTimers()
+      const { controller } = createController(100)
+      const started = Promise.withResolvers<AbortSignal>()
+      const finished = Promise.withResolvers<void>()
+      const next = vi.fn()
+
+      register(controller, 'slow', (_, { signal }) => {
+        started.resolve(signal)
+        return finished.promise
+      })
+      register(controller, 'next', next)
+
+      const navigation = controller.navigate([{ key: 'slow' }, { key: 'next' }])
+      const signal = await started.promise
+
+      if (status === 'cancelled') {
+        await controller.navigate([])
+      } else {
+        await vi.advanceTimersByTimeAsync(100)
+      }
+
+      await expect(navigation).resolves.toEqual({ status, cursor: 0, currentStep: { key: 'slow' } })
+      expect(signal.aborted).toBe(true)
+
+      finished.resolve()
+      await vi.runAllTimersAsync()
+      expect(next).not.toHaveBeenCalled()
+    }
+  )
 
   test('rejects duplicate handlers for the same key', () => {
     const { controller } = createController()

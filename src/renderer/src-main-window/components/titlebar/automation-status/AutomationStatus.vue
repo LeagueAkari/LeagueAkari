@@ -3,16 +3,15 @@
 </template>
 
 <script setup lang="ts">
-import { useAkariNavigation } from '@renderer-shared/shards/akari-navigation'
-
-import { navigateToSetting } from '@main-window/settings-navigation'
+import type { MainWindowTarget } from '@renderer-shared/components/settings-navigation/targets'
+import { useNavigateToTarget } from '@renderer-shared/composables/useNavigateToTarget'
 
 import AutomationStatusView from './AutomationStatusView.vue'
 import { useEnabledAutomations } from './use-enabled-automations'
 
 defineProps<{ compact: boolean }>()
 
-const navigation = useAkariNavigation()
+const navigateToTarget = useNavigateToTarget<MainWindowTarget>('main-window')
 const automations = useEnabledAutomations()
 
 const handleNavigate = (id: string) => {
@@ -21,6 +20,6 @@ const handleNavigate = (id: string) => {
     return
   }
 
-  void navigateToSetting(navigation, automation.targetId, automation.navigationOptions)
+  void navigateToTarget(automation.targetId, automation.navigationOptions)
 }
 </script>

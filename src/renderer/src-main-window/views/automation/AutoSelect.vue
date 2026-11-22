@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import SettingsSection from '@main-window/settings-navigation/NavigableSettingsSection.vue'
+import SettingsSection from '@renderer-shared/components/settings-navigation/SettingsSection.vue'
 import { NScrollbar } from 'naive-ui'
 
 import AutoSelectEditor from './AutoSelectEditor.vue'

@@ -13,13 +13,13 @@ qq101:
     augments: 海克斯榜
     synergies: 最佳拍档榜
   board: 榜单
+  showAllBestChampions: 查看全部适配英雄
   tier: 段位
   patch: 版本
   position: 位置
   role: 英雄类别
   rarity: 品质
   all: 全部
-  latest: 最新版本
   roles:
     tank: 坦克
     fighter: 战士
@@ -149,4 +149,3 @@ qq101:
     label: 101 页面
     close: 关闭页面
     closeOthers: 关闭其他页面
-  openPairQuery: 打开拍档查询

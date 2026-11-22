@@ -4,19 +4,18 @@ import {
 } from '@shared/types/champion-data'
 import { z } from 'zod'
 
+import type { FeatureGateEvaluationResult } from '../feature-gating'
+
+export function isChampionDataSourceAllowed(evaluation: FeatureGateEvaluationResult) {
+  // Missing snapshots and unconfigured keys both leave these sources available.
+  return !evaluation.configured || evaluation.enabled
+}
+
 export function createChampionDataSourcePreferences(): ChampionDataSourcePreferences {
   return { enabled: { opgg: true, qq101: true }, defaultSource: 'opgg' }
 }
 
-export const championDataSourcePreferencesSchema = z
-  .object({
-    enabled: z.object({ opgg: z.boolean(), qq101: z.boolean() }),
-    defaultSource: z.enum(CHAMPION_DATA_SOURCE_ORDER).nullable()
-  })
-  .transform((preferences): ChampionDataSourcePreferences => ({
-    ...preferences,
-    defaultSource:
-      preferences.defaultSource && preferences.enabled[preferences.defaultSource]
-        ? preferences.defaultSource
-        : (CHAMPION_DATA_SOURCE_ORDER.find((source) => preferences.enabled[source]) ?? null)
-  }))
+export const championDataSourcePreferencesSchema = z.object({
+  enabled: z.object({ opgg: z.boolean(), qq101: z.boolean() }),
+  defaultSource: z.enum(CHAMPION_DATA_SOURCE_ORDER).nullable()
+})

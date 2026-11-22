@@ -14,13 +14,13 @@ qq101:
     augments: Augments
     synergies: Best partners
   board: Ranking
+  showAllBestChampions: Show all recommended champions
   tier: Rank
   patch: Patch
   position: Position
   role: Class
   rarity: Rarity
   all: All
-  latest: Latest patch
   roles:
     tank: Tank
     fighter: Fighter
@@ -151,4 +151,3 @@ qq101:
     label: 101 pages
     close: Close page
     closeOthers: Close other pages
-  openPairQuery: Open partner query

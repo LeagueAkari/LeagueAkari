@@ -140,12 +140,6 @@ export class ChampSelectHttpApi {
     })
   }
 
-  reroll(options: HttpApiRequestOptions = {}) {
-    return this._http.post('/lol-champ-select/v1/session/my-selection/reroll', undefined, {
-      signal: options.signal
-    })
-  }
-
   getCurrentChamp(options: HttpApiRequestOptions = {}) {
     return this._http.get<number>('/lol-champ-select/v1/current-champion', {
       signal: options.signal

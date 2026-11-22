@@ -87,7 +87,7 @@
 
 <script setup lang="tsx">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
-import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
+import SettingsSection from '@renderer-shared/components/settings-navigation/SettingsSection.vue'
 import { useActivated } from '@renderer-shared/composables/useActivated'
 import { useCompositionAwareInput } from '@renderer-shared/composables/useCompositionAwareInput'
 import { useComponentName } from '@renderer-shared/composables/useComponentName'

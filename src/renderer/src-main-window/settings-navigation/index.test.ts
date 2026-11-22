@@ -1,7 +1,7 @@
 import type { AkariNavigation } from '@renderer-shared/shards/akari-navigation'
 import { describe, expect, test, vi } from 'vitest'
 
-import { navigateToSetting } from './index'
+import { activateRegisteredTarget } from './index'
 
 describe('Settings navigation', () => {
   test('uses the registered fallback under the original navigation deadline', async () => {
@@ -11,7 +11,9 @@ describe('Settings navigation', () => {
       .mockResolvedValueOnce({ status: 'completed' })
     const navigation = { navigate } satisfies AkariNavigation
 
-    await expect(navigateToSetting(navigation, 'app.misc.http-proxy.host')).resolves.toMatchObject({
+    await expect(
+      activateRegisteredTarget(navigation, 'app.misc.http-proxy.host')
+    ).resolves.toMatchObject({
       status: 'completed'
     })
 
@@ -27,7 +29,9 @@ describe('Settings navigation', () => {
     const navigate = vi.fn().mockResolvedValue({ status: 'cancelled' })
     const navigation = { navigate } satisfies AkariNavigation
 
-    await expect(navigateToSetting(navigation, 'app.misc.http-proxy.host')).resolves.toMatchObject({
+    await expect(
+      activateRegisteredTarget(navigation, 'app.misc.http-proxy.host')
+    ).resolves.toMatchObject({
       status: 'cancelled'
     })
     expect(navigate).toHaveBeenCalledOnce()
@@ -37,7 +41,7 @@ describe('Settings navigation', () => {
     const navigate = vi.fn().mockResolvedValue({ status: 'completed' })
     const navigation = { navigate } satisfies AkariNavigation
 
-    await navigateToSetting(navigation, 'automation.champ-select.pick.enabled', {
+    await activateRegisteredTarget(navigation, 'automation.champ-select.pick.enabled', {
       autoSelectGroupId: 'aram'
     })
 

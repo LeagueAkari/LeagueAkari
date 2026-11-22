@@ -8,12 +8,11 @@ import {
 describe('champion data source preferences', () => {
   it.each([
     { enabled: { opgg: true, qq101: true }, requested: 'qq101', expected: 'qq101' },
-    { enabled: { opgg: false, qq101: true }, requested: 'opgg', expected: 'qq101' },
-    { enabled: { opgg: true, qq101: false }, requested: 'qq101', expected: 'opgg' },
-    { enabled: { opgg: false, qq101: false }, requested: 'opgg', expected: null },
-    { enabled: { opgg: false, qq101: true }, requested: null, expected: 'qq101' }
+    { enabled: { opgg: false, qq101: true }, requested: 'opgg', expected: 'opgg' },
+    { enabled: { opgg: false, qq101: false }, requested: 'opgg', expected: 'opgg' },
+    { enabled: { opgg: false, qq101: true }, requested: null, expected: null }
   ])(
-    'keeps the default enabled, or empty when both sources are off: $requested -> $expected',
+    'preserves the saved default independently of source enablement: $requested',
     ({ enabled, requested, expected }) => {
       expect(
         championDataSourcePreferencesSchema.parse({ enabled, defaultSource: requested })

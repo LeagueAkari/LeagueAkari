@@ -51,7 +51,7 @@ The renderer console is not a Node.js console. Use exposed preload APIs and rend
 
 League Akari exposes several project-specific globals in renderer windows:
 
-- `window.akariWindowType`: current window type, such as `main-window`, `aux-window`, `champion-data-window`, `ongoing-game-window`, or `cd-timer-window`.
+- `window.akariWindowType`: current window type, such as `main-window`, `secondary-window`, `ongoing-game-window`, or `cd-timer-window`.
 - `window.akariManager`: renderer shard manager. Use `window.akariManager.getInstance('<shard-id>')` to access instantiated renderer shards in the selected window.
 - `window.electron`: limited preload bridge from `@electron-toolkit/preload`; use it only for low-level IPC when a renderer shard wrapper is unavailable.
 - `window.lcuApi`: League Client HTTP helper, available in windows that register `LeagueClientRenderer`.
@@ -60,13 +60,12 @@ League Akari exposes several project-specific globals in renderer windows:
 
 Window-specific availability:
 
-| Window        | Always useful globals / shards                                                                                                    |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| Main          | `window.akariManager`, `window.lcuApi`, `window.sgpApi`, `window.selfUpdateShard`, `renderer-debug-renderer`, most feature shards |
-| Aux           | `window.akariManager`, `window.lcuApi`, `window-manager-renderer`, automation shards                                              |
-| Champion Data | `window.akariManager`, `window.lcuApi`, `opgg-renderer`, `auto-champ-config-renderer`                                             |
-| Ongoing Game  | `window.akariManager`, `window.lcuApi`, `window.sgpApi`, `ongoing-game-renderer`                                                  |
-| CD Timer      | `window.akariManager`, `window.lcuApi`, `window.sgpApi`, `additional-info` shard, `window-manager-renderer`                       |
+| Window       | Always useful globals / shards                                                                                                    |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| Main         | `window.akariManager`, `window.lcuApi`, `window.sgpApi`, `window.selfUpdateShard`, `renderer-debug-renderer`, most feature shards |
+| Secondary    | `window.akariManager`, `window.lcuApi`, `champion-data-renderer`, `auto-gameflow-renderer`, `auto-champ-config-renderer`          |
+| Ongoing Game | `window.akariManager`, `window.lcuApi`, `window.sgpApi`, `ongoing-game-renderer`                                                  |
+| CD Timer     | `window.akariManager`, `window.lcuApi`, `window.sgpApi`, `additional-info` shard, `window-manager-renderer`                       |
 
 Convenient console helper:
 
@@ -190,7 +189,7 @@ await shard('window-manager-renderer').mainWindow.toggleDevtools()
 ```
 
 ```js
-await shard('window-manager-renderer').auxWindow.show(true)
+await shard('window-manager-renderer').secondaryWindow.show(true)
 ```
 
 ```js
@@ -210,17 +209,18 @@ If MCP is attached to one renderer but a snippet must run in another League Akar
 Targets:
 
 - `main-window`
-- `aux-window`
 - `cd-timer-window`
 - `ongoing-game-window`
-- `champion-data-window`
+- `secondary-window`
 - `main`: dev-only main process eval. The snippet runs inside an async function with `app`, `manager`, `shared`, `logger`, and `process` parameters available.
 
 Example:
 
 ```js
 const code = `console.log('[mcp cross-window]', window.akariWindowType)`
-await fetch(`akari://renderer-link/evaluate?target=aux-window&code=${encodeURIComponent(code)}`)
+await fetch(
+  `akari://renderer-link/evaluate?target=secondary-window&code=${encodeURIComponent(code)}`
+)
 ```
 
 This is powerful and intentionally dangerous. Prefer selecting the target tab through MCP when possible.
@@ -254,8 +254,7 @@ League Akari has multiple Electron renderer windows. MCP can show several debug 
 Common windows include:
 
 - Main window, usually `main-window.html`.
-- Aux window, usually `aux-window.html`.
-- Champion Data window.
+- Secondary window, usually `secondary-window.html`.
 - Ongoing game window.
 - Cooldown timer window.
 

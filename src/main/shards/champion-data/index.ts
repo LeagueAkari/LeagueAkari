@@ -1,6 +1,9 @@
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { championDataAutomationSettingsSchema } from '@shared/shards/champion-data/automation'
-import { championDataSourcePreferencesSchema } from '@shared/shards/champion-data/source-preferences'
+import {
+  championDataSourcePreferencesSchema,
+  isChampionDataSourceAllowed
+} from '@shared/shards/champion-data/source-preferences'
 import type {
   OpggChampionDataPreferences,
   Qq101ChampionDataPreferences
@@ -52,8 +55,8 @@ export class ChampionDataMain implements IAkariShardInitDispose {
   static id = CHAMPION_DATA_MAIN_NAMESPACE
 
   public readonly settings = new ChampionDataSettings()
-  public readonly opgg = makeAutoObservable({ enabled: false })
-  public readonly qq101 = makeAutoObservable({ enabled: false })
+  public readonly opgg = makeAutoObservable({ enabled: true })
+  public readonly qq101 = makeAutoObservable({ enabled: true })
   private readonly _protocolController: ChampionDataProtocolController
 
   private readonly _logger: AkariLogger
@@ -138,16 +141,17 @@ export class ChampionDataMain implements IAkariShardInitDispose {
 
   private _watchFeatureGates() {
     this._mobxUtils.reaction(
-      () => this._featureGating.getEvaluation(CHAMPION_DATA_OPGG_FEATURE_GATE, false),
+      () => this._featureGating.getEvaluation(CHAMPION_DATA_OPGG_FEATURE_GATE, true),
       (evaluation) => {
-        this.opgg.enabled = evaluation.enabled
+        this.opgg.enabled = isChampionDataSourceAllowed(evaluation)
       },
       { fireImmediately: true }
     )
+
     this._mobxUtils.reaction(
-      () => this._featureGating.getEvaluation(CHAMPION_DATA_QQ101_FEATURE_GATE, false),
+      () => this._featureGating.getEvaluation(CHAMPION_DATA_QQ101_FEATURE_GATE, true),
       (evaluation) => {
-        this.qq101.enabled = evaluation.enabled
+        this.qq101.enabled = isChampionDataSourceAllowed(evaluation)
       },
       { fireImmediately: true }
     )

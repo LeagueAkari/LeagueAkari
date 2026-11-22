@@ -14,9 +14,7 @@
       <NNotificationProvider placement="bottom-right">
         <NDialogProvider>
           <AkariResourceProvider :value="akariResourceProvider">
-            <AkariNavigationProvider>
-              <App />
-            </AkariNavigationProvider>
+            <App />
           </AkariResourceProvider>
         </NDialogProvider>
       </NNotificationProvider>
@@ -30,7 +28,6 @@ import {
   AkariResourceProvider,
   createAkariResourceProvider
 } from '@renderer-shared/providers/akari-resource'
-import AkariNavigationProvider from '@renderer-shared/shards/akari-navigation/AkariNavigationProvider.vue'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import {
   getNaiveUiLocale,

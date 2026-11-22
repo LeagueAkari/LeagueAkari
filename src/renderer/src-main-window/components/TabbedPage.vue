@@ -43,7 +43,7 @@ import {
 } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { createMainPageNavigationStepKey } from '@main-window/navigation-steps'
+import { createMainPageNavigationStepKey } from '@main-window/routes/navigation-steps'
 
 export interface TabConfig {
   key: string

@@ -22,8 +22,8 @@
 </template>
 
 <script setup lang="ts">
-import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
-import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
+import SettingsRow from '@renderer-shared/components/settings-navigation/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/settings-navigation/SettingsSection.vue'
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'

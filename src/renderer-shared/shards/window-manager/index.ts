@@ -12,17 +12,16 @@ import {
 } from './context'
 import { useWindowManagerStore } from './store'
 import {
-  AkariAuxWindow,
   AkariCdTimerWindow,
-  AkariChampionDataWindow,
   AkariMainWindow,
-  AkariOngoingGameWindow
+  AkariOngoingGameWindow,
+  AkariSecondaryWindow
 } from './windows'
 
 export {
   AkariCdTimerWindow,
   AkariOngoingGameWindow,
-  AkariChampionDataWindow,
+  AkariSecondaryWindow,
   type WindowManagerRendererContext
 }
 
@@ -33,8 +32,7 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
   private context: WindowManagerRendererContext
 
   public mainWindow: AkariMainWindow
-  public auxWindow: AkariAuxWindow
-  public championDataWindow: AkariChampionDataWindow
+  public secondaryWindow: AkariSecondaryWindow
   public ongoingGameWindow: AkariOngoingGameWindow
   public cdTimerWindow: AkariCdTimerWindow
 
@@ -51,8 +49,7 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
     }
 
     this.mainWindow = new AkariMainWindow(this.context)
-    this.auxWindow = new AkariAuxWindow(this.context)
-    this.championDataWindow = new AkariChampionDataWindow(this.context)
+    this.secondaryWindow = new AkariSecondaryWindow(this.context)
     this.ongoingGameWindow = new AkariOngoingGameWindow(this.context)
     this.cdTimerWindow = new AkariCdTimerWindow(this.context)
   }
@@ -63,8 +60,7 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
     await this.context.pm.sync(WINDOW_MANAGER_MAIN_NAMESPACE, 'settings', store.settings)
 
     await this.mainWindow.onInit()
-    await this.auxWindow.onInit()
-    await this.championDataWindow.onInit()
+    await this.secondaryWindow.onInit()
     await this.ongoingGameWindow.onInit()
     await this.cdTimerWindow.onInit()
   }

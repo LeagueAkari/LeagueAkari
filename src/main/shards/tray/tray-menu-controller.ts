@@ -11,10 +11,8 @@ export class TrayMenuController {
   private _contextMenu: Menu | null = null
 
   mainWindowDevTrayItem!: MenuItem
-  auxWindowTrayItem!: MenuItem
-  auxWindowDevTrayItem!: MenuItem
-  championDataWindowTrayItem!: MenuItem
-  championDataWindowDevTrayItem!: MenuItem
+  secondaryWindowTrayItem!: MenuItem
+  secondaryWindowDevTrayItem!: MenuItem
   ongoingGameWindowDevTrayItem!: MenuItem
   cdTimerWindowDevTrayItem!: MenuItem
   quitTrayItem!: MenuItem
@@ -26,39 +24,24 @@ export class TrayMenuController {
     const { ipc, windowManager } = this.context
     this._trayIcon = new Tray(this._createTrayIcon())
 
-    this.auxWindowTrayItem = new MenuItem({
-      label: i18next.t('tray.auxWindow'),
-      type: 'normal',
-      click: () => windowManager.auxWindow.showOrRestore(),
-      enabled: windowManager.auxWindow.settings.enabled
-    })
-
-    this.auxWindowDevTrayItem = new MenuItem({
-      id: 'aux-window-dev',
-      label: i18next.t('tray.dev.toggleAuxWindowDevtools'),
-      type: 'normal',
-      click: () => windowManager.auxWindow.toggleDevtools(),
-      enabled: windowManager.auxWindow.settings.enabled
-    })
-
     this.mainWindowDevTrayItem = new MenuItem({
       label: i18next.t('tray.dev.toggleMainWindowDevtools'),
       type: 'normal',
       click: () => windowManager.mainWindow.toggleDevtools()
     })
 
-    this.championDataWindowTrayItem = new MenuItem({
-      label: i18next.t('tray.championDataWindow'),
+    this.secondaryWindowTrayItem = new MenuItem({
+      label: i18next.t('tray.secondaryWindow'),
       type: 'normal',
-      click: () => windowManager.championDataWindow.showOrRestore(),
-      enabled: windowManager.championDataWindow.settings.enabled
+      click: () => windowManager.secondaryWindow.showOrRestore(),
+      enabled: windowManager.secondaryWindow.settings.enabled
     })
 
-    this.championDataWindowDevTrayItem = new MenuItem({
-      label: i18next.t('tray.dev.toggleChampionDataWindowDevtools'),
+    this.secondaryWindowDevTrayItem = new MenuItem({
+      label: i18next.t('tray.dev.toggleSecondaryWindowDevtools'),
       type: 'normal',
-      click: () => windowManager.championDataWindow.toggleDevtools(),
-      enabled: windowManager.championDataWindow.settings.enabled
+      click: () => windowManager.secondaryWindow.toggleDevtools(),
+      enabled: windowManager.secondaryWindow.settings.enabled
     })
 
     this.ongoingGameWindowDevTrayItem = new MenuItem({
@@ -80,8 +63,7 @@ export class TrayMenuController {
       type: 'normal',
       click: () => {
         windowManager.mainWindow.repositionWindowIfInvisible()
-        windowManager.auxWindow.repositionWindowIfInvisible()
-        windowManager.championDataWindow.repositionWindowIfInvisible()
+        windowManager.secondaryWindow.repositionWindowIfInvisible()
         windowManager.ongoingGameWindow.repositionWindowIfInvisible()
         windowManager.cdTimerWindow.repositionWindowIfInvisible()
       }
@@ -107,8 +89,7 @@ export class TrayMenuController {
         type: 'submenu',
         submenu: Menu.buildFromTemplate([
           this.mainWindowDevTrayItem,
-          this.auxWindowDevTrayItem,
-          this.championDataWindowDevTrayItem,
+          this.secondaryWindowDevTrayItem,
           this.ongoingGameWindowDevTrayItem,
           this.cdTimerWindowDevTrayItem,
           {
@@ -120,8 +101,7 @@ export class TrayMenuController {
       {
         type: 'separator'
       },
-      this.auxWindowTrayItem,
-      this.championDataWindowTrayItem,
+      this.secondaryWindowTrayItem,
       this.quitTrayItem
     ])
 

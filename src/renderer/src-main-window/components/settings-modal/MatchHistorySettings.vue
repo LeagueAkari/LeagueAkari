@@ -27,8 +27,8 @@
 </template>
 
 <script setup lang="ts">
-import SettingsRow from '@main-window/settings-navigation/NavigableSettingsRow.vue'
-import SettingsSection from '@main-window/settings-navigation/NavigableSettingsSection.vue'
+import SettingsRow from '@renderer-shared/components/settings-navigation/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/settings-navigation/SettingsSection.vue'
 import { useTranslation } from 'i18next-vue'
 import { NScrollbar, NSelect, NSwitch } from 'naive-ui'
 

@@ -494,8 +494,8 @@
 </template>
 
 <script setup lang="ts">
-import SettingsRow from '@main-window/settings-navigation/NavigableSettingsRow.vue'
-import SettingsSection from '@main-window/settings-navigation/NavigableSettingsSection.vue'
+import SettingsRow from '@renderer-shared/components/settings-navigation/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/settings-navigation/SettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAkariNavigationStep } from '@renderer-shared/shards/akari-navigation'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'

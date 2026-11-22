@@ -1,15 +1,13 @@
-import type { AkariAuxWindow } from './aux-window/window'
 import { isSystemBackgroundMaterialSupported } from './background-material-resolver'
 import type { AkariCdTimerWindow } from './cd-timer-window/windows'
-import type { AkariChampionDataWindow } from './champion-data-window/window'
 import type { WindowManagerMainContext } from './context'
 import type { AkariMainWindow } from './main-window/window'
 import type { AkariOngoingGameWindow } from './ongoing-game-window/window'
+import type { AkariSecondaryWindow } from './secondary-window/window'
 
 interface WindowManagerWindows {
   mainWindow: AkariMainWindow
-  auxWindow: AkariAuxWindow
-  championDataWindow: AkariChampionDataWindow
+  secondaryWindow: AkariSecondaryWindow
   ongoingGameWindow: AkariOngoingGameWindow
   cdTimerWindow: AkariCdTimerWindow
 }
@@ -52,8 +50,7 @@ export class WindowManagerLifecycleController {
     })
 
     await this._windows.mainWindow.onInit()
-    await this._windows.auxWindow.onInit()
-    await this._windows.championDataWindow.onInit()
+    await this._windows.secondaryWindow.onInit()
     await this._windows.ongoingGameWindow.onInit()
     await this._windows.cdTimerWindow.onInit()
   }

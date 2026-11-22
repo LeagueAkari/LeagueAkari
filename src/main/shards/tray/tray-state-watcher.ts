@@ -10,46 +10,27 @@ export class TrayStateWatcher {
   ) {}
 
   watch() {
-    this._watchAuxWindow()
-    this._watchChampionDataWindow()
+    this._watchSecondaryWindow()
     this._watchOngoingGameWindow()
     this._watchCdTimerWindow()
     this._watchLocale()
   }
 
-  private _watchAuxWindow() {
-    const { mobxUtils, windowManager } = this.context
-
-    mobxUtils.reaction(
-      () => [windowManager.auxWindow.settings.enabled, windowManager.auxWindow.state.ready],
-      ([enabled, ready]) => {
-        if (enabled && ready) {
-          this.menuController.auxWindowDevTrayItem.enabled = true
-          this.menuController.auxWindowTrayItem.enabled = true
-        } else {
-          this.menuController.auxWindowDevTrayItem.enabled = false
-          this.menuController.auxWindowTrayItem.enabled = false
-        }
-      },
-      { fireImmediately: true, equals: compareShallow }
-    )
-  }
-
-  private _watchChampionDataWindow() {
+  private _watchSecondaryWindow() {
     const { mobxUtils, windowManager } = this.context
 
     mobxUtils.reaction(
       () => [
-        windowManager.championDataWindow.settings.enabled,
-        windowManager.championDataWindow.state.ready
+        windowManager.secondaryWindow.settings.enabled,
+        windowManager.secondaryWindow.state.ready
       ],
       ([enabled, ready]) => {
         if (enabled && ready) {
-          this.menuController.championDataWindowDevTrayItem.enabled = true
-          this.menuController.championDataWindowTrayItem.enabled = true
+          this.menuController.secondaryWindowDevTrayItem.enabled = true
+          this.menuController.secondaryWindowTrayItem.enabled = true
         } else {
-          this.menuController.championDataWindowDevTrayItem.enabled = false
-          this.menuController.championDataWindowTrayItem.enabled = false
+          this.menuController.secondaryWindowDevTrayItem.enabled = false
+          this.menuController.secondaryWindowTrayItem.enabled = false
         }
       },
       { fireImmediately: true, equals: compareShallow }

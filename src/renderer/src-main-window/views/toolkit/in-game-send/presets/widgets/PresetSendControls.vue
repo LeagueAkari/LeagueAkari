@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import SettingsRow from '@renderer-shared/components/SettingsRow.vue'
+import SettingsRow from '@renderer-shared/components/settings-navigation/SettingsRow.vue'
 import { DocumentText24Regular as DryRunIcon, Send24Filled as SendIcon } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NDivider, NIcon, NPopover, useMessage } from 'naive-ui'

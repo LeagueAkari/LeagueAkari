@@ -418,7 +418,7 @@
 
 <script lang="ts" setup>
 import { useAkariNavigationStep } from '@renderer-shared/shards/akari-navigation'
-import SettingsRow from '@main-window/settings-navigation/NavigableSettingsRow.vue'
+import SettingsRow from '@renderer-shared/components/settings-navigation/SettingsRow.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import TooltipWithIcon from '@renderer-shared/components/TooltipWithIcon.vue'
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'

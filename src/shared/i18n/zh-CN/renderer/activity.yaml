@@ -1,0 +1,109 @@
+activity:
+  title: 进行中
+  championBench:
+    title: 英雄选择台
+    notInBenchMode: 当前不在随机模式中
+    notInPhase: 未处于英雄选择过程中
+    swapFailed: 交换失败 {{reason}}
+    current: 当前英雄
+    bench: 公共备战席
+    subset: 个人候选
+    waiting: '{{name}} · 暂不可选'
+    locked: '{{name}} · 本局不可用'
+  champSelect:
+    actions:
+      picked: 已选择
+      voted: 已投票
+      banned: 已禁用
+      autoPick: 自动选择
+      autoBan: 自动禁用
+      picking: 英雄选择
+      banning: 英雄禁用
+      voting: 投票
+      tenBansRevealing: 系统 · 禁用展示
+      inProgress: 进行中
+      completed: 已完成
+      ceremonies:
+        ten_bans_reveal: 禁用展示
+        TEN_BANS_REVEAL: 禁用展示
+        phase_transition: 阶段过渡
+        vote_transition: 投票过渡
+        team_vote_reveal: 团队投票展示
+    operations:
+      title: 英雄选择
+      dodge:
+        label: 退出英雄选择
+        button: 立即秒退
+        popconfirm: 这将退出英雄选择阶段
+        positiveText: 退出
+        negativeText: 取消
+        cancel: 取消
+      temporarilyDisabled:
+        label: 临时取消自动选择/禁用
+  lounge:
+    operations:
+      sections:
+        accept: 对局接受
+        matchmaking: 匹配
+      immediately: 立即
+      delay: '{{seconds}} 秒'
+      members: '{{count}} 人'
+      autoAccept:
+        label: 自动接受
+        unavailable: 模式不适用
+      autoMatchmaking:
+        label: 自动匹配
+        unavailable: 模式不适用
+      autoMatchmakingMinimumMembers:
+        label: 最低人数
+      autoMatchmakingDelaySeconds:
+        label: 匹配前等待时间
+      autoMatchmakingWaitForInvitees:
+        label: 等待邀请中成员
+    panel:
+      map: 地图
+      gameMode: 模式中
+      wait: 等待
+      atMost: 最多
+      autoAccept:
+        acceptIn: 自动接受 {{seconds}} s
+        cancelButton: 取消本次自动接受
+        declineButton: 拒绝对局
+        acceptButton: 接受对局
+        accepted: 已接受
+        pending: 等待接受对局
+        subtitle1: 已经接受的对局仍可拒绝
+        subtitle2: 已经取消的对局仍可接受
+        declined: 已拒绝
+      matchmaking:
+        stopAndDisable: 停止匹配并取消自动匹配
+        stop: 停止匹配
+        cancel: 取消本次自动匹配
+        searching: 匹配中
+        searchIn: 匹配中 {{seconds}} s
+        waitingForPenalty: 等待秒退计时器 {{seconds}} s
+        waitingForMembers: 自动匹配需达到 {{count}} 人
+        waitingForInvitees: 等待邀请中成员
+  skinSelection:
+    skins: '{{count}} 款皮肤可用'
+    button: 应用
+    success: 应用皮肤成功
+    failed: 应用皮肤失败
+  placeholder:
+    inProgress: 游戏进行中
+    idle: 当前没有进行中的活动
+    spectating: 等待观战中
+  automationPlan:
+    autoPick:
+      title: 自动选择
+      willPick: 将自动选择
+    autoBan:
+      title: 自动禁用
+      willBan: 将自动禁用
+    autoBenchSwap:
+      title: 自动交换
+      willSwap: 将自动交换
+    autoChampionSwap:
+      title: 自动交换
+      willAccept: 将自动接受交换
+      willDecline: 将自动拒绝交换

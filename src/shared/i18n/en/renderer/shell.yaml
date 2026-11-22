@@ -140,8 +140,7 @@ titlebar:
     noticeOk: Got it
     noticeSeeMore: See More
     github: Project GitHub
-    auxWindow: Auxiliary Window
-    championDataWindow: Champion Data
+    secondaryWindow: Champion Data
     backgroundTasks: Background Tasks
     themeSelector:
       title: Theme Palette
@@ -218,3 +217,10 @@ startup:
 backgroundTasks:
   taskTitle: Ongoing Tasks ({{count}})
   emptyPlaceholder: No background tasks
+
+secondaryWindow:
+  settings: Settings
+  close: Close
+  minimize: Minimize
+  pin: Pin
+  unpin: Unpin

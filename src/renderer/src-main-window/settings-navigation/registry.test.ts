@@ -1,3 +1,6 @@
+import { getSearchableNavigationTargets } from '@renderer-shared/components/settings-navigation/targets'
+import { mainWindowTargets } from '@renderer-shared/components/settings-navigation/targets/main-window'
+import { createSettingsNavigationTargetStepKey } from '@renderer-shared/components/settings-navigation/useSettingsNavigationTarget'
 import { describe, expect, test } from 'vitest'
 
 import {
@@ -6,37 +9,48 @@ import {
 } from '@main-window/components/settings-modal/navigation'
 import { STORAGE_SETTINGS_NAVIGATION_STEP_KEY } from '@main-window/components/settings-modal/storage-settings/navigation'
 import {
-  MAIN_WINDOW_NAVIGATION_STEP_KEY,
+  MAIN_WINDOW_ROUTE_STEP_KEY,
   createMainPageNavigationStepKey
-} from '@main-window/navigation-steps'
+} from '@main-window/routes/navigation-steps'
 import { AUTO_SELECT_NAVIGATION_STEP_KEY } from '@main-window/views/automation/auto-select-navigation'
 
-import {
-  type SettingsNavigationTargetDefinition,
-  createSettingsNavigationPath,
-  createSettingsNavigationRegistry,
-  getSettingsNavigationTarget,
-  searchableSettingsNavigationTargets,
-  settingsNavigationRegistry,
-  settingsNavigationTargets
-} from './registry'
-import { createSettingsNavigationTargetStepKey } from './useSettingsNavigationTarget'
+import { createSettingsNavigationPath, getSettingsNavigationTarget } from './registry'
+
+const targetIds = mainWindowTargets.flatMap((group) => group.targets.map((target) => target.id))
 
 describe('Settings navigation registry', () => {
   test('keeps every target id unique and resolvable', () => {
-    expect(settingsNavigationRegistry.size).toBe(settingsNavigationTargets.length)
+    expect(new Set(targetIds).size).toBe(targetIds.length)
 
-    for (const target of settingsNavigationTargets) {
-      expect(getSettingsNavigationTarget(target.id)).toEqual(target)
+    for (const id of targetIds) {
+      const target = getSettingsNavigationTarget(id)!
+      expect(target.id).toBe(id)
+
+      for (const linkedId of [target.terminalId, target.fallbackId]) {
+        if (linkedId) {
+          expect(getSettingsNavigationTarget(linkedId)).toBeDefined()
+        }
+      }
     }
   })
 
-  test('keeps searchable rows connected to a navigation route', () => {
-    expect(searchableSettingsNavigationTargets.length).toBeGreaterThan(0)
+  test('adds secondary preferences to search only when their window is enabled', () => {
+    const main = getSearchableNavigationTargets(false)
+    const all = getSearchableNavigationTargets(true)
+    const flash = all.find(({ address }) => address.targetId === 'champion-data.flash-position')
 
-    for (const target of searchableSettingsNavigationTargets) {
-      expect('tab' in target.route ? target.route.tab : target.route.name).toBeTruthy()
-    }
+    expect(flash?.address.window).toBe('secondary-window')
+    expect(flash?.groupKeys).toEqual([
+      'settings.multiWindow.secondaryWindow.title',
+      'opgg.view.settings.sections.preferences'
+    ])
+    expect(all.filter(({ address }) => address.window === 'main-window')).toEqual(main)
+    expect(main).toContainEqual(
+      expect.objectContaining({
+        address: { window: 'main-window', targetId: 'multi-window.secondary.enabled' },
+        groupKeys: ['settings.multiWindow.title', 'settings.multiWindow.secondaryWindow.title']
+      })
+    )
   })
 
   test('describes deep links that cross top-level and nested tabs', () => {
@@ -86,10 +100,6 @@ describe('Settings navigation registry', () => {
 
     expect(createSettingsNavigationPath(settingsTarget)).toEqual([
       {
-        key: MAIN_WINDOW_NAVIGATION_STEP_KEY,
-        payload: { surface: 'settings-modal' }
-      },
-      {
         key: SETTINGS_MODAL_NAVIGATION_STEP_KEY,
         payload: 'ongoing-game'
       },
@@ -98,13 +108,11 @@ describe('Settings navigation registry', () => {
       }
     ])
     expect(createSettingsNavigationPath(storageTarget).map((step) => step.key)).toEqual([
-      MAIN_WINDOW_NAVIGATION_STEP_KEY,
       SETTINGS_MODAL_NAVIGATION_STEP_KEY,
       STORAGE_SETTINGS_NAVIGATION_STEP_KEY,
       createSettingsNavigationTargetStepKey(storageTarget.id)
     ])
     expect(createSettingsNavigationPath(taggedPlayersTarget).map((step) => step.key)).toEqual([
-      MAIN_WINDOW_NAVIGATION_STEP_KEY,
       SETTINGS_MODAL_NAVIGATION_STEP_KEY,
       STORAGE_SETTINGS_NAVIGATION_STEP_KEY,
       createSettingsNavigationTargetStepKey(taggedPlayersTarget.id)
@@ -119,10 +127,13 @@ describe('Settings navigation registry', () => {
       key: AUTO_SELECT_NAVIGATION_STEP_KEY,
       payload: { tab: 'ban', groupId: 'aram' }
     })
-    expect(createSettingsNavigationPath(toolkitTarget).map((step) => step.key)).toEqual([
-      MAIN_WINDOW_NAVIGATION_STEP_KEY,
-      createMainPageNavigationStepKey('toolkit'),
-      createSettingsNavigationTargetStepKey(toolkitTarget.id)
+    expect(createSettingsNavigationPath(toolkitTarget)).toEqual([
+      {
+        key: MAIN_WINDOW_ROUTE_STEP_KEY,
+        payload: { name: 'toolkit', params: { section: 'in-game-send' } }
+      },
+      { key: createMainPageNavigationStepKey('toolkit'), payload: 'in-game-send' },
+      { key: createSettingsNavigationTargetStepKey(toolkitTarget.id) }
     ])
   })
 
@@ -142,65 +153,15 @@ describe('Settings navigation registry', () => {
   })
 
   test('gives every registered target a root-to-terminal canonical path', () => {
-    for (const target of settingsNavigationTargets) {
+    for (const id of targetIds) {
+      const target = getSettingsNavigationTarget(id)!
       const path = createSettingsNavigationPath(target)
-      expect(path[0]?.key).toBe(MAIN_WINDOW_NAVIGATION_STEP_KEY)
+      expect(path[0]?.key).toBe(
+        'tab' in target.route ? SETTINGS_MODAL_NAVIGATION_STEP_KEY : MAIN_WINDOW_ROUTE_STEP_KEY
+      )
       expect(path.at(-1)).toEqual({
         key: createSettingsNavigationTargetStepKey(target.terminalId ?? target.id)
       })
     }
-  })
-
-  test('rejects duplicate ids', () => {
-    const duplicateTargets: SettingsNavigationTargetDefinition[] = [
-      {
-        id: 'duplicate',
-        route: { tab: 'basic' },
-        labelKey: 'first'
-      },
-      {
-        id: 'duplicate',
-        route: { tab: 'misc' },
-        labelKey: 'second'
-      }
-    ]
-
-    expect(() => createSettingsNavigationRegistry(duplicateTargets)).toThrow(
-      'Duplicate settings navigation target: duplicate'
-    )
-  })
-
-  test('rejects missing parent and fallback targets', () => {
-    const target: SettingsNavigationTargetDefinition = {
-      id: 'child',
-      route: { tab: 'basic' },
-      labelKey: 'child',
-      parentId: 'missing-parent'
-    }
-
-    expect(() => createSettingsNavigationRegistry([target])).toThrow(
-      'Unknown settings navigation target missing-parent referenced by child'
-    )
-  })
-
-  test('rejects fallback cycles', () => {
-    const cyclicTargets: SettingsNavigationTargetDefinition[] = [
-      {
-        id: 'first',
-        route: { tab: 'basic' },
-        labelKey: 'first',
-        fallbackId: 'second'
-      },
-      {
-        id: 'second',
-        route: { tab: 'basic' },
-        labelKey: 'second',
-        fallbackId: 'first'
-      }
-    ]
-
-    expect(() => createSettingsNavigationRegistry(cyclicTargets)).toThrow(
-      'Settings navigation fallback cycle detected from first'
-    )
   })
 })

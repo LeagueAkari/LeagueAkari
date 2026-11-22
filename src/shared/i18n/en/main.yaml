@@ -2,12 +2,10 @@ tray:
   about: About
   settings: Settings
   quit: Quit
-  auxWindow: Aux Window
-  championDataWindow: Champion Data Window
+  secondaryWindow: Secondary Window
   dev:
     toggleMainWindowDevtools: Toggle DevTools - Main Window
-    toggleAuxWindowDevtools: Toggle DevTools - Aux Window
-    toggleChampionDataWindowDevtools: Toggle DevTools - Champion Data Window
+    toggleSecondaryWindowDevtools: Toggle DevTools - Secondary Window
     toggleOngoingGameWindowDevtools: Toggle DevTools - Ongoing Game Window
     toggleCdTimerWindowDevtools: Toggle DevTools - Cooldown Timer Window
   adjustAllWindowPositions: Adjust All Window Positions
@@ -73,10 +71,6 @@ auto-champ-config-main:
   auto-config-enabled: 'Auto configuration enabled, configured champions: {{names}}'
 
 window-manager-main:
-  aux-window:
-    quickClose:
-      title: Don't want mini window?
-      body: You can permanently disable the mini window in the settings (Settings > Multi-window)
   download:
     dialogTitle: Save File
     dialogButtonLabel: Save

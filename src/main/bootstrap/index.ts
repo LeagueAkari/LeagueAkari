@@ -3,6 +3,7 @@ import '@main/i18n'
 import { initAppLogger } from '@main/logger'
 import { initializeNativeRuntime } from '@main/native'
 import { AkariApiMain } from '@main/shards/akari-api'
+import { AkariNavigationMain } from '@main/shards/akari-navigation'
 import { AkariProtocolMain } from '@main/shards/akari-protocol'
 import { AppCommonMain } from '@main/shards/app-common'
 import { AutoChampionConfigMain } from '@main/shards/auto-champ-config'
@@ -328,6 +329,7 @@ export function bootstrap() {
     // application specific shards
     manager.use(ClientInstallationMain)
     manager.use(WindowManagerMain)
+    manager.use(AkariNavigationMain)
     manager.use(MainWindowUiMain)
     manager.use(TrayMain)
     manager.use(KeyboardShortcutsMain)

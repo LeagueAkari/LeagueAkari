@@ -1,4 +1,6 @@
 import { AKARI_PROXY_REQUEST_ID_HEADER } from '@shared/akari-protocol/proxy-request-cancellation'
+import type { AkariFeatureGateSnapshot } from '@shared/shards/akari-api'
+import { FeatureGateEvaluator } from '@shared/shards/feature-gating'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { AkariProtocolRouter } from '../akari-protocol/protocol-router'
@@ -14,7 +16,15 @@ vi.mock('electron', () => ({
   }
 }))
 
-function setup(enabled = true, status = 200) {
+function setup(
+  enabled = true,
+  status = 200,
+  featureGating: {
+    getEvaluation(key: string, defaultValue: boolean): { enabled: boolean; configured: boolean }
+  } = {
+    getEvaluation: () => ({ enabled, configured: true })
+  }
+) {
   const router = new AkariProtocolRouter()
   const fetch = vi.fn(
     async (request: Request) =>
@@ -30,7 +40,7 @@ function setup(enabled = true, status = 200) {
   )
 
   const controller = new ChampionDataProtocolController(
-    { featureGating: { getEvaluation: () => ({ enabled }) }, logger: { warn: vi.fn() } } as never,
+    { featureGating, logger: { warn: vi.fn() } } as never,
     router as never,
     {
       createAxiosClient: (defaults: Parameters<typeof createNetworkAxiosClient>[2]) =>
@@ -97,6 +107,24 @@ describe('champion data protocol forwarding', () => {
     expect(await response.text()).toBe('Data source is disabled')
     expect(fetch).not.toHaveBeenCalled()
   })
+
+  it.each([null, { gates: {} }])(
+    'allows both sources when their gates are unconfigured: %j',
+    async (config) => {
+      const featureGating = new FeatureGateEvaluator()
+      featureGating.evaluate(config as AkariFeatureGateSnapshot | null, {
+        platform: 'win32',
+        version: '1.5.2',
+        sgpServerId: ''
+      })
+
+      const { request, fetch } = setup(true, 200, featureGating)
+
+      expect((await request('akari://opgg/api/versions')).status).toBe(200)
+      expect((await request('akari://qq101/go/database/versionlist')).status).toBe(200)
+      expect(fetch).toHaveBeenCalledTimes(2)
+    }
+  )
 
   it('preserves an upstream HTTP error for the renderer helper', async () => {
     const { request, fetch } = setup(true, 404)

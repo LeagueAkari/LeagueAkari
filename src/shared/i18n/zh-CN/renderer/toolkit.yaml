@@ -94,17 +94,11 @@ toolkit:
     loot-tools: 战利品工具
   championBench:
     title: 英雄选择台
-    reroll: 重随
-    charity: 慈善
-    charityTitle: 进行一次重新随机，但立即拿回之前的英雄
     notInBenchMode: 当前不在随机模式中
     notInPhase: 未处于英雄选择过程中
     swapFailedNotification:
       title: 英雄选择台
       description: 交换失败，目标英雄可能已经不存在
-    rerollFailedNotification:
-      title: 英雄选择台
-      description: 重随失败，重新随机失败
   gameflowInProgress:
     title: 进行时
     dodge:

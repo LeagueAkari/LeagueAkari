@@ -2,97 +2,22 @@
   <NScrollbar class="h-full">
     <div class="flex flex-col gap-6">
       <SettingsSection
-        setting-id="multi-window.aux"
-        :title="t('settings.multiWindow.auxWindow.title')"
+        setting-id="multi-window.secondary"
+        :title="t('settings.multiWindow.secondaryWindow.title')"
       >
         <SettingsRow
-          setting-id="multi-window.aux.enabled"
-          :label="t('settings.multiWindow.auxWindow.enabled.label')"
+          setting-id="multi-window.secondary.enabled"
+          :label="t('settings.multiWindow.secondaryWindow.enabled.label')"
           :label-width="400"
         >
           <template #labelDescription>
-            <div>{{ t('settings.multiWindow.auxWindow.enabled.description') }}</div>
+            <div>{{ t('settings.multiWindow.secondaryWindow.enabled.description') }}</div>
             <div>
               <TranslationComponent
-                :translation="t('settings.multiWindow.auxWindow.enabled.descriptionWithIcon')"
+                :translation="t('settings.multiWindow.secondaryWindow.enabled.descriptionWithIcon')"
               >
                 <template #icon>
-                  <NIcon class="inline-block size-4 align-middle text-black dark:text-white">
-                    <Window24FilledIcon />
-                  </NIcon>
-                </template>
-              </TranslationComponent>
-            </div>
-          </template>
-          <NSwitch
-            size="small"
-            :value="aws.settings.enabled"
-            @update:value="(val) => wm.auxWindow.setEnabled(val)"
-          />
-        </SettingsRow>
-        <SettingsRow
-          setting-id="multi-window.aux.auto-show"
-          :label="t('settings.multiWindow.auxWindow.autoShow.label')"
-          :label-description="t('settings.multiWindow.auxWindow.autoShow.description')"
-          :label-width="400"
-        >
-          <NSwitch
-            size="small"
-            :value="aws.settings.autoShow"
-            @update:value="(val) => wm.auxWindow.setAutoShow(val)"
-          />
-        </SettingsRow>
-        <SettingsRow
-          setting-id="multi-window.aux.opacity"
-          :label="t('settings.multiWindow.auxWindow.opacity.label')"
-          :label-description="t('settings.multiWindow.auxWindow.opacity.description')"
-          :label-width="400"
-        >
-          <NSlider
-            class="w-48!"
-            size=""
-            :min="0.3"
-            :max="1"
-            :step="0.01"
-            :format-tooltip="(v) => `${(v * 100).toFixed()}%`"
-            @update:value="(val) => wm.auxWindow.setOpacity(val)"
-            :value="aws.settings.opacity"
-          ></NSlider>
-        </SettingsRow>
-        <SettingsRow
-          setting-id="multi-window.aux.reset-position"
-          :label="t('settings.multiWindow.auxWindow.resetWindowPosition.label')"
-          :label-description="t('settings.multiWindow.auxWindow.resetWindowPosition.description')"
-          :label-width="400"
-        >
-          <NButton
-            size="small"
-            type="warning"
-            secondary
-            @click="() => wm.auxWindow.resetPosition()"
-            >{{ t('settings.multiWindow.auxWindow.resetWindowPosition.button') }}</NButton
-          >
-        </SettingsRow>
-      </SettingsSection>
-      <SettingsSection
-        setting-id="multi-window.champion-data"
-        :title="t('settings.multiWindow.championDataWindow.title')"
-      >
-        <SettingsRow
-          setting-id="multi-window.champion-data.enabled"
-          :label="t('settings.multiWindow.championDataWindow.enabled.label')"
-          :label-width="400"
-        >
-          <template #labelDescription>
-            <div>{{ t('settings.multiWindow.championDataWindow.enabled.description') }}</div>
-            <div>
-              <TranslationComponent
-                :translation="
-                  t('settings.multiWindow.championDataWindow.enabled.descriptionWithIcon')
-                "
-              >
-                <template #icon>
-                  <ChartLineData
+                  <Window24FilledIcon
                     class="inline-block size-4 align-middle text-black dark:text-white"
                   />
                 </template>
@@ -101,39 +26,53 @@
           </template>
           <NSwitch
             size="small"
-            :value="championDataWindowStore.settings.enabled"
-            @update:value="(val) => wm.championDataWindow.setEnabled(val)"
+            :value="secondaryWindowStore.settings.enabled"
+            @update:value="(val) => wm.secondaryWindow.setEnabled(val)"
           />
         </SettingsRow>
         <SettingsRow
-          setting-id="multi-window.champion-data.auto-show"
-          :label="t('settings.multiWindow.championDataWindow.autoShow.label')"
-          :label-description="t('settings.multiWindow.championDataWindow.autoShow.description')"
+          setting-id="multi-window.secondary.auto-show-lobby"
+          :label="t('settings.multiWindow.secondaryWindow.autoShowInLobby.label')"
+          :label-description="t('settings.multiWindow.secondaryWindow.autoShowInLobby.description')"
           :label-width="400"
         >
           <NSwitch
             size="small"
-            :value="championDataWindowStore.settings.autoShow"
-            @update:value="(val) => wm.championDataWindow.setAutoShow(val)"
+            :value="secondaryWindowStore.settings.autoShowInLobby"
+            @update:value="(val) => wm.secondaryWindow.setAutoShowInLobby(val)"
           />
         </SettingsRow>
         <SettingsRow
-          setting-id="multi-window.champion-data.shortcut"
+          setting-id="multi-window.secondary.auto-show-champ-select"
+          :label="t('settings.multiWindow.secondaryWindow.autoShowInChampSelect.label')"
+          :label-description="
+            t('settings.multiWindow.secondaryWindow.autoShowInChampSelect.description')
+          "
+          :label-width="400"
+        >
+          <NSwitch
+            size="small"
+            :value="secondaryWindowStore.settings.autoShowInChampSelect"
+            @update:value="(val) => wm.secondaryWindow.setAutoShowInChampSelect(val)"
+          />
+        </SettingsRow>
+        <SettingsRow
+          setting-id="multi-window.secondary.shortcut"
           :disabled="!as.nativeSupport.nativeInput.available"
           :label-width="400"
-          :label="t('settings.multiWindow.championDataWindow.showShortcut.label')"
-          :label-description="t('settings.multiWindow.championDataWindow.showShortcut.description')"
+          :label="t('settings.multiWindow.secondaryWindow.showShortcut.label')"
+          :label-description="t('settings.multiWindow.secondaryWindow.showShortcut.description')"
         >
           <ShortcutSelector
-            :target-id="AkariChampionDataWindow.SHOW_WINDOW_SHORTCUT_TARGET_ID"
-            :shortcut-id="championDataWindowStore.settings.showShortcut"
-            @update:shortcut-id="(id) => wm.championDataWindow.setShowShortcut(id)"
+            :target-id="AkariSecondaryWindow.SHOW_WINDOW_SHORTCUT_TARGET_ID"
+            :shortcut-id="secondaryWindowStore.settings.showShortcut"
+            @update:shortcut-id="(id) => wm.secondaryWindow.setShowShortcut(id)"
           />
         </SettingsRow>
         <SettingsRow
-          setting-id="multi-window.champion-data.opacity"
-          :label="t('settings.multiWindow.championDataWindow.opacity.label')"
-          :label-description="t('settings.multiWindow.championDataWindow.opacity.description')"
+          setting-id="multi-window.secondary.opacity"
+          :label="t('settings.multiWindow.secondaryWindow.opacity.label')"
+          :label-description="t('settings.multiWindow.secondaryWindow.opacity.description')"
           :label-width="400"
         >
           <NSlider
@@ -143,29 +82,29 @@
             :max="1"
             :step="0.01"
             :format-tooltip="(v) => `${(v * 100).toFixed()}%`"
-            @update:value="(val) => wm.championDataWindow.setOpacity(val)"
-            :value="championDataWindowStore.settings.opacity"
+            @update:value="(val) => wm.secondaryWindow.setOpacity(val)"
+            :value="secondaryWindowStore.settings.opacity"
           ></NSlider>
         </SettingsRow>
         <SettingsRow
-          setting-id="multi-window.champion-data.skin-selector"
-          :label="t('settings.multiWindow.championDataWindow.showSkinSelector.label')"
+          setting-id="multi-window.secondary.skin-selector"
+          :label="t('settings.multiWindow.secondaryWindow.showSkinSelector.label')"
           :label-description="
-            t('settings.multiWindow.championDataWindow.showSkinSelector.description')
+            t('settings.multiWindow.secondaryWindow.showSkinSelector.description')
           "
           :label-width="400"
         >
           <NSwitch
             size="small"
-            :value="championDataWindowStore.settings.showSkinSelector"
-            @update:value="(val) => wm.championDataWindow.setShowSkinSelector(val)"
+            :value="secondaryWindowStore.settings.showSkinSelector"
+            @update:value="(val) => wm.secondaryWindow.setShowSkinSelector(val)"
           />
         </SettingsRow>
         <SettingsRow
-          setting-id="multi-window.champion-data.reset-position"
-          :label="t('settings.multiWindow.championDataWindow.resetWindowPosition.label')"
+          setting-id="multi-window.secondary.reset-position"
+          :label="t('settings.multiWindow.secondaryWindow.resetWindowPosition.label')"
           :label-description="
-            t('settings.multiWindow.championDataWindow.resetWindowPosition.description')
+            t('settings.multiWindow.secondaryWindow.resetWindowPosition.description')
           "
           :label-width="400"
         >
@@ -173,8 +112,8 @@
             size="small"
             type="warning"
             secondary
-            @click="() => wm.championDataWindow.resetPosition()"
-            >{{ t('settings.multiWindow.championDataWindow.resetWindowPosition.button') }}</NButton
+            @click="() => wm.secondaryWindow.resetPosition()"
+            >{{ t('settings.multiWindow.secondaryWindow.resetWindowPosition.button') }}</NButton
           >
         </SettingsRow>
       </SettingsSection>
@@ -331,34 +270,31 @@
 </template>
 
 <script setup lang="ts">
-import { ChartLineData } from '@vicons/carbon'
-import SettingsRow from '@main-window/settings-navigation/NavigableSettingsRow.vue'
-import SettingsSection from '@main-window/settings-navigation/NavigableSettingsSection.vue'
+import SettingsRow from '@renderer-shared/components/settings-navigation/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/settings-navigation/SettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import {
   AkariCdTimerWindow,
-  AkariChampionDataWindow,
+  AkariSecondaryWindow,
   WindowManagerRenderer
 } from '@renderer-shared/shards/window-manager'
 import { AkariOngoingGameWindow } from '@renderer-shared/shards/window-manager'
 import {
-  useAuxWindowStore,
   useCdTimerWindowStore,
   useOngoingGameWindowStore,
-  useChampionDataWindowStore
+  useSecondaryWindowStore
 } from '@renderer-shared/shards/window-manager/store'
 import { Window24Filled as Window24FilledIcon } from '@vicons/fluent'
 import { TranslationComponent, useTranslation } from 'i18next-vue'
-import { NButton, NIcon, NRadio, NRadioGroup, NScrollbar, NSlider, NSwitch } from 'naive-ui'
+import { NButton, NRadio, NRadioGroup, NScrollbar, NSlider, NSwitch } from 'naive-ui'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 
 const { t } = useTranslation()
 
 const as = useAppCommonStore()
-const aws = useAuxWindowStore()
-const championDataWindowStore = useChampionDataWindowStore()
+const secondaryWindowStore = useSecondaryWindowStore()
 const ogws = useOngoingGameWindowStore()
 const ctws = useCdTimerWindowStore()
 

@@ -11,7 +11,7 @@
       :value="lcs.champSelect.skinSelectorInfo?.selectedSkinId"
       @update:value="handleSetSkin"
       :placeholder="
-        t('auxWindow.skinSelection.skins', {
+        t('activity.skinSelection.skins', {
           count: skinOptions.length
         })
       "
@@ -28,7 +28,7 @@ import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
-import { useChampionDataWindowStore } from '@renderer-shared/shards/window-manager/store'
+import { useSecondaryWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { CarouselSkins } from '@shared/types/league-client/champ-select'
 import { ChampDetails } from '@shared/types/league-client/game-data'
 import { useTranslation } from 'i18next-vue'
@@ -38,7 +38,7 @@ import { computed, ref, shallowRef, watch } from 'vue'
 const { t } = useTranslation()
 const componentName = useComponentName()
 
-const ows = useChampionDataWindowStore()
+const ows = useSecondaryWindowStore()
 const lcs = useLeagueClientStore()
 
 const lc = useInstance(LeagueClientRenderer)
@@ -173,10 +173,10 @@ const handleSetSkin = async (skinId: number) => {
 
   try {
     await lc.api.champSelect.setSkin(skinId)
-    message.success(t('auxWindow.skinSelection.success'))
+    message.success(t('activity.skinSelection.success'))
   } catch (error) {
     logger.warn(componentName, 'Failed to set champion select skin', error)
-    message.warning(t('auxWindow.skinSelection.failed'))
+    message.warning(t('activity.skinSelection.failed'))
   } finally {
     isSettingSkin.value = false
   }

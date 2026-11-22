@@ -52,10 +52,6 @@ export class RendererLinkProtocol {
         this._evaluateRendererProcess(target, windowManager.mainWindow.window?.webContents, code)
         break
 
-      case 'aux-window':
-        this._evaluateRendererProcess(target, windowManager.auxWindow.window?.webContents, code)
-        break
-
       case 'cd-timer-window':
         this._evaluateRendererProcess(target, windowManager.cdTimerWindow.window?.webContents, code)
         break
@@ -68,10 +64,10 @@ export class RendererLinkProtocol {
         )
         break
 
-      case 'champion-data-window':
+      case 'secondary-window':
         this._evaluateRendererProcess(
           target,
-          windowManager.championDataWindow.window?.webContents,
+          windowManager.secondaryWindow.window?.webContents,
           code
         )
         break

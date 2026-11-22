@@ -1,0 +1,304 @@
+import {
+  type Qq101RendererContext,
+  createQq101SourceState
+} from '@secondary-window/qq101/source-context'
+import type { Qq101DataSource } from '@shared/data-sources/qq101'
+import type { Qq101ChampionDataPreferences } from '@shared/types/champion-data'
+import { createPinia, setActivePinia } from 'pinia'
+import { describe, expect, it, onTestFinished, vi } from 'vitest'
+import { effectScope } from 'vue'
+
+import { useChampionDataStore } from '../store'
+import { Qq101ChampionDataController } from './data-controller'
+import { Qq101ChampionDataLoader } from './data-loader'
+
+vi.mock('@renderer-shared/i18n', () => ({ i18next: { t: (key: string) => key } }))
+
+const signal = new AbortController().signal
+
+function createLoader(api: Partial<Qq101DataSource>) {
+  const logger = { warn: vi.fn() }
+
+  return {
+    loader: new Qq101ChampionDataLoader(
+      logger as unknown as ConstructorParameters<typeof Qq101ChampionDataLoader>[0],
+      api as Qq101DataSource
+    ),
+    logger
+  }
+}
+
+describe('QQ101 champion data loader', () => {
+  it('keeps augment rankings available when hero rankings fail', async () => {
+    const { loader } = createLoader({
+      getMayhemChampions: vi.fn().mockRejectedValue(new Error('hero snapshot unavailable')),
+      getMayhemAugments: vi
+        .fn()
+        .mockResolvedValue({ date: '20260926', augments: [{ augmentId: 2132 }] })
+    })
+    const result = await loader.loadOverview(
+      { mode: 'aram_mayhem', position: 'all', patch: null, tier: 255 },
+      signal
+    )
+    expect(result.data).toMatchObject({
+      champions: [],
+      augments: [{ augmentId: 2132 }],
+      errors: { champions: expect.stringContaining('hero snapshot unavailable') }
+    })
+  })
+
+  it('uses China calendar dates and keeps an empty daily snapshot', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-09-26T17:00:00Z'))
+    onTestFinished(() => {
+      vi.useRealTimers()
+    })
+    const getAramChampions = vi
+      .fn()
+      .mockResolvedValueOnce({ date: '20260926', champions: [] })
+      .mockResolvedValueOnce({ date: '20260925', champions: [{ championId: 22 }] })
+    const { loader } = createLoader({ getAramChampions })
+    const preferences = { mode: 'aram', position: 'all', patch: null, tier: 255 } as const
+    const result = await loader.loadOverview(preferences, signal)
+    expect(getAramChampions.mock.calls.map(([date]) => date)).toEqual(['20260926'])
+    expect(result.data.date).toBe('20260926')
+
+    getAramChampions.mockReset().mockRejectedValue(new Error('invalid schema'))
+    await expect(loader.loadOverview(preferences, signal)).rejects.toThrow('invalid schema')
+    expect(getAramChampions).toHaveBeenCalledTimes(1)
+  })
+
+  it('discards a daily snapshot when cancelled', async () => {
+    const abort = new AbortController()
+    const getAramChampions = vi.fn(async () => {
+      abort.abort()
+      return { date: '20260926', champions: [] }
+    })
+    const { loader } = createLoader({ getAramChampions })
+    await expect(
+      loader.loadOverview({ mode: 'aram', position: 'all', patch: null, tier: 255 }, abort.signal)
+    ).rejects.toMatchObject({ name: 'AbortError' })
+    expect(getAramChampions).toHaveBeenCalledTimes(1)
+  })
+
+  it('loads an unlisted hero in its resolved lane and keeps independent detail failures', async () => {
+    const positions = {
+      championId: 103,
+      date: '20260925',
+      positions: [
+        { position: 'TOP', share: 0.1 },
+        { position: 'MIDDLE', share: 0.9 }
+      ]
+    }
+    const getPositions = vi.fn().mockResolvedValue(positions)
+    const getBuild = vi.fn().mockRejectedValue(new Error('build failed'))
+    const getRunes = vi.fn().mockResolvedValue({ championId: 103, pages: [] })
+    const { loader } = createLoader({
+      getPositions,
+      getBuild,
+      getRunes,
+      getMatchups: vi.fn().mockResolvedValue(null),
+      getSynergies: vi.fn().mockResolvedValue(null),
+      getSummonerSpells: vi.fn().mockResolvedValue(null),
+      getSkillOrder: vi.fn().mockResolvedValue(null),
+      getTrend: vi.fn().mockResolvedValue(null),
+      getTierStats: vi.fn().mockResolvedValue(null),
+      getDurations: vi.fn().mockResolvedValue(null)
+    })
+    setActivePinia(createPinia())
+    const store = useChampionDataStore()
+    const state = createQq101SourceState()
+    store.qq101.enabled = true
+    state.loadedPreferences = { mode: 'ranked', position: 'all', patch: '16.19', tier: 26 }
+    const controller = new Qq101ChampionDataController(
+      {
+        logger: { warn: vi.fn() },
+        state,
+        settings: store.settings,
+        get canRequest() {
+          return store.sourceStates.qq101.canRequest
+        }
+      } as unknown as Qq101RendererContext,
+      loader,
+      { setRunes: vi.fn(), setSummonerSpells: vi.fn() }
+    )
+    await controller.selectChampion(103)
+    expect(getRunes).toHaveBeenCalledWith({ patch: '16.19', tier: 26, position: 'MIDDLE' }, 103, {
+      signal: expect.any(AbortSignal)
+    })
+    expect(state.detailView).toMatchObject({
+      mode: 'ranked',
+      championId: 103,
+      position: 'MIDDLE',
+      sections: { build: { status: 'error' }, runes: { status: 'empty' } }
+    })
+    controller.cancel()
+    setActivePinia(undefined)
+  })
+
+  it('does not overwrite each source snapshot date with the hero snapshot date', async () => {
+    const { loader } = createLoader({
+      getMayhemChampions: vi
+        .fn()
+        .mockResolvedValue({ date: '20260926', champions: [{ championId: 103 }] }),
+      getMayhemAugments: vi.fn().mockResolvedValue({ date: '20260926', augments: [] }),
+      getMayhemPairSynergies: vi.fn().mockResolvedValue({ date: '20260925', synergies: [] })
+    })
+    const result = await loader.loadOverview(
+      { mode: 'aram_mayhem', position: 'all', patch: null, tier: 255 },
+      signal
+    )
+    expect(result.data).toMatchObject({
+      date: '20260926',
+      augmentDate: '20260926'
+    })
+    const pairs = await loader.loadPairs(
+      { championId: null, firstRole: 'all', secondRole: 'all' },
+      signal
+    )
+    expect(pairs.date).toBe('20260925')
+  })
+  it.each(['remote', 'local'] as const)(
+    'loads when enabled and cancels when the %s switch is disabled',
+    async (switchKind) => {
+      setActivePinia(createPinia())
+
+      const store = useChampionDataStore()
+
+      const state = createQq101SourceState()
+      const data = { date: '20260913', patch: '16.18', champions: [{ championId: 1 }] }
+      const getTierList = vi.fn().mockResolvedValue(data)
+      const { loader, logger } = createLoader({
+        getPatches: vi.fn().mockResolvedValue([{ id: 18, name: '16.18' }]),
+        getTierList
+      })
+      const controller = new Qq101ChampionDataController(
+        {
+          logger,
+          state,
+          settings: store.settings,
+
+          get canRequest() {
+            return store.sourceStates.qq101.canRequest
+          },
+
+          ipc: {
+            call: vi.fn(async (_namespace, _method, preferences: Qq101ChampionDataPreferences) => {
+              store.settings.qq101Preferences = preferences
+            })
+          }
+        } as unknown as Qq101RendererContext,
+        loader,
+        { setRunes: vi.fn(), setSummonerSpells: vi.fn() }
+      )
+
+      const scope = effectScope()
+
+      onTestFinished(() => {
+        scope.stop()
+        setActivePinia(undefined)
+      })
+
+      const setEnabled = (enabled: boolean) => {
+        if (switchKind === 'remote') {
+          store.qq101.enabled = enabled
+        } else {
+          store.settings.sourcePreferences = {
+            enabled: { opgg: true, qq101: enabled },
+            defaultSource: 'opgg'
+          }
+        }
+      }
+      store.qq101.enabled = true
+      setEnabled(false)
+      scope.run(() => controller.setup())
+
+      expect(getTierList).not.toHaveBeenCalled()
+      setEnabled(true)
+
+      await vi.waitFor(() => expect(state.isLoading).toBe(false))
+      expect(state.overview).toEqual({ mode: 'ranked', data })
+
+      const pending = Promise.withResolvers<typeof data>()
+      getTierList.mockReturnValueOnce(pending.promise)
+      const refresh = controller.refresh()
+
+      await vi.waitFor(() => expect(getTierList).toHaveBeenCalledTimes(2))
+      const signal = getTierList.mock.calls[1][1].signal as AbortSignal
+      setEnabled(false)
+
+      expect(signal.aborted).toBe(true)
+      expect(state.isLoading).toBe(false)
+      expect(state.overview).toBeNull()
+
+      pending.resolve(data)
+      await expect(refresh).resolves.toBe(false)
+      expect(state.overview).toBeNull()
+      expect(logger.warn).not.toHaveBeenCalled()
+    }
+  )
+
+  it('keeps the latest ranked patch when its data is empty', async () => {
+    const previous = {
+      date: '20260830',
+      patch: '16.16',
+      champions: [{ championId: 1 }]
+    }
+    const getTierList = vi
+      .fn()
+      .mockResolvedValueOnce({ date: '20260831', patch: '16.17', champions: [] })
+      .mockResolvedValueOnce(previous)
+    const { loader } = createLoader({
+      getPatches: vi.fn().mockResolvedValue([
+        { id: 17, name: '16.17' },
+        { id: 16, name: '16.16' }
+      ]),
+      getTierList
+    })
+
+    const { query } = await loader.resolveQuery(
+      { mode: 'ranked', position: 'middle', patch: null, tier: 26 },
+      signal
+    )
+    const result = await loader.loadOverview(query, signal)
+
+    expect(query.patch).toBe('16.17')
+    expect(getTierList).toHaveBeenCalledTimes(1)
+    expect(result).toEqual({
+      mode: 'ranked',
+      data: { date: '20260831', patch: '16.17', champions: [] }
+    })
+    expect(getTierList).toHaveBeenLastCalledWith(
+      { patch: '16.17', tier: 26, position: 'MIDDLE' },
+      { signal }
+    )
+  })
+
+  it('keeps mayhem source sections independent and tolerates optional failures', async () => {
+    const champions = [{ championId: 2, rank: 1 }]
+    const { loader, logger } = createLoader({
+      getMayhemChampions: vi.fn().mockResolvedValue({ date: '20260830', champions }),
+      getMayhemAugments: vi.fn().mockRejectedValue(new Error('augment unavailable'))
+    })
+
+    const result = await loader.loadOverview(
+      { mode: 'aram_mayhem', position: 'all', patch: null, tier: 255 },
+      signal
+    )
+
+    expect(result).toEqual({
+      mode: 'aram_mayhem',
+      data: {
+        date: '20260830',
+        augmentDate: null,
+        champions,
+        augments: null,
+        errors: { augments: expect.stringContaining('augment unavailable') }
+      }
+    })
+    expect(logger.warn).toHaveBeenCalledWith(
+      'QQ101 Mayhem augments failed; continuing with partial data',
+      expect.stringContaining('augment unavailable')
+    )
+  })
+})

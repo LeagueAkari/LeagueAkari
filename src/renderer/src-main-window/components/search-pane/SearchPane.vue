@@ -49,7 +49,7 @@
 
             <SettingsSearch
               ref="settings-search"
-              @navigate="emit('navigateToSetting', $event)"
+              @navigate="emit('navigateToTarget', $event)"
               @close="show = false"
             />
           </NTabPane>
@@ -70,7 +70,7 @@ import { useTranslation } from 'i18next-vue'
 import { NIcon, NModal, NTabPane, NTabs, useDialog } from 'naive-ui'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
-import type { SettingsNavigationTargetId } from '@main-window/settings-navigation'
+import type { NavigationTargetAddress } from '@renderer-shared/components/settings-navigation/targets'
 
 import SettingsSearch from './SettingsSearch.vue'
 import SummonerSearch from './summoner-search/SummonerSearch.vue'
@@ -78,7 +78,7 @@ import type { SearchPanePage } from './types'
 
 const emit = defineEmits<{
   navigateToSummoner: [puuid: string, sgpServerId: string | null, setCurrent?: boolean]
-  navigateToSetting: [targetId: SettingsNavigationTargetId]
+  navigateToTarget: [address: NavigationTargetAddress]
 }>()
 
 const show = defineModel<boolean>('show', { default: false })

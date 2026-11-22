@@ -89,8 +89,7 @@ export default defineConfig({
     resolve: {
       alias: {
         '@main-window': resolve('src/renderer/src-main-window'),
-        '@aux-window': resolve('src/renderer/src-aux-window'),
-        '@champion-data-window': resolve('src/renderer/src-champion-data-window'),
+        '@secondary-window': resolve('src/renderer/src-secondary-window'),
         '@ongoing-game-window': resolve('src/renderer/src-ongoing-game-window'),
         '@cd-timer-window': resolve('src/renderer/src-cd-timer-window'),
         '@shared': resolve('src/shared'),
@@ -114,8 +113,7 @@ export default defineConfig({
       rollupOptions: {
         input: {
           mainWindow: resolve(__dirname, 'src/renderer/main-window.html'),
-          auxWindow: resolve(__dirname, 'src/renderer/aux-window.html'),
-          championDataWindow: resolve(__dirname, 'src/renderer/champion-data-window.html'),
+          secondaryWindow: resolve(__dirname, 'src/renderer/secondary-window.html'),
           ongoingGameWindow: resolve(__dirname, 'src/renderer/ongoing-game-window.html'),
           cdTimerWindow: resolve(__dirname, 'src/renderer/cd-timer-window.html')
         }

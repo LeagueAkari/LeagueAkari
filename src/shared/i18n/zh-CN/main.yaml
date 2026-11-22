@@ -2,12 +2,10 @@ tray:
   about: 关于
   settings: 设置
   quit: 退出
-  auxWindow: 小窗口
-  championDataWindow: 英雄数据窗口
+  secondaryWindow: 副窗口
   dev:
     toggleMainWindowDevtools: Toggle DevTools - 主窗口
-    toggleAuxWindowDevtools: Toggle DevTools - 小窗口
-    toggleChampionDataWindowDevtools: Toggle DevTools - 英雄数据窗口
+    toggleSecondaryWindowDevtools: Toggle DevTools - 副窗口
     toggleOngoingGameWindowDevtools: Toggle DevTools - 对局窗口
     toggleCdTimerWindowDevtools: Toggle DevTools - 计时器窗口
   adjustAllWindowPositions: 调整所有窗口的位置
@@ -73,10 +71,6 @@ auto-champ-config-main:
   auto-config-enabled: 已启用自动配置，已配置的英雄：{{names}}
 
 window-manager-main:
-  aux-window:
-    quickClose:
-      title: 不需要小窗?
-      body: 可以在设置项中 (设置 > 多窗口) 永久禁用小窗口
   download:
     dialogTitle: 保存文件
     dialogButtonLabel: 保存

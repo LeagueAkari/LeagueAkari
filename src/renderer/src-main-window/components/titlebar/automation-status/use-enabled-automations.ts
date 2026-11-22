@@ -1,3 +1,7 @@
+import type {
+  MainWindowNavigationOptions,
+  MainWindowTargetId
+} from '@renderer-shared/components/settings-navigation/targets'
 import { useAutoChampConfigStore } from '@renderer-shared/shards/auto-champ-config/store'
 import { useAutoGameflowStore } from '@renderer-shared/shards/auto-gameflow/store'
 import { useAutoMiscStore } from '@renderer-shared/shards/auto-misc/store'
@@ -5,11 +9,6 @@ import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { useTranslation } from 'i18next-vue'
 import { computed } from 'vue'
-
-import type {
-  NavigateToSettingOptions,
-  SettingsNavigationTargetId
-} from '@main-window/settings-navigation'
 
 import {
   countConfiguredChampions,
@@ -19,8 +18,8 @@ import {
 import type { AutomationStatusItem } from './types'
 
 export interface EnabledAutomation extends AutomationStatusItem {
-  readonly targetId: SettingsNavigationTargetId
-  readonly navigationOptions?: NavigateToSettingOptions
+  readonly targetId: MainWindowTargetId
+  readonly navigationOptions?: MainWindowNavigationOptions
 }
 
 export function useEnabledAutomations() {
@@ -93,7 +92,7 @@ export function useEnabledAutomations() {
     const addAutoSelectAutomation = (
       id: string,
       labelKey: string,
-      targetId: SettingsNavigationTargetId,
+      targetId: MainWindowTargetId,
       groups: typeof autoPickBanGroups
     ) => {
       const groupId = getPreferredAutoSelectGroupId(groups, autoSelect.activeGroupConfigId)

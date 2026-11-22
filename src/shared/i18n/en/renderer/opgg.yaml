@@ -114,6 +114,9 @@ opgg:
       bestChampions: Best Champions
       combination: Combination
   sources:
+    emptyTitle: No data sources available
+    disabledDescription: Data sources are turned off. Enable a source in Settings to browse champion data.
+    unavailableDescription: Champion data is currently unavailable. Please check back later.
     disabled: Disabled
     noneEnabled: No data sources enabled
     enableDescription: Enable OP.GG or 101 to view champion data.
@@ -167,6 +170,7 @@ opgg:
     dataUnavailable: The selected source does not support this mode or is unavailable
     settings:
       title: Champion Data Settings
+      back: Back to Champion Data
       sections:
         window: Window
         sources: Data Sources
@@ -177,7 +181,7 @@ opgg:
         default: Default
         defaultLabel: Set {{source}} as the default source
         enableLabel: Enable {{source}}
-        enableDescription: Show this source in the Champion Data window.
+        enableDescription: Enable champion data queries and recommendations from this source.
         defaultSource: Default Source
         defaultDescription: Used for the default champion data view and automatic rune recommendations.
         saveFailed: Failed to save data source settings. Please try again.

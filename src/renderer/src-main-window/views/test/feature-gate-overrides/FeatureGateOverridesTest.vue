@@ -88,7 +88,7 @@
 </template>
 
 <script setup lang="tsx">
-import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
+import SettingsSection from '@renderer-shared/components/settings-navigation/SettingsSection.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAkariApiStore } from '@renderer-shared/shards/akari-api/store'
 import { FeatureGatingRenderer } from '@renderer-shared/shards/feature-gating'

@@ -114,6 +114,9 @@ opgg:
       bestChampions: 适配英雄
       combination: 英雄组合
   sources:
+    emptyTitle: 暂无可用数据源
+    disabledDescription: 数据源已关闭。前往设置启用一个数据源，即可继续查看英雄数据。
+    unavailableDescription: 当前暂无可用的英雄数据，请稍后再来看看。
     disabled: 已禁用
     noneEnabled: 尚未启用数据源
     enableDescription: 启用 OP.GG 或 101，开始查看英雄数据。
@@ -167,6 +170,7 @@ opgg:
     dataUnavailable: 当前数据源不支持此模式或暂不可用
     settings:
       title: 英雄数据设置
+      back: 返回英雄数据
       sections:
         window: 窗口设置
         sources: 数据源
@@ -177,7 +181,7 @@ opgg:
         default: 默认
         defaultLabel: 将 {{source}} 设为默认来源
         enableLabel: 启用 {{source}}
-        enableDescription: 在英雄数据窗口中显示此来源。
+        enableDescription: 启用此来源的英雄数据查询和推荐。
         defaultSource: 默认数据源
         defaultDescription: 用于默认显示的英雄数据与自动符文推荐。
         saveFailed: 保存数据源设置失败，请重试

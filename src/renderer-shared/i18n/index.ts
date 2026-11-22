@@ -1,6 +1,6 @@
 import commonEn from '@shared/i18n/en/common.yaml'
+import activityEn from '@shared/i18n/en/renderer/activity.yaml'
 import automationEn from '@shared/i18n/en/renderer/automation.yaml'
-import auxWindowEn from '@shared/i18n/en/renderer/aux-window.yaml'
 import cdTimerEn from '@shared/i18n/en/renderer/cd-timer.yaml'
 import gameAssetsEn from '@shared/i18n/en/renderer/game-assets.yaml'
 import leagueClientEn from '@shared/i18n/en/renderer/league-client.yaml'
@@ -16,8 +16,8 @@ import shellEn from '@shared/i18n/en/renderer/shell.yaml'
 import tabBarEn from '@shared/i18n/en/renderer/tab-bar.yaml'
 import toolkitEn from '@shared/i18n/en/renderer/toolkit.yaml'
 import commonZhCN from '@shared/i18n/zh-CN/common.yaml'
+import activityZhCN from '@shared/i18n/zh-CN/renderer/activity.yaml'
 import automationZhCN from '@shared/i18n/zh-CN/renderer/automation.yaml'
-import auxWindowZhCN from '@shared/i18n/zh-CN/renderer/aux-window.yaml'
 import cdTimerZhCN from '@shared/i18n/zh-CN/renderer/cd-timer.yaml'
 import gameAssetsZhCN from '@shared/i18n/zh-CN/renderer/game-assets.yaml'
 import leagueClientZhCN from '@shared/i18n/zh-CN/renderer/league-client.yaml'
@@ -62,7 +62,7 @@ const rendererEn = mergeRendererResources(
   toolkitEn,
   gameAssetsEn,
   ongoingGameEn,
-  auxWindowEn,
+  activityEn,
   opggEn,
   qq101En,
   cdTimerEn,
@@ -81,7 +81,7 @@ const rendererZhCN = mergeRendererResources(
   toolkitZhCN,
   gameAssetsZhCN,
   ongoingGameZhCN,
-  auxWindowZhCN,
+  activityZhCN,
   opggZhCN,
   qq101ZhCN,
   cdTimerZhCN,

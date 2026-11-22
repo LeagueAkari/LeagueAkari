@@ -174,8 +174,8 @@ import {
 } from 'naive-ui'
 import { ref } from 'vue'
 
-import SettingsRow from '../../SettingsRow.vue'
-import SettingsSection from '../../SettingsSection.vue'
+import SettingsRow from '@renderer-shared/components/settings-navigation/SettingsRow.vue'
+import SettingsSection from '@renderer-shared/components/settings-navigation/SettingsSection.vue'
 import StoryPanel from '../StoryPanel.vue'
 
 // Storybook 没有真实的 i18n 上下文，提供一个最小化字典模拟翻译键，让示例更贴近真实页面写法。

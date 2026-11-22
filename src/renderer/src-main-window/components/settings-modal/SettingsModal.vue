@@ -162,6 +162,14 @@ const waitUntilEntered = (signal: AbortSignal) => {
 useAkariNavigationStep<SettingsTabName>({
   key: SETTINGS_MODAL_NAVIGATION_STEP_KEY,
   activate: async (payload, { signal }) => {
+    show.value = true
+    await nextTick()
+    await waitUntilEntered(signal)
+
+    if (signal.aborted) {
+      return
+    }
+
     if (tabName.value === payload) {
       await nextTick()
       return undefined
@@ -181,8 +189,6 @@ useAkariNavigationStep<SettingsTabName>({
     return undefined
   }
 })
-
-defineExpose({ waitUntilEntered })
 
 const as = useAppCommonStore()
 

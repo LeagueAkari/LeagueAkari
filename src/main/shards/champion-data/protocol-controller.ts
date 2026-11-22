@@ -2,6 +2,7 @@ import { createChampionDataHttpClient } from '@main/utils/champion-data-http'
 import { AKARI_PROXY_REQUEST_ID_HEADER } from '@shared/akari-protocol/proxy-request-cancellation'
 import { OpggHttpApiAxiosHelper } from '@shared/http-api-axios-helper/opgg'
 import { Qq101HttpApiAxiosHelper } from '@shared/http-api-axios-helper/qq101'
+import { isChampionDataSourceAllowed } from '@shared/shards/champion-data/source-preferences'
 import { type AxiosInstance, type AxiosResponse, isAxiosError } from 'axios'
 
 import type { AkariProtocolMain } from '../akari-protocol'
@@ -46,7 +47,9 @@ export class ChampionDataProtocolController {
 
   private _registerSource(domain: string, gate: string, http: AxiosInstance) {
     this._protocol.registerDomain(domain, async (uri, request, context) => {
-      if (!this._context.featureGating.getEvaluation(gate, false).enabled) {
+      const evaluation = this._context.featureGating.getEvaluation(gate, true)
+
+      if (!isChampionDataSourceAllowed(evaluation)) {
         return new Response('Data source is disabled', { status: 403 })
       }
 

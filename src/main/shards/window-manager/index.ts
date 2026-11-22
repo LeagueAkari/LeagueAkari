@@ -12,13 +12,12 @@ import { MobxUtilsMain } from '../mobx-utils'
 import { SelfUpdateMain } from '../self-update'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
-import { AkariAuxWindow } from './aux-window/window'
 import { AkariCdTimerWindow } from './cd-timer-window/windows'
-import { AkariChampionDataWindow } from './champion-data-window/window'
 import { WINDOW_MANAGER_MAIN_NAMESPACE, type WindowManagerMainContext } from './context'
 import { WindowManagerLifecycleController } from './lifecycle-controller'
 import { AkariMainWindow } from './main-window/window'
 import { AkariOngoingGameWindow } from './ongoing-game-window/window'
+import { AkariSecondaryWindow } from './secondary-window/window'
 import { WindowManagerSettings, WindowManagerState } from './state'
 
 @Shard(WindowManagerMain.id)
@@ -34,8 +33,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   public readonly state = new WindowManagerState()
 
   public readonly mainWindow: AkariMainWindow
-  public readonly auxWindow: AkariAuxWindow
-  public readonly championDataWindow: AkariChampionDataWindow
+  public readonly secondaryWindow: AkariSecondaryWindow
   public readonly ongoingGameWindow: AkariOngoingGameWindow
   public readonly cdTimerWindow: AkariCdTimerWindow
 
@@ -67,14 +65,12 @@ export class WindowManagerMain implements IAkariShardInitDispose {
 
     this._context = this.getContext()
     this.mainWindow = new AkariMainWindow(this._context)
-    this.auxWindow = new AkariAuxWindow(this._context)
-    this.championDataWindow = new AkariChampionDataWindow(this._context)
+    this.secondaryWindow = new AkariSecondaryWindow(this._context)
     this.ongoingGameWindow = new AkariOngoingGameWindow(this._context)
     this.cdTimerWindow = new AkariCdTimerWindow(this._context)
     this._lifecycleController = new WindowManagerLifecycleController(this._context, {
       mainWindow: this.mainWindow,
-      auxWindow: this.auxWindow,
-      championDataWindow: this.championDataWindow,
+      secondaryWindow: this.secondaryWindow,
       ongoingGameWindow: this.ongoingGameWindow,
       cdTimerWindow: this.cdTimerWindow
     })

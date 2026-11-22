@@ -135,7 +135,7 @@ import {
 } from 'vue'
 
 import { PlayerTabsRenderer } from '@main-window/shards/player-tabs'
-import SettingsSection from '@main-window/settings-navigation/NavigableSettingsSection.vue'
+import SettingsSection from '@renderer-shared/components/settings-navigation/SettingsSection.vue'
 
 interface RecordType {
   selfPuuid: string

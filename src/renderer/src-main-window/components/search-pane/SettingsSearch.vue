@@ -33,7 +33,7 @@
         <div v-bind="virtualWrapperProps" role="listbox">
           <button
             v-for="{ data: result, index } in virtualResults"
-            :key="result.targetId"
+            :key="`${result.address.window}:${result.address.targetId}`"
             type="button"
             :class="[
               styles['settings-search__result'],
@@ -45,12 +45,12 @@
             :title="result.description || undefined"
             role="option"
             @mousedown.prevent
-            @click="selectResult(result.targetId)"
+            @click="selectResult(result.address)"
           >
             <span class="flex min-w-0 flex-1 items-center gap-1">
               <template
                 v-for="(ancestorLabel, ancestorIndex) in result.ancestorLabels"
-                :key="`${result.targetId}:${ancestorIndex}`"
+                :key="ancestorIndex"
               >
                 <span class="max-w-40 truncate text-xs text-black/45 dark:text-white/45">
                   {{ ancestorLabel }}
@@ -102,20 +102,25 @@ import { useCompositionAwareInput } from '@renderer-shared/composables/useCompos
 import { useVirtualList } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { NEmpty, NIcon, NInput, NScrollbar, type InputInst } from 'naive-ui'
-import { computed, nextTick, ref, useCssModule, useTemplateRef, watch, watchEffect } from 'vue'
+import {
+  computed,
+  nextTick,
+  ref,
+  toRaw,
+  useCssModule,
+  useTemplateRef,
+  watch,
+  watchEffect
+} from 'vue'
 
 import {
-  MAIN_WINDOW_PAGE_LABEL_KEYS,
-  MAIN_WINDOW_SECTION_LABEL_KEYS,
-  SETTINGS_TAB_LABEL_KEYS,
-  STORAGE_SETTINGS_TAB_LABEL_KEYS,
-  getSettingsNavigationTarget,
-  searchableSettingsNavigationTargets,
-  type SettingsNavigationTargetId
-} from '@main-window/settings-navigation/registry'
+  type NavigationTargetAddress,
+  getSearchableNavigationTargets
+} from '@renderer-shared/components/settings-navigation/targets'
+import { useSecondaryWindowStore } from '@renderer-shared/shards/window-manager/store'
 
 interface SettingsNavigationSearchResult {
-  targetId: SettingsNavigationTargetId
+  address: NavigationTargetAddress
   label: string
   description: string
   ancestorLabels: string[]
@@ -128,11 +133,12 @@ const RESULT_ITEM_HEIGHT = 36
 const RESULTS_SCROLL_PADDING = 6
 
 const emit = defineEmits<{
-  navigate: [targetId: SettingsNavigationTargetId]
+  navigate: [address: NavigationTargetAddress]
   close: []
 }>()
 
 const { t } = useTranslation()
+const secondaryWindow = useSecondaryWindowStore()
 const styles = useCssModule()
 const activeIndex = ref(0)
 const searchInput = useTemplateRef<InputInst>('search-input')
@@ -154,48 +160,32 @@ const {
 const normalizeSearchText = (value: string) => value.trim().toLocaleLowerCase()
 
 const allResults = computed<SettingsNavigationSearchResult[]>(() =>
-  searchableSettingsNavigationTargets.map((target) => {
-    const parent = target.parentId ? getSettingsNavigationTarget(target.parentId) : undefined
+  getSearchableNavigationTargets(secondaryWindow.settings.enabled).map((target) => {
     const routeParts: string[] = []
 
-    if ('tab' in target.route) {
-      routeParts.push(t(SETTINGS_TAB_LABEL_KEYS[target.route.tab]))
+    for (const key of target.groupKeys) {
+      const label = t(key)
+      const segments = routeParts.flatMap((part) => part.split('/').map((item) => item.trim()))
 
-      if (target.route.tab === 'storage') {
-        routeParts.push(t(STORAGE_SETTINGS_TAB_LABEL_KEYS[target.route.subTab]))
-      }
-    } else {
-      routeParts.push(t(MAIN_WINDOW_PAGE_LABEL_KEYS[target.route.name]))
-      routeParts.push(
-        t(MAIN_WINDOW_SECTION_LABEL_KEYS[`${target.route.name}.${target.route.section}`])
-      )
-    }
-
-    if (parent) {
-      const parentLabel = t(parent.labelKey)
-      const existingSegments = routeParts.flatMap((part) =>
-        part.split('/').map((item) => item.trim())
-      )
-
-      if (!existingSegments.includes(parentLabel)) {
-        routeParts.push(parentLabel)
+      if (!segments.includes(label)) {
+        routeParts.push(label)
       }
     }
 
     const label = t(target.labelKey)
     const description = target.descriptionKey ? t(target.descriptionKey) : ''
     const keywords = target.keywordKeys?.map((key) => t(key)).join(' ') ?? ''
-    const routeLabel = [...new Set(routeParts)].join(' / ')
+    const routeLabel = routeParts.join(' / ')
 
     return {
-      targetId: target.id as SettingsNavigationTargetId,
+      address: target.address,
       label,
       description,
       ancestorLabels: routeParts,
       normalizedLabel: normalizeSearchText(label),
       normalizedRoute: normalizeSearchText(routeLabel),
       searchText: normalizeSearchText(
-        [label, description, keywords, routeLabel, target.id].join(' ')
+        [label, description, keywords, routeLabel, target.address.targetId].join(' ')
       )
     }
   })
@@ -281,14 +271,14 @@ const moveActiveResult = (offset: number) => {
   scrollActiveResultIntoView()
 }
 
-const selectResult = (targetId: SettingsNavigationTargetId) => {
-  emit('navigate', targetId)
+const selectResult = (address: NavigationTargetAddress) => {
+  emit('navigate', toRaw(address))
 }
 
 const selectActiveResult = () => {
   const result = filteredResults.value[activeIndex.value]
   if (result) {
-    selectResult(result.targetId)
+    selectResult(result.address)
   }
 }
 

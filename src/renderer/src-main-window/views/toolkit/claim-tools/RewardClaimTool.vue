@@ -52,7 +52,7 @@
 </template>
 
 <script lang="tsx" setup>
-import SettingsSection from '@renderer-shared/components/SettingsSection.vue'
+import SettingsSection from '@renderer-shared/components/settings-navigation/SettingsSection.vue'
 import { useComponentName } from '@renderer-shared/composables/useComponentName'
 import { useActivated } from '@renderer-shared/composables/useActivated'
 import { useInstance } from '@renderer-shared/shards'
