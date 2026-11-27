@@ -4,6 +4,7 @@ default: 默认
 yes: 是
 no: 否
 confirm: 确认
+cancel: 取消
 na: N/A
 
 summonerPlaceholder: 召唤师 {{index}}

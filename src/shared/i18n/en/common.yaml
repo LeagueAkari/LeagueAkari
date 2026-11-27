@@ -4,6 +4,7 @@ default: Default
 yes: yes
 no: no
 confirm: Confirm
+cancel: Cancel
 na: N/A
 
 summonerPlaceholder: Summoner {{index}}

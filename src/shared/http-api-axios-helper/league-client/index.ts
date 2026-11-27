@@ -2,6 +2,7 @@ import { AxiosInstance } from 'axios'
 
 import { ChallengesHttpApi } from './challenges'
 import { ChampSelectHttpApi } from './champ-select'
+import { ChampionInventoryHttpApi } from './champion-inventory'
 import { ChampionMasteryHttpApi } from './champion-mastery'
 import { ChatHttpApi } from './chat'
 import { EndOfGameHttpApi } from './end-of-game'
@@ -41,6 +42,7 @@ import { SummonerHttpApi } from './summoner'
  */
 export class LeagueClientHttpApiAxiosHelper {
   public readonly champSelect: ChampSelectHttpApi
+  public readonly championInventory: ChampionInventoryHttpApi
   public readonly championMastery: ChampionMasteryHttpApi
   public readonly chat: ChatHttpApi
   public readonly entitlements: EntitlementsHttpApi
@@ -78,6 +80,7 @@ export class LeagueClientHttpApiAxiosHelper {
 
   constructor(private _http: AxiosInstance) {
     this.champSelect = new ChampSelectHttpApi(this._http)
+    this.championInventory = new ChampionInventoryHttpApi(this._http)
     this.championMastery = new ChampionMasteryHttpApi(this._http)
     this.chat = new ChatHttpApi(this._http)
     this.entitlements = new EntitlementsHttpApi(this._http)

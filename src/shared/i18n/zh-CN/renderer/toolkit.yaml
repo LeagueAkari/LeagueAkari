@@ -92,6 +92,112 @@ toolkit:
     claim-tools: 领取工具
     friend-tools: 好友工具
     loot-tools: 战利品工具
+    aram-tools: 快捷购置
+  aramTools:
+    title: 快捷购置
+    notConnected: 未连接 League Client，请先在「客户端 / 游戏端」标签页完成连接。
+    roles:
+      FIGHTER: 战士
+      TANK: 坦克
+      MAGE: 法师
+      ASSASSIN: 刺客
+      MARKSMAN: 射手
+      SUPPORT: 辅助
+    summoner:
+      noData: 未获取到召唤师信息
+      copy: 复制召唤师名称
+      copied: 已复制召唤师名称
+      copyFailed: 复制失败
+    roleFilter:
+      title: 英雄定位筛选
+      all: 全部定位
+    priceFilter:
+      title: 价格定位筛选
+      all: 全部价格
+      unknown: 价格未知
+    weekFree:
+      title: 大乱斗周免
+      refresh: 更新周免
+      count: '共 {{n}} 位'
+      syncedAt: '同步于 {{time}}'
+      neverSynced: 尚未同步
+      sourceRemote: 官方数据
+      sourceCache: 本地缓存
+      sourceClient: 客户端周免
+      addPlaceholder: 添加周免英雄
+      empty: 暂无周免英雄
+      remove: 移除
+      reset: 恢复默认
+      syncSuccess: '已更新本周大乱斗周免（{{n}} 位）'
+      syncFailed: 更新失败，已回退到上次缓存
+    presets:
+      title: 预设管理
+      namePlaceholder: 预设名称
+      create: 新建
+      remove: 删除
+      saveSelection: 保存当前勾选
+      loadSelection: 读取预设勾选
+      saveSuccess: '已保存 {{n}} 个英雄到预设'
+      removeConfirmTitle: 删除预设
+      removeConfirm: 确定删除预设「{{name}}」？
+    presetList:
+      title: 预设目录
+      empty: 暂无预设
+      championCount: '{{n}} 个英雄'
+    assets:
+      refresh: 刷新
+      owned: 已拥有英雄
+      unowned: 未拥有英雄
+      count: '{{n}} 个'
+      balance: '余额 BE: {{n}}'
+      refreshSuccess: 资产已刷新
+      refreshFailed: 刷新失败：{{reason}}
+    panel:
+      title: 英雄面板
+      summary: 共 {{total}} 位 · 已勾选 {{selected}}
+      sort: 排序
+      sortDefault: 英雄排序筛选
+      sortByName: 名称排序
+      sortPriceAsc: BE 升序
+      sortPriceDesc: BE 降序
+      showRiftFree: 显示峡谷周免
+      showAramFree: 显示乱斗周免
+      showOwned: 显示已拥有
+      selectAll: 全选当前页
+      clearSelection: 取消勾选
+      deselectRiftFree: 取消峡谷周免
+      deselectAramFree: 取消乱斗周免
+      empty: 没有符合条件的英雄
+      owned: 已拥有
+      freeRift: 峡谷周免
+      freeAram: 乱斗周免
+      priceUnknown: 价格未知
+      essenceUnit: BE
+    cart:
+      title: 购物车
+      empty: 未选择英雄
+      remove: 移除
+      selectedCount: '已勾选 {{n}} 位英雄'
+      totalCost: '消耗 {{n}} BE'
+      balance: '余额 {{n}} BE'
+      insufficient: 余额不足
+      purchase: 购买
+      needSelect: 请先勾选要购买的英雄
+      finished: '批量购买完成：成功 {{success}}，失败 {{failed}}'
+      success: 成功
+      failed: 失败
+    pluginStatus:
+      title: 插件状态
+      ready: 就绪 / 等待购买
+      purchasing: 正在批量购置...
+    progress:
+      label: '购买总进度 ({{n}}%)'
+    purchaseLog:
+      title: 购买进度日志
+      empty: 暂无购买记录
+      success: 购买成功
+      failure: '购买失败：{{reason}}'
+      remaining: '剩余 {{n}} 个英雄'
   championBench:
     title: 英雄选择台
     reroll: 重随
