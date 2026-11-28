@@ -1,4 +1,5 @@
 import type { GtimgApi } from '@shared/data-sources/gtimg'
+import type { LolQqWeekFreeApi } from '@shared/data-sources/lol-qq-weekfree'
 import type { OpggHttpApiAxiosHelper } from '@shared/http-api-axios-helper/opgg'
 
 import type { AkariLogger } from '../logger-factory'
@@ -18,4 +19,5 @@ export interface ExtraAssetsMainContext {
   opgg: ExtraAssetsStateOpgg
   gtimgApi: GtimgApi
   opggApi: OpggHttpApiAxiosHelper
+  weekFreeApi: LolQqWeekFreeApi
 }

@@ -92,6 +92,112 @@ toolkit:
     claim-tools: Claim Tools
     friend-tools: Friend Tools
     loot-tools: Loot Tools
+    aram-tools: Quick Purchase
+  aramTools:
+    title: Quick Purchase
+    notConnected: League Client is not connected. Connect it in the "League Client / Game Client" tab first.
+    roles:
+      FIGHTER: Fighter
+      TANK: Tank
+      MAGE: Mage
+      ASSASSIN: Assassin
+      MARKSMAN: Marksman
+      SUPPORT: Support
+    summoner:
+      noData: No summoner data
+      copy: Copy summoner name
+      copied: Summoner name copied
+      copyFailed: Copy failed
+    roleFilter:
+      title: Role Filter
+      all: All roles
+    priceFilter:
+      title: Price Filter
+      all: All prices
+      unknown: Unknown price
+    weekFree:
+      title: ARAM Free Rotation
+      refresh: Update
+      count: '{{n}} total'
+      syncedAt: 'Synced at {{time}}'
+      neverSynced: Not synced yet
+      sourceRemote: Official data
+      sourceCache: Local cache
+      sourceClient: Client rotation
+      addPlaceholder: Add a champion
+      empty: No free champions
+      remove: Remove
+      reset: Reset
+      syncSuccess: 'ARAM free rotation updated ({{n}})'
+      syncFailed: Update failed, fell back to the last cache
+    presets:
+      title: Preset Management
+      namePlaceholder: Preset name
+      create: New
+      remove: Delete
+      saveSelection: Save selection
+      loadSelection: Load selection
+      saveSuccess: 'Saved {{n}} champions to the preset'
+      removeConfirmTitle: Delete Preset
+      removeConfirm: 'Delete preset "{{name}}"?'
+    presetList:
+      title: Preset Directory
+      empty: No presets yet
+      championCount: '{{n}} champions'
+    assets:
+      refresh: Refresh
+      owned: Owned champions
+      unowned: Unowned champions
+      count: '{{n}}'
+      balance: 'Balance BE: {{n}}'
+      refreshSuccess: Assets refreshed
+      refreshFailed: 'Refresh failed: {{reason}}'
+    panel:
+      title: Champions
+      summary: '{{total}} total · {{selected}} selected'
+      sort: Sort
+      sortDefault: Hero Sort Filter
+      sortByName: Sort by Name
+      sortPriceAsc: BE ascending
+      sortPriceDesc: BE descending
+      showRiftFree: Show Rift free
+      showAramFree: Show ARAM free
+      showOwned: Show owned
+      selectAll: Select current page
+      clearSelection: Clear
+      deselectRiftFree: Deselect Rift free
+      deselectAramFree: Deselect ARAM free
+      empty: No champions match the filters
+      owned: Owned
+      freeRift: Rift free
+      freeAram: ARAM free
+      priceUnknown: Unknown
+      essenceUnit: BE
+    cart:
+      title: Cart
+      empty: No champions selected
+      remove: Remove
+      selectedCount: '{{n}} champions selected'
+      totalCost: 'Cost {{n}} BE'
+      balance: 'Balance {{n}} BE'
+      insufficient: Insufficient balance
+      purchase: Purchase
+      needSelect: Select the champions to purchase first
+      finished: 'Bulk purchase finished: {{success}} succeeded, {{failed}} failed'
+      success: Success
+      failed: Failed
+    pluginStatus:
+      title: Plugin Status
+      ready: Ready / Waiting for purchase
+      purchasing: Batch purchasing...
+    progress:
+      label: 'Purchase progress ({{n}}%)'
+    purchaseLog:
+      title: Purchase Log
+      empty: No purchase records yet
+      success: Purchased
+      failure: 'Failed: {{reason}}'
+      remaining: '{{n}} champions left'
   championBench:
     title: Champion Bench
     reroll: Reroll

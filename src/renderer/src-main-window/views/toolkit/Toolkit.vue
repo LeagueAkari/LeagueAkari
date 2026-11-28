@@ -17,6 +17,7 @@ import { computed } from 'vue'
 
 import TabbedPage, { TabConfig } from '@main-window/components/TabbedPage.vue'
 
+import AramTools from './aram-tools/AramTools.vue'
 import ClaimTools from './claim-tools/ClaimTools.vue'
 import Client from './client/Client.vue'
 import FriendTools from './friend-tools/FriendTools.vue'
@@ -64,6 +65,12 @@ const tabs = computed<TabConfig[]>(() => [
     name: t('toolkit.home.claim-tools'),
     icon: GiftFilled,
     component: ClaimTools
+  },
+  {
+    key: 'aram-tools',
+    name: t('toolkit.home.aram-tools'),
+    icon: Box,
+    component: AramTools
   },
   ...(import.meta.env.DEV
     ? [

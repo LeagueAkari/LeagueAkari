@@ -1,7 +1,9 @@
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { GtimgApi } from '@shared/data-sources/gtimg'
+import { LolQqWeekFreeApi } from '@shared/data-sources/lol-qq-weekfree'
 import { OpggHttpApiAxiosHelper } from '@shared/http-api-axios-helper/opgg'
 
+import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { NetworkMain } from '../network'
@@ -35,6 +37,7 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
 
   constructor(
     private readonly _network: NetworkMain,
+    private readonly _ipc: AkariIpcMain,
     _loggerFactory: LoggerFactoryMain,
     private readonly _mobxUtils: MobxUtilsMain
   ) {
@@ -51,7 +54,12 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
           headers: { 'User-Agent': GtimgApi.USER_AGENT }
         })
       ),
-      opggApi: new OpggHttpApiAxiosHelper(this._network.createAxiosClient())
+      opggApi: new OpggHttpApiAxiosHelper(this._network.createAxiosClient()),
+      weekFreeApi: new LolQqWeekFreeApi(
+        this._network.createAxiosClient({
+          headers: { 'User-Agent': LolQqWeekFreeApi.USER_AGENT }
+        })
+      )
     }
     this._refreshController = new ExtraAssetsRefreshController(this._context)
   }
@@ -59,6 +67,21 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
   async onInit() {
     this._mobxUtils.propSync(ExtraAssetsMain.id, 'gtimg', this.gtimg, ['heroList', 'kiwiAugments'])
     this._mobxUtils.propSync(ExtraAssetsMain.id, 'opgg', this.opgg, ['aramBalance'])
+
+    // 渲染进程可主动触发一次英雄列表（含大乱斗周免）刷新
+    this._ipc.onCall(ExtraAssetsMain.id, 'refreshGtimgHeroList', () =>
+      this._refreshController.refreshGtimgHeroList()
+    )
+
+    // 渲染进程可主动触发一次官方大乱斗免费英雄名单刷新
+    this._ipc.onCall(ExtraAssetsMain.id, 'refreshAramFreeChampions', () =>
+      this._refreshController.refreshAramFreeChampions()
+    )
+
+    // 渲染进程可主动触发一次召唤师峡谷每周免费英雄名单刷新
+    this._ipc.onCall(ExtraAssetsMain.id, 'refreshRiftFreeChampions', () =>
+      this._refreshController.refreshRiftFreeChampions()
+    )
 
     this._refreshController.start()
   }
